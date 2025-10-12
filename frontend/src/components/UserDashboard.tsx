@@ -11,10 +11,7 @@ interface UserDashboardProps {
   userEmail?: string | null;
 }
 
-export function UserDashboard({
-  displayName,
-  userEmail,
-}: UserDashboardProps) {
+export function UserDashboard({ displayName, userEmail }: UserDashboardProps) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [tutorialOpen, setTutorialOpen] = useState(false);
   const [tutorialStep, setTutorialStep] = useState(0);
@@ -81,10 +78,6 @@ export function UserDashboard({
             <div className={styles.brandLogo}>
               <Logo />
             </div>
-            <div className={styles.brandText}>
-              <span className={styles.brandGreeting}>Ciao,</span>
-              <span className={styles.brandName}>{displayName}</span>
-            </div>
           </div>
           <button
             type="button"
@@ -105,11 +98,7 @@ export function UserDashboard({
           >
             <ul className={styles.menuList}>
               <li className={styles.menuItem}>
-                <Link
-                  href="/"
-                  className={styles.menuLink}
-                  onClick={closeMenu}
-                >
+                <Link href="/" className={styles.menuLink} onClick={closeMenu}>
                   Dashboard
                 </Link>
               </li>
@@ -133,9 +122,7 @@ export function UserDashboard({
                 </SignOutButton>
               </li>
             </ul>
-            {userEmail ? (
-              <p className={styles.menuEmail}>{userEmail}</p>
-            ) : null}
+            {userEmail ? <p className={styles.menuEmail}>{userEmail}</p> : null}
           </nav>
         </div>
       </header>
@@ -226,9 +213,7 @@ export function UserDashboard({
               <button
                 type="button"
                 className={styles.tutorialDialogSecondary}
-                onClick={
-                  tutorialStep === 0 ? closeTutorial : goToPreviousStep
-                }
+                onClick={tutorialStep === 0 ? closeTutorial : goToPreviousStep}
               >
                 {tutorialStep === 0 ? "Esci" : "Indietro"}
               </button>
