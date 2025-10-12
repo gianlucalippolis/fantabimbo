@@ -8,7 +8,7 @@ export const Logo = () => {
         src={logo}
         alt="Fantabimbo"
         priority
-        style={{ height: 200, width: "auto" }}
+        style={{ height: 120, width: "auto" }}
       />
     </div>
   );
