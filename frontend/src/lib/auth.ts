@@ -85,7 +85,7 @@ async function fetchStrapiUserProfile(jwt: string): Promise<StrapiUserProfile> {
 }
 
 export const authOptions: NextAuthOptions = {
-  secret: process.env.STRAPI_API_TOKEN,
+  secret: process.env.NEXT_PUBLIC_STRAPI_API_TOKEN,
   session: {
     strategy: "jwt",
   },
@@ -97,12 +97,14 @@ export const authOptions: NextAuthOptions = {
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
-        if (!credentials?.identifier || !credentials?.password) {
+        const identifier = credentials?.identifier;
+
+        if (!identifier || !credentials?.password) {
           throw new Error("Email e password sono obbligatori");
         }
 
         const { jwt, user } = await authenticateWithStrapi(
-          credentials?.identifier,
+          identifier,
           credentials.password
         );
 
@@ -173,5 +175,22 @@ export const authOptions: NextAuthOptions = {
 
       return token;
     },
+    // async session({ session, token }) {
+    //   const jwt = (token as Record<string, unknown>).jwt as string | undefined;
+    //   const id = (token as Record<string, unknown>).id as
+    //     | number
+    //     | string
+    //     | undefined;
+
+    //   if (session.user && token) {
+    //     session.user.name = token.name as string | undefined;
+    //     session.user.email = token.email as string | undefined;
+    //     session.user.image = (token.picture as string | null) ?? undefined;
+    //     (session as Record<string, unknown>).jwt = jwt;
+    //     (session as Record<string, unknown>).id = id;
+    //   }
+
+    //   return session;
+    // },
   },
 };
