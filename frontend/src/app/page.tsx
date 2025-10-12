@@ -12,7 +12,9 @@ export const revalidate = 0;
 
 export default async function Home() {
   const { apiUrl: strapiUrl } = getStrapiConfig({ required: false });
-  const session = await getServerSession(authOptions);
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const session: any = await getServerSession(authOptions);
 
   if (!session) {
     return (
@@ -48,9 +50,7 @@ export default async function Home() {
   let displayName =
     session?.user?.name?.trim() || userEmail?.split("@")[0] || "Allenatore";
 
-  const strapiJwt = (session as Record<string, unknown>)?.jwt as
-    | string
-    | undefined;
+  const strapiJwt = session?.jwt as string | undefined;
   let requiresProfileCompletion = false;
 
   debugger;

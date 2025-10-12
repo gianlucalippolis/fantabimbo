@@ -93,7 +93,6 @@ export default function CompleteProfile({
         return;
       }
 
-      debugger;
       const response = await fetch(
         `${strapiApiUrl}/api/users/` + numericUserId,
         {
@@ -234,7 +233,13 @@ export const getServerSideProps: GetServerSideProps<
   CompleteProfileProps
 > = async (context) => {
   const { apiUrl: strapiUrl } = getStrapiConfig({ required: false });
-  const session = await getServerSession(context.req, context.res, authOptions);
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const session: any = await getServerSession(
+    context.req,
+    context.res,
+    authOptions
+  );
 
   if (!session) {
     return {
@@ -245,9 +250,7 @@ export const getServerSideProps: GetServerSideProps<
     };
   }
 
-  const strapiJwt = (session as Record<string, unknown>).jwt as
-    | string
-    | undefined;
+  const strapiJwt = session?.jwt as string | undefined;
 
   let firstName = "";
   let lastName = "";
