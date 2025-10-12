@@ -1,8 +1,21 @@
-import CredentialsProvider from "next-auth/providers/credentials";
 import type { NextAuthOptions } from "next-auth";
+import type { Session } from "next-auth";
+import CredentialsProvider from "next-auth/providers/credentials";
+import type { JWT } from "next-auth/jwt";
 import { getStrapiConfig } from "./env";
 
 const { apiUrl: STRAPI_API_URL } = getStrapiConfig();
+
+type ExtendedJWT = JWT & {
+  jwt?: string;
+  id?: number | string;
+  profileFetchedAt?: number;
+};
+
+type ExtendedSession = Session & {
+  jwt?: string;
+  id?: number | string;
+};
 
 interface StrapiAuthResponse {
   jwt: string;
@@ -126,7 +139,7 @@ export const authOptions: NextAuthOptions = {
   ],
   callbacks: {
     async jwt({ token, user }) {
-      const mutableToken = token as Record<string, unknown>;
+      const mutableToken = token as ExtendedJWT;
 
       if (user) {
         const strapiUser = user as StrapiAuthorizedUser;
@@ -175,22 +188,28 @@ export const authOptions: NextAuthOptions = {
 
       return token;
     },
-    // async session({ session, token }) {
-    //   const jwt = (token as Record<string, unknown>).jwt as string | undefined;
-    //   const id = (token as Record<string, unknown>).id as
-    //     | number
-    //     | string
-    //     | undefined;
+    async session({ session, token }) {
+      const extendedToken = token as ExtendedJWT;
+      const extendedSession = session as ExtendedSession;
 
-    //   if (session.user && token) {
-    //     session.user.name = token.name as string | undefined;
-    //     session.user.email = token.email as string | undefined;
-    //     session.user.image = (token.picture as string | null) ?? undefined;
-    //     (session as Record<string, unknown>).jwt = jwt;
-    //     (session as Record<string, unknown>).id = id;
-    //   }
+      const jwt = extendedToken.jwt;
+      const id = extendedToken.id;
 
-    //   return session;
-    // },
+      if (extendedSession.user) {
+        extendedSession.user.name =
+          typeof token.name === "string" ? token.name : extendedSession.user.name;
+        extendedSession.user.email =
+          typeof token.email === "string" ? token.email : extendedSession.user.email;
+        extendedSession.user.image =
+          typeof token.picture === "string"
+            ? token.picture
+            : extendedSession.user.image ?? undefined;
+      }
+
+      extendedSession.jwt = jwt;
+      extendedSession.id = id;
+
+      return extendedSession;
+    },
   },
 };

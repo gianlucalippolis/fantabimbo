@@ -1,3 +1,6 @@
+body {
+  margin: 0;
+}
 /* Main login page background */
 .login {
   min-height: 100vh;

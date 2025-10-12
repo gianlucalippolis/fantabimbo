@@ -3,6 +3,7 @@ import { useRouter } from "next/router";
 import { FormEvent, useState } from "react";
 import styles from "../../styles/Login.module.css";
 import Link from "next/link";
+import { Logo } from "components/Logo";
 
 export default function Login() {
   const router = useRouter();
@@ -71,6 +72,7 @@ export default function Login() {
     <div className={styles.login}>
       <div className={styles.wrapper}>
         <div className={styles.header}>
+          <Logo />
           <h1 className={styles.title}>Bentornato!</h1>
           <p className={styles.subtitle}>
             Accedi per gestire la tua squadra Fantabimbo.

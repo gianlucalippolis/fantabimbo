@@ -47,14 +47,10 @@ export default async function Home() {
   }
 
   let userEmail = session?.user?.email;
-  let displayName =
-    session?.user?.name?.trim() || userEmail?.split("@")[0] || "Allenatore";
+  let displayName = session?.user?.firstName?.trim();
 
   const strapiJwt = session?.jwt as string | undefined;
   let requiresProfileCompletion = false;
-
-  debugger;
-
   if (strapiUrl && strapiJwt) {
     try {
       const response = await fetch(`${strapiUrl}/api/users/me`, {
@@ -75,11 +71,15 @@ export default async function Home() {
           requiresProfileCompletion = true;
         }
         userEmail = profile?.email ?? userEmail;
+      } else {
+        console.error("Failed to fetch profile", response);
       }
     } catch (error) {
-      console.error("Failed to fetch Strapi profile", error);
+      console.error("Failed to fetch profile", error);
     }
   }
+
+  console.log("requiresProfileCompletion", requiresProfileCompletion);
 
   if (requiresProfileCompletion) {
     redirect("/completa-profilo");
