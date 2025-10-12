@@ -1,8 +1,15 @@
+import Image from "next/image";
+import logo from "../../public/logo.png";
+
 export const Logo = () => {
   return (
     <div>
-      <h1>Fanta</h1>
-      <h1>Nome</h1>
+      <Image
+        src={logo}
+        alt="Fantabimbo"
+        priority
+        style={{ height: 200, width: "auto" }}
+      />
     </div>
   );
 };
