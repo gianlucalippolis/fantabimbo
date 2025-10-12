@@ -78,19 +78,35 @@ export function UserDashboard({ displayName, userEmail }: UserDashboardProps) {
             <div className={styles.brandLogo}>
               <Logo />
             </div>
+            <div className={styles.brandText}>
+              <span className={styles.brandGreeting}>Ciao,</span>
+              <span className={styles.brandName}>{displayName}</span>
+              {userEmail ? (
+                <span className={styles.brandEmail}>{userEmail}</span>
+              ) : null}
+            </div>
           </div>
-          <button
-            type="button"
-            className={`${styles.hamburger} ${
-              menuOpen ? styles.hamburgerOpen : ""
-            }`}
-            onClick={toggleMenu}
-            aria-label={menuOpen ? "Chiudi menu" : "Apri menu"}
-            aria-expanded={menuOpen}
-            aria-controls="dashboard-menu"
-          >
-            <span className={styles.hamburgerLine} />
-          </button>
+          <div className={styles.headerActions}>
+            <button
+              type="button"
+              className={`${styles.headerTutorial} ${styles.primary}`}
+              onClick={openTutorial}
+            >
+              Apri tutorial
+            </button>
+            <button
+              type="button"
+              className={`${styles.hamburger} ${
+                menuOpen ? styles.hamburgerOpen : ""
+              }`}
+              onClick={toggleMenu}
+              aria-label={menuOpen ? "Chiudi menu" : "Apri menu"}
+              aria-expanded={menuOpen}
+              aria-controls="dashboard-menu"
+            >
+              <span className={styles.hamburgerLine} />
+            </button>
+          </div>
           <nav
             id="dashboard-menu"
             className={`${styles.menu} ${menuOpen ? styles.menuOpen : ""}`}
@@ -136,12 +152,31 @@ export function UserDashboard({ displayName, userEmail }: UserDashboardProps) {
       ) : null}
       <main className={styles.main}>
         <section className={styles.dashboardCard}>
-          <h1 className={styles.title}>Ciao, {displayName}!</h1>
-          <p className={styles.subtitle}>
-            Sei nella tua area Fantabimbo. Presto potrai gestire la rosa,
-            monitorare le prestazioni e sfidare gli altri allenatori.
-          </p>
-          <section className={styles.tutorial}>
+          <div className={styles.dashboardGrid}>
+            <div className={styles.dashboardIntro}>
+              <h1 className={styles.title}>Ciao, {displayName}!</h1>
+              <p className={styles.subtitle}>
+                Sei nella tua area Fantabimbo. Presto potrai gestire la rosa,
+                monitorare le prestazioni e sfidare gli altri allenatori.
+              </p>
+              <div className={styles.actions}>
+                <button
+                  className={`${styles.action} ${styles.primary}`}
+                  type="button"
+                  disabled
+                >
+                  Gestisci squadra (presto disponibile)
+                </button>
+                <SignOutButton
+                  className={`${styles.action} ${styles.secondary}`}
+                >
+                  Esci
+                </SignOutButton>
+              </div>
+            </div>
+            <section
+              className={`${styles.tutorial} ${styles.dashboardTutorial}`}
+            >
             <h2 className={styles.tutorialTitle}>Come funziona Fantabimbo</h2>
             <ol className={styles.tutorialList}>
               <li>Crea e personalizza la tua squadra di piccoli campioni.</li>
@@ -162,17 +197,6 @@ export function UserDashboard({ displayName, userEmail }: UserDashboardProps) {
               Avvia il tutorial interattivo
             </button>
           </section>
-          <div className={styles.actions}>
-            <button
-              className={`${styles.action} ${styles.primary}`}
-              type="button"
-              disabled
-            >
-              Gestisci squadra (presto disponibile)
-            </button>
-            <SignOutButton className={`${styles.action} ${styles.secondary}`}>
-              Esci
-            </SignOutButton>
           </div>
         </section>
       </main>
