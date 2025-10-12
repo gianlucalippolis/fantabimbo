@@ -2,6 +2,7 @@ import { signIn } from "next-auth/react";
 import { useRouter } from "next/router";
 import { FormEvent, useState } from "react";
 import styles from "../../styles/Login.module.css";
+import Link from "next/link";
 
 const MIN_PASSWORD_LENGTH = 8;
 
@@ -52,7 +53,9 @@ export default function Register() {
     }
 
     if (form.password.length < MIN_PASSWORD_LENGTH) {
-      setError(`La password deve contenere almeno ${MIN_PASSWORD_LENGTH} caratteri.`);
+      setError(
+        `La password deve contenere almeno ${MIN_PASSWORD_LENGTH} caratteri.`
+      );
       return;
     }
 
@@ -171,7 +174,9 @@ export default function Register() {
                 placeholder="••••••••"
                 value={form.password}
                 className={styles.input}
-                onChange={(event) => updateField("password", event.target.value)}
+                onChange={(event) =>
+                  updateField("password", event.target.value)
+                }
               />
             </div>
           </div>
@@ -224,7 +229,7 @@ export default function Register() {
         </form>
         <p className={styles.footer}>
           Hai già un account?
-          <a href="/login">Accedi</a>
+          <Link href="/login">Accedi</Link>
         </p>
       </div>
     </div>

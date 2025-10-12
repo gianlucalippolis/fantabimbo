@@ -2,6 +2,7 @@ import { signIn } from "next-auth/react";
 import { useRouter } from "next/router";
 import { FormEvent, useState } from "react";
 import styles from "../../styles/Login.module.css";
+import Link from "next/link";
 
 export default function Login() {
   const router = useRouter();
@@ -152,7 +153,7 @@ export default function Login() {
         </form>
         <p className={styles.footer}>
           Non hai ancora un account?
-          <a href="/registrazione">Registrati subito</a>
+          <Link href="/registrazione">Registrati subito</Link>
         </p>
       </div>
     </div>
