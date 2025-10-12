@@ -1,8 +1,9 @@
+import type { Session } from "next-auth";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getServerSession } from "next-auth";
 import { Logo } from "components/Logo";
-import { SignOutButton } from "components/SignOutButton";
+import { UserDashboard } from "components/UserDashboard";
 import { authOptions } from "../lib/auth";
 import { getStrapiConfig } from "../lib/env";
 import styles from "./page.module.css";
@@ -13,8 +14,13 @@ export const revalidate = 0;
 export default async function Home() {
   const { apiUrl: strapiUrl } = getStrapiConfig({ required: false });
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const session: any = await getServerSession(authOptions);
+  type SessionWithStrapi = Session & {
+    jwt?: string;
+  };
+
+  const session = (await getServerSession(
+    authOptions
+  )) as SessionWithStrapi | null;
 
   if (!session) {
     return (
@@ -46,14 +52,18 @@ export default async function Home() {
     );
   }
 
-  let userEmail = session?.user?.email;
-  let displayName = session?.user?.firstName?.trim();
+  let userEmail = session.user?.email ?? null;
+  let displayName =
+    session.user?.name?.trim() ||
+    userEmail?.split("@")[0] ||
+    "Allenatore";
 
-  const strapiJwt = session?.jwt as string | undefined;
+  const strapiJwt = session.jwt;
   let requiresProfileCompletion = false;
+
   if (strapiUrl && strapiJwt) {
     try {
-      const response = await fetch(`${strapiUrl}/api/users/me`, {
+      const response = await fetch(`${strapiUrl}/api/users/me?populate=*`, {
         headers: {
           Authorization: `Bearer ${strapiJwt}`,
         },
@@ -71,52 +81,15 @@ export default async function Home() {
           requiresProfileCompletion = true;
         }
         userEmail = profile?.email ?? userEmail;
-      } else {
-        console.error("Failed to fetch profile", response);
       }
     } catch (error) {
       console.error("Failed to fetch profile", error);
     }
   }
 
-  console.log("requiresProfileCompletion", requiresProfileCompletion);
-
   if (requiresProfileCompletion) {
     redirect("/completa-profilo");
   }
 
-  return (
-    <div className={styles.hero}>
-      <div className={styles.card}>
-        <div className={styles.logoWrapper}>
-          <Logo />
-        </div>
-        <h1 className={styles.title}>Ciao, {displayName}!</h1>
-        <p className={styles.subtitle}>
-          Sei nella tua area Fantabimbo. Presto potrai gestire la rosa,
-          monitorare le prestazioni e sfidare gli altri allenatori.
-        </p>
-        {userEmail && (
-          <dl className={styles.details}>
-            <div className={styles.detailRow}>
-              <dt>Email</dt>
-              <dd>{userEmail}</dd>
-            </div>
-          </dl>
-        )}
-        <div className={styles.actions}>
-          <button
-            className={`${styles.action} ${styles.primary}`}
-            type="button"
-            disabled
-          >
-            Gestisci squadra (presto disponibile)
-          </button>
-          <SignOutButton className={`${styles.action} ${styles.secondary}`}>
-            Esci
-          </SignOutButton>
-        </div>
-      </div>
-    </div>
-  );
+  return <UserDashboard displayName={displayName} userEmail={userEmail} />;
 }
