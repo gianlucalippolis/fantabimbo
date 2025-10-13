@@ -68,7 +68,7 @@ export default async function handler(
     }
 
     const [game] = games;
-    const gameName = game.attributes?.name ?? "Partita Fantabimbo";
+    const gameName = game.attributes?.name ?? "Partita Fantanome";
 
     return res.status(200).json({
       valid: true,

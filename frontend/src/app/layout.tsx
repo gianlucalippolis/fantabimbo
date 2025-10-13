@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Luckiest_Guy } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./providers";
-import Script from "next/script";
 
 const font = Luckiest_Guy({
   variable: "--luckiest-guy",
@@ -11,8 +10,8 @@ const font = Luckiest_Guy({
 });
 
 export const metadata: Metadata = {
-  title: "Fantabimbo",
-  description: "Fantabimbo",
+  title: "Fantanome",
+  description: "Fantanome",
 };
 
 export default function RootLayout({

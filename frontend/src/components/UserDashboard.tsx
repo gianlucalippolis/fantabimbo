@@ -44,7 +44,7 @@ export function UserDashboard({
       {
         title: "Guadagna punti reali",
         description:
-          "Le prestazioni sul campo diventano punti Fantabimbo: goal, assist, parate e tanto altro alimentano la tua classifica.",
+          "Le prestazioni sul campo diventano punti Fantanome: goal, assist, parate e tanto altro alimentano la tua classifica.",
       },
       {
         title: "Scala la classifica",
@@ -169,7 +169,7 @@ export function UserDashboard({
             <div className={styles.dashboardIntro}>
               <h1 className={styles.title}>Ciao, {displayName}!</h1>
               <p className={styles.subtitle}>
-                Sei nella tua area Fantabimbo. Presto potrai gestire la rosa,
+                Sei nella tua area Fantanome. Presto potrai gestire la rosa,
                 monitorare le prestazioni e sfidare gli altri allenatori.
               </p>
               {userType ? (
@@ -202,7 +202,7 @@ export function UserDashboard({
             <section
               className={`${styles.tutorial} ${styles.dashboardTutorial}`}
             >
-              <h2 className={styles.tutorialTitle}>Come funziona Fantabimbo</h2>
+            <h2 className={styles.tutorialTitle}>Come funziona Fantanome</h2>
               <ol className={styles.tutorialList}>
                 <li>Crea e personalizza la tua squadra di piccoli campioni.</li>
                 <li>Scegli la formazione migliore in base alle partite.</li>

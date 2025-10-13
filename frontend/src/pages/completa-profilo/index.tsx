@@ -144,7 +144,7 @@ export default function CompleteProfile({
           <h1 className={styles.title}>Completa il profilo</h1>
           <p className={styles.subtitle}>
             Ci serve solo il tuo nome e cognome per personalizzare
-            l&apos;esperienza Fantabimbo.
+            l&apos;esperienza Fantanome.
           </p>
         </div>
         <form className={styles.form} onSubmit={handleSubmit}>

@@ -35,7 +35,7 @@ export default async function Home() {
           </div>
           <p className={styles.subtitle}>
             Per iniziare configura il tuo account, crea la squadra e unisciti
-            alla lega dei Fantabimbo.
+            alla lega dei Fantanome.
           </p>
           <div className={styles.actions}>
             <Link

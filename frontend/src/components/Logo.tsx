@@ -6,7 +6,7 @@ export const Logo = () => {
     <div>
       <Image
         src={logo}
-        alt="Fantabimbo"
+        alt="Fantanome"
         priority
         width={200}
         height={200}
