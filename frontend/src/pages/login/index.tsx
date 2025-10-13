@@ -4,6 +4,7 @@ import { FormEvent, useState } from "react";
 import styles from "../../styles/Login.module.css";
 import Link from "next/link";
 import { Logo } from "components/Logo";
+import { Button } from "components/Button";
 
 export default function Login() {
   const router = useRouter();
@@ -148,15 +149,11 @@ export default function Login() {
           <div className={styles.error} aria-live="polite">
             {loginError}
           </div>
-          <div className={styles.actions}>
-            <button
-              className={styles.button}
-              type="submit"
-              disabled={isSubmitting}
-            >
-              {isSubmitting ? "Accesso in corso…" : "Accedi"}
-            </button>
-          </div>
+        <div className={styles.actions}>
+          <Button type="submit" disabled={isSubmitting} fullWidth>
+            {isSubmitting ? "Accesso in corso…" : "Accedi"}
+          </Button>
+        </div>
         </form>
         <p className={styles.footer}>
           Non hai ancora un account?

@@ -3,6 +3,7 @@ import { signIn } from "next-auth/react";
 import { useRouter } from "next/router";
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import styles from "../../styles/Login.module.css";
+import { Button } from "components/Button";
 
 const MIN_PASSWORD_LENGTH = 8;
 
@@ -357,9 +358,9 @@ export default function Register() {
             </label>
           </div>
           <div className={styles.stepActions}>
-            <Link className={styles.secondaryButton} href="/login">
+            <Button href="/login" variant="secondary" fullWidth>
               Torna al login
-            </Link>
+            </Button>
           </div>
         </div>
       </div>
@@ -566,17 +567,13 @@ export default function Register() {
             </span>
           </label>
           <div className={styles.actions}>
-            <button
-              className={styles.button}
+            <Button
               type="submit"
-              disabled={
-                isSubmitting ||
-                !isInviteValid ||
-                !acceptedPrivacy
-              }
+              disabled={isSubmitting || !isInviteValid || !acceptedPrivacy}
+              fullWidth
             >
               {isSubmitting ? "Registrazione in corso…" : "Registrati"}
-            </button>
+            </Button>
           </div>
         </form>
         <p className={styles.footer}>

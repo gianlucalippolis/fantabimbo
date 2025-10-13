@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { getServerSession } from "next-auth";
 import { Logo } from "components/Logo";
 import { UserDashboard } from "components/UserDashboard";
+import { InstallPwaPrompt } from "components/InstallPwaPrompt";
 import { authOptions } from "../lib/auth";
 import { getAppBaseUrl, getStrapiConfig } from "../lib/env";
 import { mapStrapiGamesResponse } from "../lib/games";
@@ -127,13 +128,16 @@ export default async function Home() {
   const canCreateGames = userType === "parent";
 
   return (
-    <UserDashboard
-      displayName={displayName}
-      userEmail={userEmail}
-      games={games}
-      inviteBaseUrl={inviteBaseUrl}
-      canCreateGames={canCreateGames}
-      userType={userType}
-    />
+    <>
+      <InstallPwaPrompt />
+      <UserDashboard
+        displayName={displayName}
+        userEmail={userEmail}
+        games={games}
+        inviteBaseUrl={inviteBaseUrl}
+        canCreateGames={canCreateGames}
+        userType={userType}
+      />
+    </>
   );
 }

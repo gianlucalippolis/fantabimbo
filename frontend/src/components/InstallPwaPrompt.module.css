@@ -1,0 +1,52 @@
+.wrapper {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  z-index: 1000;
+  max-width: min(320px, calc(100% - 3rem));
+}
+
+.card {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 18px;
+  padding: 1.25rem 1.5rem;
+  box-shadow: 0 18px 45px rgba(95, 70, 52, 0.2);
+  border: 1px solid rgba(194, 160, 131, 0.25);
+  display: grid;
+  gap: 0.75rem;
+}
+
+.title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #5f4634;
+}
+
+.subtitle {
+  margin: 0;
+  font-size: 0.85rem;
+  color: rgba(95, 70, 52, 0.8);
+  line-height: 1.45;
+}
+
+.actions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-end;
+}
+
+@media (max-width: 600px) {
+  .wrapper {
+    left: 1.5rem;
+    right: 1.5rem;
+  }
+
+  .card {
+    padding: 1rem 1.15rem;
+  }
+
+  .actions {
+    flex-direction: column;
+  }
+}
