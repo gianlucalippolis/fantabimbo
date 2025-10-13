@@ -1,6 +1,7 @@
+"use client";
 import Link from "next/link";
 import { signIn } from "next-auth/react";
-import { useRouter } from "next/router";
+import { useRouter, useSearchParams } from "next/navigation";
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import styles from "../../styles/Login.module.css";
 import { Button } from "components/Button";
@@ -16,26 +17,22 @@ type RegisterFormState = {
 
 export default function Register() {
   const router = useRouter();
-  const [isClient, setIsClient] = useState(false);
 
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
+  const searchParams = useSearchParams();
 
-  const isRouterReady = isClient && router.isReady;
   const initialInviteCode = useMemo(() => {
-    if (!isRouterReady) {
-      return "";
-    }
-    const value = router.query?.code ?? router.query?.invite;
-    if (typeof value === "string") {
-      return value.trim().toUpperCase();
-    }
-    if (Array.isArray(value) && value.length > 0) {
-      return value[0]?.trim().toUpperCase() ?? "";
+    const codeFromQueryParams = searchParams?.get("code") || "";
+    const inviteFromQueryParams = searchParams?.get("invite") || "";
+    const initialCode =
+      codeFromQueryParams.trim().toUpperCase() ??
+      inviteFromQueryParams.trim().toUpperCase() ??
+      "";
+
+    if (typeof initialCode === "string") {
+      return initialCode.trim().toUpperCase();
     }
     return "";
-  }, [router.query?.code, router.query?.invite, isRouterReady]);
+  }, [searchParams]);
   const [form, setForm] = useState<RegisterFormState>({
     email: "",
     password: "",
@@ -58,14 +55,11 @@ export default function Register() {
         );
 
   useEffect(() => {
-    if (!isRouterReady) {
-      return;
-    }
     setInviteCode(initialInviteCode);
-  }, [initialInviteCode, isRouterReady]);
+  }, [initialInviteCode]);
 
   useEffect(() => {
-    if (!isRouterReady || form.accountType !== "player") {
+    if (form.accountType !== "player") {
       setInviteError(null);
       setInviteGameName(null);
       setIsCheckingInvite(false);
@@ -125,7 +119,7 @@ export default function Register() {
     return () => {
       isMounted = false;
     };
-  }, [inviteCode, form.accountType, isRouterReady]);
+  }, [inviteCode, form.accountType]);
 
   function updateField<K extends keyof RegisterFormState>(
     field: K,
@@ -149,9 +143,7 @@ export default function Register() {
       if (typedValue === "parent") {
         setInviteCode("");
       } else if (typedValue === "player") {
-        setInviteCode((current) =>
-          current ? current : initialInviteCode
-        );
+        setInviteCode((current) => (current ? current : initialInviteCode));
       } else {
         setInviteCode(initialInviteCode);
       }
@@ -301,21 +293,6 @@ export default function Register() {
     }
   }
 
-  if (!isRouterReady) {
-    return (
-      <div className={styles.login}>
-        <div className={styles.wrapper}>
-          <div className={styles.header}>
-            <h1 className={styles.title}>Caricamento…</h1>
-            <p className={styles.subtitle}>
-              Prepariamo il modulo di registrazione. Un momento…
-            </p>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   if (!form.accountType) {
     return (
       <div className={styles.login}>
@@ -447,8 +424,7 @@ export default function Register() {
                 <p className={styles.noticeError}>{inviteError}</p>
               ) : inviteGameName ? (
                 <p className={styles.noticeSuccess}>
-                  Codice valido! Ti unirai a{" "}
-                  <strong>{inviteGameName}</strong>.
+                  Codice valido! Ti unirai a <strong>{inviteGameName}</strong>.
                 </p>
               ) : null}
             </div>

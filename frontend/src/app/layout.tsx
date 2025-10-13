@@ -22,6 +22,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
+        <title>Fantanome</title>
         <link rel="manifest" href="/manifest.webmanifest" />
         <meta name="theme-color" content="#c2a083" />
         <link rel="apple-touch-icon" href="/logo.png" />
