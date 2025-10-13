@@ -73,9 +73,12 @@ export default function Login() {
       <div className={styles.wrapper}>
         <div className={styles.header}>
           <Logo />
-          <h1 className={styles.title}>Bentornato!</h1>
+          <h1 className={styles.title}>Benvenuti su Fantanome!</h1>
           <p className={styles.subtitle}>
-            Accedi per gestire la tua squadra Fantabimbo.
+            Un gioco per genitori e amici che vogliono indovinare il nome
+            perfetto!
+            <br />I genitori caricano i loro 10 nomi preferiti, i giocatori
+            cercano di scoprirli e guadagnano punti a ogni colpo indovinato.
           </p>
         </div>
         <form className={styles.form} onSubmit={handleSubmit}>
