@@ -266,6 +266,44 @@ body {
   text-decoration: underline;
 }
 
+.stepActions {
+  margin-top: 1.5rem;
+  display: flex;
+  justify-content: center;
+}
+
+.secondaryButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.9rem 1.4rem;
+  border-radius: 12px;
+  border: 1px solid rgba(194, 160, 131, 0.35);
+  background: rgba(255, 255, 255, 0.9);
+  color: #5f4634;
+  font-weight: 600;
+  font-size: 1rem;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+  width: min(220px, 100%);
+}
+
+.secondaryButton:hover {
+  background: rgba(194, 160, 131, 0.12);
+  box-shadow: 0 10px 25px rgba(194, 160, 131, 0.25);
+  transform: translateY(-1px);
+}
+
+.secondaryButton:focus-visible {
+  outline: 3px solid rgba(194, 160, 131, 0.45);
+  outline-offset: 3px;
+}
+
+.secondaryButton:active {
+  transform: translateY(0);
+}
+
 .privacyConsent {
   display: flex;
   align-items: flex-start;

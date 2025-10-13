@@ -162,15 +162,6 @@ export default function Login() {
           Non hai ancora un account?
           <Link href="/registrazione">Registrati subito</Link>
         </p>
-        <div className={styles.policy}>
-          <a
-            href="https://www.iubenda.com/privacy-policy/35656956"
-            className="iubenda-white iubenda-noiframe iubenda-embed"
-            title="Privacy Policy"
-          >
-            Privacy Policy
-          </a>
-        </div>
       </div>
     </div>
   );

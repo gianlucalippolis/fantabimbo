@@ -9,11 +9,6 @@ export default function App({
   return (
     <SessionProvider session={session}>
       <Component {...pageProps} />
-      <script
-        async
-        type="text/javascript"
-        src="https://embeds.iubenda.com/widgets/47fdfa86-3eac-431e-8373-64228236fe6b.js"
-      ></script>
     </SessionProvider>
   );
 }

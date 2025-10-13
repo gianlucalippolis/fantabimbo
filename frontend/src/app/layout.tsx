@@ -24,10 +24,6 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${font.variable}`}>
         <Providers>{children}</Providers>
-        <Script
-          strategy="lazyOnload"
-          src="https://cdn.iubenda.com/iubenda.js"
-        />
       </body>
     </html>
   );

@@ -356,8 +356,8 @@ export default function Register() {
               </div>
             </label>
           </div>
-          <div className={styles.actions}>
-            <Link className={styles.button} href="/login">
+          <div className={styles.stepActions}>
+            <Link className={styles.secondaryButton} href="/login">
               Torna al login
             </Link>
           </div>
@@ -579,15 +579,6 @@ export default function Register() {
           Hai già un account?
           <Link href="/login">Accedi</Link>
         </p>
-        <div className={styles.policy}>
-          <a
-            href="https://www.iubenda.com/privacy-policy/35656956"
-            className="iubenda-white iubenda-noiframe iubenda-embed"
-            title="Privacy Policy"
-          >
-            Privacy Policy
-          </a>
-        </div>
       </div>
     </div>
   );
