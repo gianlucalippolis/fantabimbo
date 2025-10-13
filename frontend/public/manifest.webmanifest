@@ -1,0 +1,24 @@
+{
+  "name": "Fantanome",
+  "short_name": "Fantanome",
+  "description": "Indovina il nome perfetto con Fantanome",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#ede3da",
+  "theme_color": "#c2a083",
+  "icons": [
+    {
+      "src": "/logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/logo.png",
+      "sizes": "1024x1024",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
