@@ -102,7 +102,7 @@ export default function Register() {
         }
 
         const gameName =
-          (payload as { name?: string }).name ?? "Partita Fantabimbo";
+          (payload as { name?: string }).name ?? "Partita Fantanome";
         setInviteGameName(gameName);
         setInviteError(null);
       } catch (validateError) {
@@ -372,7 +372,7 @@ export default function Register() {
         <div className={styles.header}>
           <h1 className={styles.title}>Crea il tuo account</h1>
           <p className={styles.subtitle}>
-            Iscriviti per entrare nel mondo Fantabimbo.
+            Iscriviti per entrare nel mondo Fantanome.
           </p>
         </div>
         <form className={styles.form} onSubmit={handleSubmit}>
@@ -569,7 +569,11 @@ export default function Register() {
             <button
               className={styles.button}
               type="submit"
-              disabled={isSubmitting || !isInviteValid}
+              disabled={
+                isSubmitting ||
+                !isInviteValid ||
+                !acceptedPrivacy
+              }
             >
               {isSubmitting ? "Registrazione in corso…" : "Registrati"}
             </button>
