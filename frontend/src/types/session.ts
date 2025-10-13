@@ -7,4 +7,5 @@ export default interface ISession {
   };
   id: number;
   expires: string;
+  userType?: "parent" | "player" | null;
 }

@@ -5,13 +5,28 @@ import Link from "next/link";
 import styles from "../app/page.module.css";
 import { Logo } from "./Logo";
 import { SignOutButton } from "./SignOutButton";
+import { GamesManager } from "./GamesManager";
+import type { GameSummary } from "types/game";
 
 interface UserDashboardProps {
   displayName: string;
   userEmail?: string | null;
+  games: GameSummary[];
+  inviteBaseUrl: string;
+  canCreateGames: boolean;
+  userType: "parent" | "player" | null;
+  strapiJwt: string | null;
 }
 
-export function UserDashboard({ displayName, userEmail }: UserDashboardProps) {
+export function UserDashboard({
+  displayName,
+  userEmail,
+  games,
+  inviteBaseUrl,
+  canCreateGames,
+  userType,
+  strapiJwt,
+}: UserDashboardProps) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [tutorialOpen, setTutorialOpen] = useState(false);
   const [tutorialStep, setTutorialStep] = useState(0);
@@ -159,6 +174,18 @@ export function UserDashboard({ displayName, userEmail }: UserDashboardProps) {
                 Sei nella tua area Fantabimbo. Presto potrai gestire la rosa,
                 monitorare le prestazioni e sfidare gli altri allenatori.
               </p>
+              {userType ? (
+                <span
+                  className={`${styles.roleBadge} ${
+                    userType === "parent"
+                      ? styles.roleBadgeParent
+                      : styles.roleBadgePlayer
+                  }`}
+                >
+                  Ruolo:&nbsp;
+                  {userType === "parent" ? "Genitore" : "Giocatore"}
+                </span>
+              ) : null}
               <div className={styles.actions}>
                 <button
                   className={`${styles.action} ${styles.primary}`}
@@ -177,27 +204,33 @@ export function UserDashboard({ displayName, userEmail }: UserDashboardProps) {
             <section
               className={`${styles.tutorial} ${styles.dashboardTutorial}`}
             >
-            <h2 className={styles.tutorialTitle}>Come funziona Fantabimbo</h2>
-            <ol className={styles.tutorialList}>
-              <li>Crea e personalizza la tua squadra di piccoli campioni.</li>
-              <li>Scegli la formazione migliore in base alle partite.</li>
-              <li>
-                Ottieni punti in base alle prestazioni reali e scala la
-                classifica.
-              </li>
-              <li>
-                Sfida gli altri allenatori nelle leghe settimanali e stagionali.
-              </li>
-            </ol>
-            <button
-              type="button"
-              className={`${styles.action} ${styles.primary} ${styles.tutorialButton}`}
-              onClick={openTutorial}
-            >
-              Avvia il tutorial interattivo
-            </button>
-          </section>
+              <h2 className={styles.tutorialTitle}>Come funziona Fantabimbo</h2>
+              <ol className={styles.tutorialList}>
+                <li>Crea e personalizza la tua squadra di piccoli campioni.</li>
+                <li>Scegli la formazione migliore in base alle partite.</li>
+                <li>
+                  Ottieni punti in base alle prestazioni reali e scala la
+                  classifica.
+                </li>
+                <li>
+                  Sfida gli altri allenatori nelle leghe settimanali e stagionali.
+                </li>
+              </ol>
+              <button
+                type="button"
+                className={`${styles.action} ${styles.primary} ${styles.tutorialButton}`}
+                onClick={openTutorial}
+              >
+                Avvia il tutorial interattivo
+              </button>
+            </section>
           </div>
+          <GamesManager
+            games={games}
+            inviteBaseUrl={inviteBaseUrl}
+            canCreateGames={canCreateGames}
+            strapiJwt={strapiJwt}
+          />
         </section>
       </main>
       {tutorialOpen ? (

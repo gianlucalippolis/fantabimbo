@@ -10,11 +10,13 @@ type ExtendedJWT = JWT & {
   jwt?: string;
   id?: number | string;
   profileFetchedAt?: number;
+  userType?: "parent" | "player" | null;
 };
 
 type ExtendedSession = Session & {
   jwt?: string;
   id?: number | string;
+  userType?: "parent" | "player" | null;
 };
 
 interface StrapiAuthResponse {
@@ -25,6 +27,7 @@ interface StrapiAuthResponse {
     email: string;
     firstName?: string | null;
     lastName?: string | null;
+    userType?: "parent" | "player" | null;
   };
 }
 
@@ -37,6 +40,7 @@ interface StrapiUserProfile {
   avatar?: {
     url: string;
   } | null;
+  userType?: "parent" | "player" | null;
 }
 
 interface StrapiAuthorizedUser {
@@ -46,13 +50,15 @@ interface StrapiAuthorizedUser {
   jwt: string;
   firstName?: string | null;
   lastName?: string | null;
+  userType?: "parent" | "player" | null;
 }
 
 async function authenticateWithStrapi(
   identifier: string,
   password: string
 ): Promise<StrapiAuthResponse> {
-  const response = await fetch(`${STRAPI_API_URL}/api/auth/local`, {
+  const endpoint = `${STRAPI_API_URL}/api/auth/local`;
+  const response = await fetch(endpoint, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -83,7 +89,8 @@ async function fetchStrapiUserProfile(jwt: string): Promise<StrapiUserProfile> {
     throw new Error("Missing STRAPI_API_URL environment variable");
   }
 
-  const response = await fetch(`${STRAPI_API_URL}/api/users/me?populate=*`, {
+  const endpoint = `${STRAPI_API_URL}/api/users/me?populate=*`;
+  const response = await fetch(endpoint, {
     headers: {
       Authorization: `Bearer ${jwt}`,
     },
@@ -133,6 +140,7 @@ export const authOptions: NextAuthOptions = {
           jwt,
           firstName: user.firstName,
           lastName: user.lastName,
+          userType: user.userType ?? null,
         };
       },
     }),
@@ -155,6 +163,7 @@ export const authOptions: NextAuthOptions = {
         token.name = displayName || token.name;
         token.email = strapiUser.email;
         mutableToken.profileFetchedAt = 0;
+        mutableToken.userType = strapiUser.userType ?? null;
       }
 
       if (!mutableToken.jwt) {
@@ -181,6 +190,8 @@ export const authOptions: NextAuthOptions = {
           token.email = profile.email;
           token.picture = profile.avatar?.url ?? null;
           mutableToken.profileFetchedAt = Date.now();
+          mutableToken.userType =
+            profile.userType ?? mutableToken.userType ?? null;
         } catch (error) {
           console.error("Failed to refresh Strapi profile", error);
         }
@@ -197,9 +208,13 @@ export const authOptions: NextAuthOptions = {
 
       if (extendedSession.user) {
         extendedSession.user.name =
-          typeof token.name === "string" ? token.name : extendedSession.user.name;
+          typeof token.name === "string"
+            ? token.name
+            : extendedSession.user.name;
         extendedSession.user.email =
-          typeof token.email === "string" ? token.email : extendedSession.user.email;
+          typeof token.email === "string"
+            ? token.email
+            : extendedSession.user.email;
         extendedSession.user.image =
           typeof token.picture === "string"
             ? token.picture
@@ -208,6 +223,10 @@ export const authOptions: NextAuthOptions = {
 
       extendedSession.jwt = jwt;
       extendedSession.id = id;
+      extendedSession.userType =
+        typeof extendedToken.userType === "string"
+          ? (extendedToken.userType as "parent" | "player")
+          : null;
 
       return extendedSession;
     },

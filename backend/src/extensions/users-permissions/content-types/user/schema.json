@@ -71,6 +71,24 @@
     },
     "lastName": {
       "type": "string"
+    },
+    "userType": {
+      "type": "enumeration",
+      "enum": ["parent", "player"],
+      "default": "player",
+      "required": true
+    },
+    "ownedGames": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::game.game",
+      "mappedBy": "owner"
+    },
+    "joinedGames": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::game.game",
+      "mappedBy": "participants"
     }
   }
 }

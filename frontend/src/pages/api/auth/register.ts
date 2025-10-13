@@ -13,6 +13,7 @@ interface StrapiRegisterResponse {
     lastName?: string;
     confirmed?: boolean;
     blocked?: boolean;
+    userType?: "parent" | "player";
   };
 }
 
@@ -36,10 +37,7 @@ export default async function handler(
       .json({ error: "STRAPI_API_URL non è configurata sul server." });
   }
 
-  const {
-    email,
-    password,
-  } = req.body ?? {};
+  const { email, password, userType } = req.body ?? {};
 
   const trimmedEmail = typeof email === "string" ? email.trim().toLowerCase() : "";
 
@@ -50,6 +48,12 @@ export default async function handler(
     return res
       .status(400)
       .json({ error: "Email e password sono campi obbligatori." });
+  }
+
+  if (userType !== "parent" && userType !== "player") {
+    return res
+      .status(400)
+      .json({ error: "Specificare se sei genitore o giocatore è obbligatorio." });
   }
 
   try {
@@ -78,7 +82,47 @@ export default async function handler(
       return res.status(response.status).json({ error: message });
     }
 
-    return res.status(200).json(payload as StrapiRegisterResponse);
+    const successPayload = payload as StrapiRegisterResponse;
+
+    if (
+      userType === "parent" &&
+      successPayload?.jwt &&
+      successPayload?.user?.id
+    ) {
+      try {
+        const updateResponse = await fetch(
+          `${STRAPI_API_URL}/api/users/${successPayload.user.id}`,
+          {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${successPayload.jwt}`,
+            },
+            body: JSON.stringify({ userType }),
+          }
+        );
+
+        const updatePayload = (await updateResponse
+          .json()
+          .catch(() => ({}))) as { error?: { message?: string }; message?: string };
+
+        if (!updateResponse.ok) {
+          const message =
+            updatePayload?.error?.message ??
+            updatePayload?.message ??
+            "Registrazione riuscita ma non è stato possibile aggiornare il ruolo.";
+          return res.status(updateResponse.status).json({ error: message });
+        }
+      } catch (updateError) {
+        console.error("Failed to update userType after registration", updateError);
+        return res.status(500).json({
+          error:
+            "Registrazione riuscita, ma non è stato possibile salvare il ruolo genitore. Contatta l'assistenza.",
+        });
+      }
+    }
+
+    return res.status(200).json(successPayload);
   } catch (error) {
     console.error("Strapi registration failed", error);
     return res

@@ -1,25 +1,127 @@
+import Link from "next/link";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/router";
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useMemo, useState } from "react";
 import styles from "../../styles/Login.module.css";
-import Link from "next/link";
 
 const MIN_PASSWORD_LENGTH = 8;
 
+type RegisterFormState = {
+  email: string;
+  password: string;
+  confirmPassword: string;
+  accountType: "parent" | "player" | "";
+};
+
 export default function Register() {
   const router = useRouter();
-  const [form, setForm] = useState({
+  const isRouterReady = router.isReady;
+  const initialInviteCode = useMemo(() => {
+    if (!isRouterReady) {
+      return "";
+    }
+    const value = router.query?.code ?? router.query?.invite;
+    if (typeof value === "string") {
+      return value.trim().toUpperCase();
+    }
+    if (Array.isArray(value) && value.length > 0) {
+      return value[0]?.trim().toUpperCase() ?? "";
+    }
+    return "";
+  }, [router.query?.code, router.query?.invite, isRouterReady]);
+  const [form, setForm] = useState<RegisterFormState>({
     email: "",
     password: "",
     confirmPassword: "",
+    accountType: "",
   });
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isCheckingInvite, setIsCheckingInvite] = useState(false);
+  const [inviteError, setInviteError] = useState<string | null>(null);
+  const [inviteGameName, setInviteGameName] = useState<string | null>(null);
+  const [inviteCode, setInviteCode] = useState("");
+  const isInviteValid =
+    form.accountType === "parent"
+      ? true
+      : Boolean(
+          inviteCode && inviteGameName && !inviteError && !isCheckingInvite
+        );
 
-  function updateField(
-    field: "email" | "password" | "confirmPassword",
-    value: string
+  useEffect(() => {
+    if (!isRouterReady) {
+      return;
+    }
+    setInviteCode(initialInviteCode);
+  }, [initialInviteCode, isRouterReady]);
+
+  useEffect(() => {
+    if (!isRouterReady || form.accountType !== "player") {
+      setInviteError(null);
+      setInviteGameName(null);
+      setIsCheckingInvite(false);
+      return;
+    }
+
+    const normalizedCode = inviteCode.trim().toUpperCase();
+    if (!normalizedCode) {
+      setInviteError(null);
+      setInviteGameName(null);
+      setIsCheckingInvite(false);
+      return;
+    }
+
+    let isMounted = true;
+
+    async function validateInvite(code: string) {
+      setIsCheckingInvite(true);
+      setInviteError(null);
+      setInviteGameName(null);
+      try {
+        const response = await fetch(
+          `/api/games/validate?code=${encodeURIComponent(code)}`
+        );
+        const payload = await response.json().catch(() => ({}));
+        if (!isMounted) {
+          return;
+        }
+        if (!response.ok || !(payload as { valid?: boolean }).valid) {
+          const message =
+            (payload as { error?: string })?.error ??
+            "Codice invito non valido o scaduto.";
+          setInviteError(message);
+          return;
+        }
+
+        const gameName =
+          (payload as { name?: string }).name ?? "Partita Fantabimbo";
+        setInviteGameName(gameName);
+        setInviteError(null);
+      } catch (validateError) {
+        console.error("Invite validation failed", validateError);
+        if (isMounted) {
+          setInviteError(
+            "Impossibile verificare il codice invito. Riprova più tardi."
+          );
+        }
+      } finally {
+        if (isMounted) {
+          setIsCheckingInvite(false);
+        }
+      }
+    }
+
+    validateInvite(normalizedCode);
+
+    return () => {
+      isMounted = false;
+    };
+  }, [inviteCode, form.accountType, isRouterReady]);
+
+  function updateField<K extends keyof RegisterFormState>(
+    field: K,
+    value: RegisterFormState[K]
   ) {
     setForm((prev) => ({
       ...prev,
@@ -31,6 +133,25 @@ export default function Register() {
     if (success) {
       setSuccess(null);
     }
+    if (field === "accountType") {
+      const typedValue = value as RegisterFormState["accountType"];
+      setInviteError(null);
+      setInviteGameName(null);
+      setIsCheckingInvite(false);
+      if (typedValue === "parent") {
+        setInviteCode("");
+      } else if (typedValue === "player") {
+        setInviteCode((current) =>
+          current ? current : initialInviteCode
+        );
+      } else {
+        setInviteCode(initialInviteCode);
+      }
+    }
+  }
+
+  function resetAccountType() {
+    updateField("accountType", "" as RegisterFormState["accountType"]);
   }
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -64,6 +185,37 @@ export default function Register() {
       return;
     }
 
+    const normalizedInviteCode = inviteCode.trim().toUpperCase();
+
+    if (form.accountType === "player") {
+      if (!normalizedInviteCode) {
+        setError("Inserisci un codice invito valido.");
+        return;
+      }
+
+      if (isCheckingInvite) {
+        setError("Attendi la verifica del codice invito prima di procedere.");
+        return;
+      }
+
+      if (inviteError) {
+        setError(inviteError);
+        return;
+      }
+
+      if (!inviteGameName) {
+        setError("Codice invito non valido o non verificato.");
+        return;
+      }
+    }
+
+    if (form.accountType !== "parent" && form.accountType !== "player") {
+      setError("Seleziona se sei genitore o giocatore.");
+      return;
+    }
+
+    const selectedAccountType = form.accountType;
+
     try {
       setIsSubmitting(true);
       setError(null);
@@ -77,6 +229,7 @@ export default function Register() {
         body: JSON.stringify({
           email: trimmedEmail,
           password: form.password,
+          userType: selectedAccountType,
         }),
       });
 
@@ -104,6 +257,32 @@ export default function Register() {
       }
 
       if (signInResult?.ok) {
+        if (form.accountType === "player" && normalizedInviteCode) {
+          try {
+            const joinResponse = await fetch("/api/games/join", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              credentials: "include",
+              body: JSON.stringify({ inviteCode: normalizedInviteCode }),
+            });
+            const joinPayload = await joinResponse.json().catch(() => ({}));
+            if (!joinResponse.ok) {
+              const message =
+                (joinPayload as { error?: string })?.error ??
+                "Registrazione riuscita, ma il codice invito non è più valido.";
+              setError(message);
+              return;
+            }
+          } catch (joinError) {
+            console.error("Failed to join via invite code", joinError);
+            setError(
+              "Registrazione completata, ma non è stato possibile usare il codice invito. Contatta chi ti ha invitato."
+            );
+            return;
+          }
+        }
         await router.replace("/completa-profilo");
       }
     } catch (registrationError) {
@@ -112,6 +291,72 @@ export default function Register() {
     } finally {
       setIsSubmitting(false);
     }
+  }
+
+  if (!isRouterReady) {
+    return (
+      <div className={styles.login}>
+        <div className={styles.wrapper}>
+          <div className={styles.header}>
+            <h1 className={styles.title}>Caricamento…</h1>
+            <p className={styles.subtitle}>
+              Prepariamo il modulo di registrazione. Un momento…
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!form.accountType) {
+    return (
+      <div className={styles.login}>
+        <div className={styles.wrapper}>
+          <div className={styles.header}>
+            <h1 className={styles.title}>Che tipo di account vuoi creare?</h1>
+            <p className={styles.subtitle}>
+              Se sei un genitore puoi creare nuove partite; i giocatori hanno
+              bisogno del codice invito ricevuto da un genitore.
+            </p>
+          </div>
+          <div className={styles.radioGroup}>
+            <label className={styles.radioOption}>
+              <input
+                type="radio"
+                name="account-type-step"
+                value="parent"
+                onChange={() => updateField("accountType", "parent")}
+              />
+              <div className={styles.radioContent}>
+                <span className={styles.radioTitle}>Sono un genitore</span>
+                <span className={styles.radioDescription}>
+                  Posso creare partite e invitare altri partecipanti.
+                </span>
+              </div>
+            </label>
+            <label className={styles.radioOption}>
+              <input
+                type="radio"
+                name="account-type-step"
+                value="player"
+                onChange={() => updateField("accountType", "player")}
+              />
+              <div className={styles.radioContent}>
+                <span className={styles.radioTitle}>Sono un giocatore</span>
+                <span className={styles.radioDescription}>
+                  Ho un codice invito per entrare in una partita esistente.
+                </span>
+              </div>
+            </label>
+          </div>
+          <div className={styles.actions}>
+            <Link className={styles.button} href="/login">
+              Torna al login
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -124,6 +369,82 @@ export default function Register() {
           </p>
         </div>
         <form className={styles.form} onSubmit={handleSubmit}>
+          <div className={styles.var}>
+            <div className={styles.labelRow}>
+              <span>Tipo di account</span>
+              <button
+                type="button"
+                className={styles.helperLink}
+                onClick={resetAccountType}
+              >
+                Cambia
+              </button>
+            </div>
+            <div className={styles.notice}>
+              <p className={styles.noticeText}>
+                Stai registrando un account{" "}
+                <strong>
+                  {form.accountType === "parent" ? "genitore" : "giocatore"}
+                </strong>
+                .
+              </p>
+              {form.accountType === "parent" ? (
+                <p className={styles.noticeInfo}>
+                  Non serve alcun codice invito: dopo l&apos;accesso potrai
+                  creare una nuova partita e invitare chi vuoi tu.
+                </p>
+              ) : (
+                <p className={styles.noticeInfo}>
+                  Inserisci il codice invito ricevuto da un genitore per
+                  completare la registrazione.
+                </p>
+              )}
+            </div>
+          </div>
+          {form.accountType === "player" ? (
+            <div className={styles.var}>
+              <div className={styles.labelRow}>
+                <label htmlFor="invite-code">Codice invito</label>
+              </div>
+              <div className={styles.inputGroup}>
+                <span className={styles.inputIcon} aria-hidden="true">
+                  <svg
+                    viewBox="0 0 24 24"
+                    role="img"
+                    focusable="false"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path d="M17 3a4 4 0 0 1 2.906 6.781l-1.47 1.471-1.414-1.414 1.47-1.47A2 2 0 0 0 17 5a2 2 0 0 0-1.414.586l-4.95 4.95A2 2 0 0 0 10 12a2 2 0 0 0 .586 1.414l1 1-1.414 1.414-1-1A4 4 0 0 1 9 12a4 4 0 0 1 1.172-2.828l4.95-4.95A4 4 0 0 1 17 3zm-5 7a4 4 0 0 1 1.172 2.828A4 4 0 0 1 12 15.828l-1.47 1.47 1.414 1.414 1.47-1.47A2 2 0 0 0 15 14a2 2 0 0 0-.586-1.414l-1-1L14.828 10l1 1A4 4 0 0 1 16 14a4 4 0 0 1-1.172 2.828l-4.95 4.95A4 4 0 0 1 6 20a4 4 0 0 1-2.906-6.781l1.47-1.47 1.414 1.414-1.47 1.47A2 2 0 0 0 6 18a2 2 0 0 0 1.414-.586l4.95-4.95A2 2 0 0 0 12 12a2 2 0 0 0-.586-1.414l-1-1L11.828 8l1 1z" />
+                  </svg>
+                </span>
+                <input
+                  id="invite-code"
+                  name="invite-code"
+                  type="text"
+                  value={inviteCode}
+                  className={styles.input}
+                  onChange={(event) =>
+                    setInviteCode(event.target.value.toUpperCase())
+                  }
+                  placeholder="ES. FANTA23"
+                  autoComplete="off"
+                  maxLength={12}
+                />
+              </div>
+              {isCheckingInvite ? (
+                <p className={styles.noticeInfo}>
+                  Verifica del codice in corso…
+                </p>
+              ) : inviteError ? (
+                <p className={styles.noticeError}>{inviteError}</p>
+              ) : inviteGameName ? (
+                <p className={styles.noticeSuccess}>
+                  Codice valido! Ti unirai a{" "}
+                  <strong>{inviteGameName}</strong>.
+                </p>
+              ) : null}
+            </div>
+          ) : null}
           <div className={styles.var}>
             <div className={styles.labelRow}>
               <label htmlFor="email">Email</label>
@@ -221,7 +542,7 @@ export default function Register() {
             <button
               className={styles.button}
               type="submit"
-              disabled={isSubmitting}
+              disabled={isSubmitting || !isInviteValid}
             >
               {isSubmitting ? "Registrazione in corso…" : "Registrati"}
             </button>

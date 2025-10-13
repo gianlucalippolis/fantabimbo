@@ -5,7 +5,9 @@ import { getServerSession } from "next-auth";
 import { Logo } from "components/Logo";
 import { UserDashboard } from "components/UserDashboard";
 import { authOptions } from "../lib/auth";
-import { getStrapiConfig } from "../lib/env";
+import { getAppBaseUrl, getStrapiConfig } from "../lib/env";
+import { mapStrapiGamesResponse } from "../lib/games";
+import type { GameSummary } from "types/game";
 import styles from "./page.module.css";
 
 export const dynamic = "force-dynamic";
@@ -16,6 +18,8 @@ export default async function Home() {
 
   type SessionWithStrapi = Session & {
     jwt?: string;
+    id?: number | string;
+    userType?: "parent" | "player" | null;
   };
 
   const session = (await getServerSession(
@@ -59,7 +63,10 @@ export default async function Home() {
     "Allenatore";
 
   const strapiJwt = session.jwt;
+  const currentUserId = session.id ?? null;
+  let userType = session.userType ?? null;
   let requiresProfileCompletion = false;
+  let games: GameSummary[] = [];
 
   if (strapiUrl && strapiJwt) {
     try {
@@ -81,9 +88,34 @@ export default async function Home() {
           requiresProfileCompletion = true;
         }
         userEmail = profile?.email ?? userEmail;
+        if (typeof profile?.userType === "string") {
+          userType = profile.userType;
+        }
       }
     } catch (error) {
       console.error("Failed to fetch profile", error);
+    }
+
+    try {
+      const response = await fetch(
+        `${strapiUrl}/api/games?populate[owner]=*&populate[participants]=*`,
+        {
+          headers: {
+            Authorization: `Bearer ${strapiJwt}`,
+          },
+          cache: "no-store",
+        }
+      );
+
+      if (response.ok) {
+        const payload = await response.json();
+        games = mapStrapiGamesResponse(
+          payload,
+          currentUserId ?? null
+        );
+      }
+    } catch (error) {
+      console.error("Failed to load games list", error);
     }
   }
 
@@ -91,5 +123,18 @@ export default async function Home() {
     redirect("/completa-profilo");
   }
 
-  return <UserDashboard displayName={displayName} userEmail={userEmail} />;
+  const inviteBaseUrl = getAppBaseUrl();
+  const canCreateGames = userType === "parent";
+
+  return (
+    <UserDashboard
+      displayName={displayName}
+      userEmail={userEmail}
+      games={games}
+      inviteBaseUrl={inviteBaseUrl}
+      canCreateGames={canCreateGames}
+      userType={userType}
+      strapiJwt={strapiJwt ?? null}
+    />
+  );
 }
