@@ -75,10 +75,12 @@ export default function Login() {
           <Logo />
           <h1 className={styles.title}>Benvenuti su Fantanome!</h1>
           <p className={styles.subtitle}>
-            Un gioco per genitori e amici che vogliono indovinare il nome
+            {/* Un gioco per genitori e amici che vogliono indovinare il nome
             perfetto!
             <br />I genitori caricano i loro 10 nomi preferiti, i giocatori
-            cercano di scoprirli e guadagnano punti a ogni colpo indovinato.
+            cercano di scoprirli e guadagnano punti a ogni colpo indovinato. */}
+            La sfida dei nomi sta per iniziare! <br />
+            Riuscirai a trovare il nome perfetto prima degli altri?
           </p>
         </div>
         <form className={styles.form} onSubmit={handleSubmit}>
