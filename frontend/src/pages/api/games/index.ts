@@ -1,6 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import type { Session } from "next-auth";
 import { getServerSession } from "next-auth/next";
+import { getToken } from "next-auth/jwt";
 import { authOptions } from "../../../lib/auth";
 import { getStrapiConfig } from "../../../lib/env";
 import { mapStrapiGamesResponse, mapStrapiGame } from "../../../lib/games";
@@ -93,6 +94,25 @@ export default async function handler(
     const match = authHeader.match(/^Bearer\s+(.+)$/i);
     if (match && match[1]) {
       strapiJwt = match[1].trim();
+    }
+  }
+
+  if (!strapiJwt || currentUserId == null || !userType) {
+    const token = await getToken({
+      req,
+      secret: authOptions.secret,
+      decode: authOptions.jwt?.decode,
+    });
+    if (token) {
+      if (!strapiJwt && typeof (token as Record<string, unknown>).jwt === "string") {
+        strapiJwt = (token as Record<string, string>).jwt;
+      }
+      if (currentUserId == null && (token as Record<string, unknown>).id != null) {
+        currentUserId = (token as Record<string, unknown>).id as number | string;
+      }
+      if (!userType && typeof (token as Record<string, unknown>).userType === "string") {
+        userType = (token as Record<string, string>).userType;
+      }
     }
   }
 

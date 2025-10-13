@@ -1,6 +1,8 @@
 "use client";
 
+import { useSession } from "next-auth/react";
 import { FormEvent, useMemo, useState } from "react";
+import type ISession from "types/session";
 import styles from "../app/page.module.css";
 import type { GameSummary } from "types/game";
 
@@ -8,7 +10,6 @@ interface GamesManagerProps {
   games: GameSummary[];
   inviteBaseUrl: string;
   canCreateGames: boolean;
-  strapiJwt: string | null;
 }
 
 type GamesState = GameSummary[];
@@ -27,8 +28,10 @@ export function GamesManager({
   games,
   inviteBaseUrl,
   canCreateGames,
-  strapiJwt,
 }: GamesManagerProps) {
+  const { data: session } = useSession();
+  const typedSession = session as (ISession | null);
+  const strapiJwt = typedSession?.jwt ?? null;
   const [items, setItems] = useState<GamesState>(games);
   const [createForm, setCreateForm] = useState<CreateFormState>(
     INITIAL_CREATE_STATE
@@ -91,15 +94,12 @@ export function GamesManager({
 
     try {
       setIsCreating(true);
-      const headers: Record<string, string> = {
-        "Content-Type": "application/json",
-      };
-      if (strapiJwt) {
-        headers.Authorization = `Bearer ${strapiJwt}`;
-      }
       const response = await fetch("/api/games", {
         method: "POST",
-        headers,
+        headers: {
+          "Content-Type": "application/json",
+          ...(strapiJwt ? { Authorization: `Bearer ${strapiJwt}` } : {}),
+        },
         credentials: "include",
         body: JSON.stringify({
           name: trimmedName,
@@ -146,15 +146,12 @@ export function GamesManager({
 
     try {
       setIsJoining(true);
-      const headers: Record<string, string> = {
-        "Content-Type": "application/json",
-      };
-      if (strapiJwt) {
-        headers.Authorization = `Bearer ${strapiJwt}`;
-      }
       const response = await fetch("/api/games/join", {
         method: "POST",
-        headers,
+        headers: {
+          "Content-Type": "application/json",
+          ...(strapiJwt ? { Authorization: `Bearer ${strapiJwt}` } : {}),
+        },
         credentials: "include",
         body: JSON.stringify({ inviteCode: trimmedCode }),
       });

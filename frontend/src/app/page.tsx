@@ -134,7 +134,6 @@ export default async function Home() {
       inviteBaseUrl={inviteBaseUrl}
       canCreateGames={canCreateGames}
       userType={userType}
-      strapiJwt={strapiJwt ?? null}
     />
   );
 }

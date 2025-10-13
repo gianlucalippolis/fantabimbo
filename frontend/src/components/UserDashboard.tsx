@@ -15,7 +15,6 @@ interface UserDashboardProps {
   inviteBaseUrl: string;
   canCreateGames: boolean;
   userType: "parent" | "player" | null;
-  strapiJwt: string | null;
 }
 
 export function UserDashboard({
@@ -25,7 +24,6 @@ export function UserDashboard({
   inviteBaseUrl,
   canCreateGames,
   userType,
-  strapiJwt,
 }: UserDashboardProps) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [tutorialOpen, setTutorialOpen] = useState(false);
@@ -229,7 +227,6 @@ export function UserDashboard({
             games={games}
             inviteBaseUrl={inviteBaseUrl}
             canCreateGames={canCreateGames}
-            strapiJwt={strapiJwt}
           />
         </section>
       </main>

@@ -15,7 +15,13 @@ type RegisterFormState = {
 
 export default function Register() {
   const router = useRouter();
-  const isRouterReady = router.isReady;
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  const isRouterReady = isClient && router.isReady;
   const initialInviteCode = useMemo(() => {
     if (!isRouterReady) {
       return "";
@@ -42,6 +48,7 @@ export default function Register() {
   const [inviteError, setInviteError] = useState<string | null>(null);
   const [inviteGameName, setInviteGameName] = useState<string | null>(null);
   const [inviteCode, setInviteCode] = useState("");
+  const [acceptedPrivacy, setAcceptedPrivacy] = useState(false);
   const isInviteValid =
     form.accountType === "parent"
       ? true
@@ -538,6 +545,26 @@ export default function Register() {
               {success}
             </div>
           )}
+          <label className={styles.privacyConsent}>
+            <input
+              type="checkbox"
+              checked={acceptedPrivacy}
+              onChange={(event) => setAcceptedPrivacy(event.target.checked)}
+            />
+            <span>
+              Dichiaro di aver letto e accettato la{" "}
+              <a
+                href="https://www.iubenda.com/privacy-policy/35656956"
+                className="iubenda-white iubenda-noiframe iubenda-embed"
+                title="Privacy Policy"
+                target="_blank"
+                rel="noreferrer"
+              >
+                Privacy Policy
+              </a>
+              .
+            </span>
+          </label>
           <div className={styles.actions}>
             <button
               className={styles.button}
@@ -552,6 +579,15 @@ export default function Register() {
           Hai già un account?
           <Link href="/login">Accedi</Link>
         </p>
+        <div className={styles.policy}>
+          <a
+            href="https://www.iubenda.com/privacy-policy/35656956"
+            className="iubenda-white iubenda-noiframe iubenda-embed"
+            title="Privacy Policy"
+          >
+            Privacy Policy
+          </a>
+        </div>
       </div>
     </div>
   );

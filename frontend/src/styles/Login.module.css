@@ -249,6 +249,45 @@ body {
   box-shadow: none;
 }
 
+.policy {
+  margin-top: 1.25rem;
+  text-align: center;
+}
+
+.policy a {
+  color: #5f4634;
+  font-size: 0.85rem;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.policy a:hover {
+  color: #a58463;
+  text-decoration: underline;
+}
+
+.privacyConsent {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  font-size: 0.85rem;
+  color: rgba(95, 70, 52, 0.85);
+}
+
+.privacyConsent input[type="checkbox"] {
+  margin-top: 0.15rem;
+  accent-color: #c2a083;
+}
+
+.privacyConsent a {
+  color: #5f4634;
+  text-decoration: none;
+}
+
+.privacyConsent a:hover {
+  text-decoration: underline;
+}
+
 .footer {
   margin-top: 1.5rem;
   text-align: center;
