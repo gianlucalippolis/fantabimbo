@@ -5,6 +5,7 @@ import { FormEvent, useMemo, useState } from "react";
 import type ISession from "types/session";
 import styles from "../app/page.module.css";
 import type { GameSummary } from "types/game";
+import api from "../lib/axios";
 
 interface GamesManagerProps {
   games: GameSummary[];
@@ -30,12 +31,11 @@ export function GamesManager({
   canCreateGames,
 }: GamesManagerProps) {
   const { data: session } = useSession();
-  const typedSession = session as (ISession | null);
+  const typedSession = session as ISession | null;
   const strapiJwt = typedSession?.jwt ?? null;
   const [items, setItems] = useState<GamesState>(games);
-  const [createForm, setCreateForm] = useState<CreateFormState>(
-    INITIAL_CREATE_STATE
-  );
+  const [createForm, setCreateForm] =
+    useState<CreateFormState>(INITIAL_CREATE_STATE);
   const [createError, setCreateError] = useState<string | null>(null);
   const [joinCode, setJoinCode] = useState("");
   const [joinError, setJoinError] = useState<string | null>(null);
@@ -94,30 +94,22 @@ export function GamesManager({
 
     try {
       setIsCreating(true);
-      const response = await fetch("/api/games", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          ...(strapiJwt ? { Authorization: `Bearer ${strapiJwt}` } : {}),
-        },
-        credentials: "include",
-        body: JSON.stringify({
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const response: any = await api.post("/api/games", {
+        data: {
           name: trimmedName,
-          description: trimmedDescription || null,
-        }),
+          description: trimmedDescription,
+        },
       });
 
-      const payload = await response.json().catch(() => ({}));
-
-      if (!response.ok) {
+      if (response.status !== 200) {
         const message =
-          (payload as { error?: string })?.error ??
-          "Impossibile creare la partita.";
+          response?.error?.message ?? "Impossibile creare la partita.";
         setCreateError(message);
         return;
       }
 
-      const createdGame = (payload as { game: GameSummary }).game;
+      const createdGame = response.data.game;
       setItems((prev) => {
         const exists = prev.some((game) => game.id === createdGame.id);
         return exists ? prev : [createdGame, ...prev];
@@ -229,9 +221,7 @@ export function GamesManager({
         await navigator.clipboard.writeText(link);
         setCopiedGameId(gameId);
         setTimeout(() => {
-          setCopiedGameId((current) =>
-            current === gameId ? null : current
-          );
+          setCopiedGameId((current) => (current === gameId ? null : current));
         }, 2000);
       }
     } catch (error) {

@@ -44,17 +44,19 @@ async function fetchWithFallback(
   }
 
   if (lastError instanceof Error) {
-    const errorDetails = (lastError as Error & { cause?: { code?: string }; code?: string }).cause?.code ??
+    const errorDetails =
+      (lastError as Error & { cause?: { code?: string }; code?: string }).cause
+        ?.code ??
       (lastError as Error & { code?: string }).code ??
       lastError.message;
     throw new Error(
-      `Impossibile contattare Strapi (${attempted.join(", ")}). Dettagli: ${errorDetails}`
+      `Impossibile contattare Strapi (${attempted.join(
+        ", "
+      )}). Dettagli: ${errorDetails}`
     );
   }
 
-  throw new Error(
-    `Impossibile contattare Strapi (${attempted.join(", ")}).`
-  );
+  throw new Error(`Impossibile contattare Strapi (${attempted.join(", ")}).`);
 }
 
 async function fetchFromStrapi<T>(
@@ -82,7 +84,6 @@ export default async function handler(
 ) {
   const session = await getServerSession(req, res, authOptions);
   const { apiUrl } = getStrapiConfig({ required: true });
-
   const typedSession = (session ?? {}) as SessionWithStrapi;
 
   let strapiJwt = typedSession.jwt ?? null;
@@ -104,22 +105,31 @@ export default async function handler(
       decode: authOptions.jwt?.decode,
     });
     if (token) {
-      if (!strapiJwt && typeof (token as Record<string, unknown>).jwt === "string") {
+      if (
+        !strapiJwt &&
+        typeof (token as Record<string, unknown>).jwt === "string"
+      ) {
         strapiJwt = (token as Record<string, string>).jwt;
       }
-      if (currentUserId == null && (token as Record<string, unknown>).id != null) {
-        currentUserId = (token as Record<string, unknown>).id as number | string;
+      if (
+        currentUserId == null &&
+        (token as Record<string, unknown>).id != null
+      ) {
+        currentUserId = (token as Record<string, unknown>).id as
+          | number
+          | string;
       }
-      if (!userType && typeof (token as Record<string, unknown>).userType === "string") {
+      if (
+        !userType &&
+        typeof (token as Record<string, unknown>).userType === "string"
+      ) {
         userType = (token as Record<string, string>).userType;
       }
     }
   }
 
   if (!strapiJwt) {
-    return res
-      .status(401)
-      .json({ error: "Autenticazione richiesta." });
+    return res.status(401).json({ error: "Autenticazione richiesta." });
   }
 
   if (!userType || currentUserId == null) {
@@ -132,9 +142,7 @@ export default async function handler(
       });
 
       if (!profileResponse.ok) {
-        return res
-          .status(401)
-          .json({ error: "Autenticazione richiesta." });
+        return res.status(401).json({ error: "Autenticazione richiesta." });
       }
 
       const profile = (await profileResponse.json().catch(() => ({}))) as {
@@ -142,17 +150,14 @@ export default async function handler(
         userType?: string | null;
       };
 
-      currentUserId =
-        profile?.id != null ? profile.id : currentUserId ?? null;
+      currentUserId = profile?.id != null ? profile.id : currentUserId ?? null;
       userType =
         typeof profile?.userType === "string"
           ? profile.userType
           : userType ?? null;
     } catch (error) {
       console.error("Failed to resolve Strapi user profile", error);
-      return res
-        .status(401)
-        .json({ error: "Autenticazione richiesta." });
+      return res.status(401).json({ error: "Autenticazione richiesta." });
     }
   }
 
