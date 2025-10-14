@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { FormEvent, useEffect, useMemo, useState } from "react";
+import { FormEvent, Suspense, useEffect, useMemo, useState } from "react";
 import styles from "../../styles/Login.module.css";
 import { Button } from "components/Button";
 
@@ -15,7 +15,7 @@ type RegisterFormState = {
   accountType: "parent" | "player" | "";
 };
 
-export default function Register() {
+function RegisterContent() {
   const router = useRouter();
 
   const searchParams = useSearchParams();
@@ -558,5 +558,13 @@ export default function Register() {
         </p>
       </div>
     </div>
+  );
+}
+
+export default function Register() {
+  return (
+    <Suspense fallback={null}>
+      <RegisterContent />
+    </Suspense>
   );
 }
