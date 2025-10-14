@@ -26,7 +26,7 @@ export default async function Home() {
     authOptions
   )) as SessionWithStrapi | null;
 
-  if (!session) {
+  if (!session || !session.id) {
     return (
       <div className={styles.hero}>
         <div className={styles.card}>
@@ -57,10 +57,9 @@ export default async function Home() {
   }
 
   let userEmail = session.user?.email ?? null;
+
   let displayName =
-    session.user?.name?.trim() ||
-    userEmail?.split("@")[0] ||
-    "Allenatore";
+    session.user?.name?.trim() || userEmail?.split("@")[0] || "Allenatore";
 
   const strapiJwt = session.jwt;
   const currentUserId = session.id ?? null;
@@ -109,10 +108,7 @@ export default async function Home() {
 
       if (response.ok) {
         const payload = await response.json();
-        games = mapStrapiGamesResponse(
-          payload,
-          currentUserId ?? null
-        );
+        games = mapStrapiGamesResponse(payload, currentUserId ?? null);
       }
     } catch (error) {
       console.error("Failed to load games list", error);
@@ -125,12 +121,14 @@ export default async function Home() {
 
   const inviteBaseUrl = getAppBaseUrl();
   const canCreateGames = userType === "parent";
+  const userId = session.id;
 
   return (
     <>
       <UserDashboard
         displayName={displayName}
         userEmail={userEmail}
+        userId={session.id}
         games={games}
         inviteBaseUrl={inviteBaseUrl}
         canCreateGames={canCreateGames}

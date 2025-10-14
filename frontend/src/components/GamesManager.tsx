@@ -1,7 +1,7 @@
 "use client";
 
 import { useSession } from "next-auth/react";
-import { FormEvent, useMemo, useState } from "react";
+import { FormEvent, useEffect, useMemo, useState } from "react";
 import type ISession from "types/session";
 import styles from "../app/page.module.css";
 import type { GameSummary } from "types/game";
@@ -10,6 +10,7 @@ import api from "../lib/axios";
 interface GamesManagerProps {
   games: GameSummary[];
   inviteBaseUrl: string;
+  userId: string | number;
   canCreateGames: boolean;
 }
 
@@ -28,6 +29,7 @@ const INITIAL_CREATE_STATE: CreateFormState = {
 export function GamesManager({
   games,
   inviteBaseUrl,
+  userId,
   canCreateGames,
 }: GamesManagerProps) {
   const { data: session } = useSession();
@@ -43,6 +45,10 @@ export function GamesManager({
   const [isCreating, setIsCreating] = useState(false);
   const [isJoining, setIsJoining] = useState(false);
   const [regeneratingId, setRegeneratingId] = useState<number | null>(null);
+  const [gamePendingDelete, setGamePendingDelete] =
+    useState<GameSummary | null>(null);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const creationNotAllowedMessage =
     "Solo i genitori possono creare una partita. Chiedi a un genitore di creare la lega.";
@@ -72,6 +78,15 @@ export function GamesManager({
       setCreateError(null);
     }
   }
+
+  async function retrieveGames() {
+    const res = await api.get("/api/games");
+    setItems(res.data.data);
+  }
+
+  useEffect(() => {
+    retrieveGames();
+  }, []);
 
   async function handleCreate(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -229,6 +244,42 @@ export function GamesManager({
     }
   }
 
+  function handleDeleteRequest(game: GameSummary) {
+    setGamePendingDelete(game);
+    setDeleteError(null);
+  }
+
+  function handleCloseDeleteModal() {
+    if (isDeleting) {
+      return;
+    }
+    setGamePendingDelete(null);
+    setDeleteError(null);
+  }
+
+  async function handleConfirmDelete() {
+    if (!gamePendingDelete || isDeleting) {
+      return;
+    }
+
+    try {
+      setIsDeleting(true);
+      await api.delete(
+        `/api/games/${encodeURIComponent(gamePendingDelete.id)}`
+      );
+      setItems((prev) =>
+        prev.filter((game) => game.id !== gamePendingDelete.id)
+      );
+      setGamePendingDelete(null);
+      setDeleteError(null);
+    } catch (error) {
+      console.error("Game deletion failed", error);
+      setDeleteError("Impossibile eliminare la partita. Riprova più tardi.");
+    } finally {
+      setIsDeleting(false);
+    }
+  }
+
   return (
     <section className={styles.gamesSection}>
       <header className={styles.gamesHeader}>
@@ -336,6 +387,7 @@ export function GamesManager({
           </p>
         ) : (
           orderedGames.map((game) => {
+            const isOwner = game.owner.id;
             const inviteLink = `${inviteBase}/registrazione?code=${encodeURIComponent(
               game.inviteCode
             )}`;
@@ -380,17 +432,29 @@ export function GamesManager({
                     >
                       {copiedGameId === game.id ? "Copiato!" : "Copia link"}
                     </button>
-                    {game.isOwner ? (
-                      <button
-                        type="button"
-                        className={styles.gamesTertiaryButton}
-                        onClick={() => handleRegenerate(game.id)}
-                        disabled={regeneratingId === game.id}
-                      >
-                        {regeneratingId === game.id
-                          ? "Rigenerazione…"
-                          : "Nuovo codice"}
-                      </button>
+                    {isOwner ? (
+                      <>
+                        <button
+                          type="button"
+                          className={styles.gamesTertiaryButton}
+                          onClick={() => handleRegenerate(game.id)}
+                          disabled={regeneratingId === game.id}
+                        >
+                          {regeneratingId === game.id
+                            ? "Rigenerazione…"
+                            : "Nuovo codice"}
+                        </button>
+                        <button
+                          type="button"
+                          className={styles.gamesDangerButton}
+                          onClick={() => handleDeleteRequest(game)}
+                          disabled={isDeleting}
+                        >
+                          {isDeleting && gamePendingDelete?.id === game.id
+                            ? "Eliminazione…"
+                            : "Elimina"}
+                        </button>
+                      </>
                     ) : null}
                   </div>
                 </div>
@@ -399,6 +463,46 @@ export function GamesManager({
           })
         )}
       </div>
+      {gamePendingDelete ? (
+        <div
+          className={styles.gamesModalBackdrop}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="delete-game-title"
+        >
+          <div className={styles.gamesModalDialog}>
+            <h3 id="delete-game-title">Elimina questa partita?</h3>
+            <p className={styles.gamesModalText}>
+              Stai per eliminare <strong>{gamePendingDelete.name}</strong>. I
+              partecipanti perderanno l&apos;accesso e il codice invito non sarà
+              più valido. Questa azione non può essere annullata.
+            </p>
+            {deleteError ? (
+              <div className={styles.gamesError} role="alert">
+                {deleteError}
+              </div>
+            ) : null}
+            <div className={styles.gamesModalActions}>
+              <button
+                type="button"
+                className={styles.gamesTertiaryButton}
+                onClick={handleCloseDeleteModal}
+                disabled={isDeleting}
+              >
+                Annulla
+              </button>
+              <button
+                type="button"
+                className={styles.gamesDangerButton}
+                onClick={handleConfirmDelete}
+                disabled={isDeleting}
+              >
+                {isDeleting ? "Eliminazione…" : "Elimina partita"}
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </section>
   );
 }

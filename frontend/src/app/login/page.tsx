@@ -46,7 +46,7 @@ export default function Login() {
       }
 
       if (response.error) {
-        setLoginError(response.error);
+        setLoginError("Credenziali non valide");
         return;
       }
 

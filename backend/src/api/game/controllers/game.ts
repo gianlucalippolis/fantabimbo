@@ -290,5 +290,51 @@ export default factories.createCoreController(
         );
       }
     },
+
+    async delete(this: any, ctx) {
+      const user = ctx.state.user;
+
+      if (!user) {
+        return ctx.unauthorized("Autenticazione richiesta.");
+      }
+
+      const gameId = ctx.params?.id;
+      if (!gameId) {
+        return ctx.badRequest("Identificativo della partita mancante.");
+      }
+
+      const game = (await strapi.entityService.findOne(
+        "api::game.game",
+        gameId,
+        {
+          populate: {
+            owner: {
+              fields: ["id"],
+            },
+          },
+        }
+      )) as PopulatedGame | null;
+
+      if (!game) {
+        return ctx.notFound("Partita non trovata.");
+      }
+
+      if (game.owner?.id !== user.id) {
+        return ctx.forbidden(
+          "Solo il creatore della partita può eliminarla."
+        );
+      }
+
+      const deleted = (await strapi.entityService.delete(
+        "api::game.game",
+        gameId,
+        {
+          populate: DEFAULT_POPULATE as any,
+        }
+      )) as PopulatedGame;
+
+      const sanitized = await this.sanitizeOutput(deleted, ctx);
+      return this.transformResponse(sanitized);
+    },
   })
 );

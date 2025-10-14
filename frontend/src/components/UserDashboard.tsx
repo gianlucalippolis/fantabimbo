@@ -11,6 +11,7 @@ import type { GameSummary } from "types/game";
 interface UserDashboardProps {
   displayName: string;
   userEmail?: string | null;
+  userId: string | number;
   games: GameSummary[];
   inviteBaseUrl: string;
   canCreateGames: boolean;
@@ -20,6 +21,7 @@ interface UserDashboardProps {
 export function UserDashboard({
   displayName,
   userEmail,
+  userId,
   games,
   inviteBaseUrl,
   canCreateGames,
@@ -202,7 +204,7 @@ export function UserDashboard({
             <section
               className={`${styles.tutorial} ${styles.dashboardTutorial}`}
             >
-            <h2 className={styles.tutorialTitle}>Come funziona Fantanome</h2>
+              <h2 className={styles.tutorialTitle}>Come funziona Fantanome</h2>
               <ol className={styles.tutorialList}>
                 <li>Crea e personalizza la tua squadra di piccoli campioni.</li>
                 <li>Scegli la formazione migliore in base alle partite.</li>
@@ -211,7 +213,8 @@ export function UserDashboard({
                   classifica.
                 </li>
                 <li>
-                  Sfida gli altri allenatori nelle leghe settimanali e stagionali.
+                  Sfida gli altri allenatori nelle leghe settimanali e
+                  stagionali.
                 </li>
               </ol>
               <button
@@ -225,6 +228,7 @@ export function UserDashboard({
           </div>
           <GamesManager
             games={games}
+            userId={userId}
             inviteBaseUrl={inviteBaseUrl}
             canCreateGames={canCreateGames}
           />
