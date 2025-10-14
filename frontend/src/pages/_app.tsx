@@ -1,6 +1,7 @@
 import type { Session } from "next-auth";
 import type { AppProps } from "next/app";
 import { SessionProvider } from "next-auth/react";
+import { Suspense } from "react";
 
 export default function App({
   Component,
@@ -8,7 +9,9 @@ export default function App({
 }: AppProps<{ session: Session | null }>) {
   return (
     <SessionProvider session={session}>
-      <Component {...pageProps} />
+      <Suspense fallback={<div>Loading...</div>}>
+        <Component {...pageProps} />
+      </Suspense>
     </SessionProvider>
   );
 }
