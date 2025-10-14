@@ -9,6 +9,7 @@ import { getAppBaseUrl, getStrapiConfig } from "../lib/env";
 import { mapStrapiGamesResponse } from "../lib/games";
 import type { GameSummary } from "types/game";
 import styles from "./page.module.css";
+import { Suspense } from "react";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -121,10 +122,9 @@ export default async function Home() {
 
   const inviteBaseUrl = getAppBaseUrl();
   const canCreateGames = userType === "parent";
-  const userId = session.id;
 
   return (
-    <>
+    <Suspense>
       <UserDashboard
         displayName={displayName}
         userEmail={userEmail}
@@ -134,6 +134,6 @@ export default async function Home() {
         canCreateGames={canCreateGames}
         userType={userType}
       />
-    </>
+    </Suspense>
   );
 }
