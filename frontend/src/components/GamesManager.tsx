@@ -124,11 +124,7 @@ export function GamesManager({
         return;
       }
 
-      const createdGame = response.data.game;
-      setItems((prev) => {
-        const exists = prev.some((game) => game.id === createdGame.id);
-        return exists ? prev : [createdGame, ...prev];
-      });
+      retrieveGames();
       setCreateForm(INITIAL_CREATE_STATE);
       setCreateError(null);
     } catch (error) {
@@ -216,11 +212,7 @@ export function GamesManager({
         setJoinError(message);
         return;
       }
-
-      const updatedGame = (payload as { game: GameSummary }).game;
-      setItems((prev) =>
-        prev.map((game) => (game.id === updatedGame.id ? updatedGame : game))
-      );
+      retrieveGames();
       setJoinError(null);
     } catch (error) {
       console.error("Invite regeneration failed", error);
@@ -387,7 +379,7 @@ export function GamesManager({
           </p>
         ) : (
           orderedGames.map((game) => {
-            const isOwner = game.owner.id;
+            const isOwner = game.owner?.id;
             const inviteLink = `${inviteBase}/registrazione?code=${encodeURIComponent(
               game.inviteCode
             )}`;
