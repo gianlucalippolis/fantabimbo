@@ -1,4 +1,6 @@
 import { GameParticipant, GameSummary } from "types/game";
+import api from "./axios";
+import { AxiosError } from "axios";
 
 type StrapiEntity<T> = {
   id: number;
@@ -107,16 +109,17 @@ export function mapStrapiGame(
     slug: entity.attributes.slug ?? null,
     description: entity.attributes.description ?? null,
     inviteCode: entity.attributes.inviteCode,
-    owner:
-      owner ?? {
-        id: 0,
-        email: null,
-        firstName: null,
-        lastName: null,
-        userType: null,
-      },
+    owner: owner ?? {
+      id: 0,
+      email: null,
+      firstName: null,
+      lastName: null,
+      userType: null,
+    },
     participants,
-    isOwner: isOwner || (!isOwner && isParticipant && owner?.id === numericCurrentUserId),
+    isOwner:
+      isOwner ||
+      (!isOwner && isParticipant && owner?.id === numericCurrentUserId),
     createdAt: entity.attributes.createdAt,
   };
 }
@@ -128,3 +131,36 @@ export function mapStrapiGamesResponse(
   const data = response?.data ?? [];
   return data.map((entity) => mapStrapiGame(entity, currentUserId));
 }
+
+export const joinGame = async (code: string) => {
+  try {
+    const trimmedCode = code.trim().toUpperCase();
+
+    if (!trimmedCode) {
+      return {
+        valid: false,
+        errMessage: "Inserisci un codice valido",
+      };
+    }
+
+    const response = await api.post("/api/games/join", {
+      inviteCode: trimmedCode,
+    });
+
+    return {
+      valid: true,
+      data: response.data.data,
+      name: response.data.data.name,
+    };
+  } catch (e) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const err = e as any;
+
+    return {
+      valid: false,
+      message:
+        err?.response?.data?.error?.message ??
+        "Impossibile unirsi alla partita",
+    };
+  }
+};

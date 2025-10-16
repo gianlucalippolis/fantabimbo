@@ -32,9 +32,6 @@ interface PopulatedGame {
 const USER_FIELDS = ["id", "email", "firstName", "lastName", "userType"];
 
 const DEFAULT_POPULATE = {
-  owner: {
-    fields: USER_FIELDS,
-  },
   participants: {
     fields: USER_FIELDS,
   },
@@ -191,7 +188,6 @@ export default factories.createCoreController(
         filters: {
           inviteCode,
         },
-        populate: DEFAULT_POPULATE as any,
         limit: 1,
       })) as PopulatedGame[];
 
@@ -320,9 +316,7 @@ export default factories.createCoreController(
       }
 
       if (game.owner?.id !== user.id) {
-        return ctx.forbidden(
-          "Solo il creatore della partita può eliminarla."
-        );
+        return ctx.forbidden("Solo il creatore della partita può eliminarla.");
       }
 
       const deleted = (await strapi.entityService.delete(
@@ -335,6 +329,33 @@ export default factories.createCoreController(
 
       const sanitized = await this.sanitizeOutput(deleted, ctx);
       return this.transformResponse(sanitized);
+    },
+    async validate(ctx) {
+      const codeParam = ctx.query.code;
+      const rawCode = Array.isArray(codeParam) ? codeParam[0] : codeParam;
+
+      if (!rawCode) {
+        return ctx.badRequest("Codice invito mancante.");
+      }
+
+      const inviteCode = rawCode.trim().toUpperCase();
+
+      const [game] = await strapi.entityService.findMany("api::game.game", {
+        filters: { inviteCode },
+        fields: ["id", "name", "inviteCode"],
+        limit: 1,
+      });
+
+      if (!game) {
+        return this.transformResponse({
+          valid: false,
+        });
+      }
+
+      return this.transformResponse({
+        valid: true,
+        name: game.name,
+      });
     },
   })
 );

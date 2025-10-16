@@ -147,6 +147,7 @@ export const authOptions: NextAuthOptions = {
   ],
   callbacks: {
     async jwt({ token, user }) {
+      console.log("token", token);
       const mutableToken = token as ExtendedJWT;
 
       if (user) {

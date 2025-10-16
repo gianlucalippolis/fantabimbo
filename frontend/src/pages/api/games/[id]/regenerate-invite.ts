@@ -59,11 +59,19 @@ export default async function handler(
       decode: authOptions.jwt?.decode,
     });
     if (token) {
-      if (!strapiJwt && typeof (token as Record<string, unknown>).jwt === "string") {
+      if (
+        !strapiJwt &&
+        typeof (token as Record<string, unknown>).jwt === "string"
+      ) {
         strapiJwt = (token as Record<string, string>).jwt;
       }
-      if (currentUserId == null && (token as Record<string, unknown>).id != null) {
-        currentUserId = (token as Record<string, unknown>).id as number | string;
+      if (
+        currentUserId == null &&
+        (token as Record<string, unknown>).id != null
+      ) {
+        currentUserId = (token as Record<string, unknown>).id as
+          | number
+          | string;
       }
     }
   }
@@ -82,17 +90,14 @@ export default async function handler(
       });
 
       if (!profileResponse.ok) {
-        return res
-          .status(401)
-          .json({ error: "Autenticazione richiesta." });
+        return res.status(401).json({ error: "Autenticazione richiesta." });
       }
 
       const profile = (await profileResponse.json().catch(() => ({}))) as {
         id?: number | string;
       };
 
-      currentUserId =
-        profile?.id != null ? profile.id : currentUserId ?? null;
+      currentUserId = profile?.id != null ? profile.id : currentUserId ?? null;
     } catch (error) {
       console.error("Failed to resolve Strapi user profile", error);
       return res.status(401).json({ error: "Autenticazione richiesta." });
@@ -111,7 +116,7 @@ export default async function handler(
   try {
     let response: Response | undefined;
     const targetUrls = buildFallbackUrls(
-      `${apiUrl}/api/games/${encodeURIComponent(targetId)}/regenerate-invite`
+      `${apiUrl}/api/games/regenerate-invite/${encodeURIComponent(targetId)}`
     );
     let lastError: unknown;
     for (const target of targetUrls) {
@@ -130,11 +135,15 @@ export default async function handler(
 
     if (!response) {
       if (lastError instanceof Error) {
-        const errorDetails = (lastError as Error & { cause?: { code?: string }; code?: string }).cause?.code ??
+        const errorDetails =
+          (lastError as Error & { cause?: { code?: string }; code?: string })
+            .cause?.code ??
           (lastError as Error & { code?: string }).code ??
           lastError.message;
         throw new Error(
-          `Impossibile contattare Strapi (${targetUrls.join(", ")}). Dettagli: ${errorDetails}`
+          `Impossibile contattare Strapi (${targetUrls.join(
+            ", "
+          )}). Dettagli: ${errorDetails}`
         );
       }
 

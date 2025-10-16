@@ -6,6 +6,7 @@ import type ISession from "types/session";
 import styles from "../app/page.module.css";
 import type { GameSummary } from "types/game";
 import api from "../lib/axios";
+import { joinGame } from "../lib/games";
 
 interface GamesManagerProps {
   games: GameSummary[];
@@ -149,36 +150,17 @@ export function GamesManager({
 
     try {
       setIsJoining(true);
-      const response = await fetch("/api/games/join", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          ...(strapiJwt ? { Authorization: `Bearer ${strapiJwt}` } : {}),
-        },
-        credentials: "include",
-        body: JSON.stringify({ inviteCode: trimmedCode }),
-      });
+      const result = await joinGame(joinCode);
 
-      const payload = await response.json().catch(() => ({}));
-
-      if (!response.ok) {
-        const message =
-          (payload as { error?: string })?.error ??
-          "Impossibile partecipare alla partita con questo codice.";
-        setJoinError(message);
+      if (result.valid === false) {
+        setJoinError("Impossibile partecipare alla partita con questo codice.");
         return;
       }
 
-      const joinedGame = (payload as { game: GameSummary }).game;
-      setItems((prev) => {
-        const filtered = prev.filter((game) => game.id !== joinedGame.id);
-        return [joinedGame, ...filtered];
-      });
-      setJoinCode("");
-      setJoinError(null);
-    } catch (error) {
+      retrieveGames();
+    } catch (error: unknown) {
       console.error("Game join failed", error);
-      setJoinError("Impossibile entrare nella partita. Riprova più tardi.");
+      setJoinError(error as string);
     } finally {
       setIsJoining(false);
     }
@@ -192,7 +174,7 @@ export function GamesManager({
     try {
       setRegeneratingId(gameId);
       const response = await fetch(
-        `/api/games/${encodeURIComponent(gameId)}/regenerate-invite`,
+        `/api/games/regenerate-invite/${encodeURIComponent(gameId)}`,
         {
           method: "POST",
           credentials: "include",

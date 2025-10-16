@@ -1,0 +1,26 @@
+paths:
+  /games/join:
+    post:
+      tags:
+        - Game
+      summary: Join a game using an invite code
+      operationId: joinGame
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                inviteCode:
+                  type: string
+                  example: "ABC123"
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found

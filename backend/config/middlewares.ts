@@ -12,7 +12,7 @@ export default [
     name: "strapi::cors",
     config: {
       enabled: true,
-      origin: ["http://localhost:3000", "https://fantanome.vercel.app"], // oppure specifica il dominio del tuo frontend
+      origin: ["http://localhost:3000", "https://fantanome.vercel.app"],
       headers: ["Content-Type", "Authorization", "Origin", "Accept"],
       methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     },

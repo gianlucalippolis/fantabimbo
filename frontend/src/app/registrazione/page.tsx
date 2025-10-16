@@ -5,6 +5,8 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { FormEvent, Suspense, useEffect, useMemo, useState } from "react";
 import styles from "../../styles/Login.module.css";
 import { Button } from "components/Button";
+import api from "../../lib/axios";
+import { joinGame } from "../../lib/games";
 
 const MIN_PASSWORD_LENGTH = 8;
 
@@ -81,23 +83,20 @@ function RegisterContent() {
       setInviteError(null);
       setInviteGameName(null);
       try {
-        const response = await fetch(
+        const response = await api.get(
           `/api/games/validate?code=${encodeURIComponent(code)}`
         );
-        const payload = await response.json().catch(() => ({}));
         if (!isMounted) {
           return;
         }
-        if (!response.ok || !(payload as { valid?: boolean }).valid) {
-          const message =
-            (payload as { error?: string })?.error ??
-            "Codice invito non valido o scaduto.";
-          setInviteError(message);
+
+        if (response.status !== 200 || response.data.data.valid === false) {
+          setInviteError("Codice invito non valido o scaduto.");
           return;
         }
 
-        const gameName =
-          (payload as { name?: string }).name ?? "Partita Fantanome";
+        debugger;
+        const gameName = response.data.data.name ?? "Partita Fantanome";
         setInviteGameName(gameName);
         setInviteError(null);
       } catch (validateError) {
@@ -259,22 +258,7 @@ function RegisterContent() {
       if (signInResult?.ok) {
         if (form.accountType === "player" && normalizedInviteCode) {
           try {
-            const joinResponse = await fetch("/api/games/join", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              credentials: "include",
-              body: JSON.stringify({ inviteCode: normalizedInviteCode }),
-            });
-            const joinPayload = await joinResponse.json().catch(() => ({}));
-            if (!joinResponse.ok) {
-              const message =
-                (joinPayload as { error?: string })?.error ??
-                "Registrazione riuscita, ma il codice invito non è più valido.";
-              setError(message);
-              return;
-            }
+            const joinResponse = joinGame(normalizedInviteCode);
           } catch (joinError) {
             console.error("Failed to join via invite code", joinError);
             setError(
