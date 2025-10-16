@@ -74,14 +74,6 @@ export function mapStrapiUsers(
   }));
 }
 
-export function mapStrapiGamesResponse(
-  response: StrapiResponse<StrapiEntity<StrapiGameAttributes>[]>,
-  currentUserId?: number | string | null
-): GameSummary[] {
-  const data = response?.data ?? [];
-  return data.map((entity) => mapStrapiGame(entity, currentUserId));
-}
-
 export const joinGame = async (code: string) => {
   try {
     const trimmedCode = code.trim().toUpperCase();

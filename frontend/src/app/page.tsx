@@ -7,7 +7,6 @@ import { UserDashboard } from "components/UserDashboard";
 import { UserHydrator } from "components/UserHydrator";
 import { authOptions } from "../lib/auth";
 import { getAppBaseUrl, getStrapiConfig } from "../lib/env";
-import { mapStrapiGamesResponse } from "../lib/games";
 import type { GameSummary } from "types/game";
 import styles from "./page.module.css";
 import { Suspense } from "react";
@@ -110,7 +109,7 @@ export default async function Home() {
 
       if (response.ok) {
         const payload = await response.json();
-        games = mapStrapiGamesResponse(payload, currentUserId ?? null);
+        games = payload;
       }
     } catch (error) {
       console.error("Failed to load games list", error);

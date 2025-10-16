@@ -12,13 +12,15 @@ const api = axios.create({
   },
 });
 
-api.interceptors.request.use(async (config) => {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+api.interceptors.request.use(async (config: any) => {
   if (typeof window === "undefined") {
     return config;
   }
 
-  const state = store.getState();
-  const storedJwt = state.user.profile?.jwt ?? null;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const state: any = store.getState();
+  const storedJwt = state?.user?.profile?.jwt ?? null;
   let token = storedJwt;
 
   if (!token) {

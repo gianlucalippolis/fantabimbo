@@ -1,11 +1,9 @@
-import axios from "axios";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { getServerSession } from "next-auth";
 import type { Session } from "next-auth";
 import { authOptions } from "../../../lib/auth";
 import { getStrapiConfig } from "../../../lib/env";
-import { mapStrapiGame } from "../../../lib/games";
 import type { GameSummary } from "types/game";
 import styles from "./page.module.css";
 import api from "../../../lib/axios";
@@ -66,7 +64,8 @@ export default async function GameDetailPage({ params }: RouteParams) {
       throw new Error(`Game fetch failed (${response.status})`);
     }
 
-    const payload = response.data as { data?: unknown };
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const payload: any = response.data as { data?: unknown };
 
     if (!payload?.data) {
       notFound();
