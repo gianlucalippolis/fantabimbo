@@ -4,7 +4,7 @@ import { getServerSession } from "next-auth/next";
 import { getToken } from "next-auth/jwt";
 import { authOptions } from "../../../lib/auth";
 import { getStrapiConfig } from "../../../lib/env";
-import { mapStrapiGamesResponse, mapStrapiGame } from "../../../lib/games";
+import { mapStrapiGamesResponse } from "../../../lib/games";
 import type { GameSummary } from "../../../types/game";
 
 type DataResponse =
@@ -220,10 +220,8 @@ export default async function handler(
         }
       );
 
-      const game = mapStrapiGame(
-        (payload as { data: never })?.data as never,
-        currentUserId ?? null
-      );
+      debugger;
+      const game = payload.data;
       return res.status(201).json({ game });
     } catch (error) {
       const message =

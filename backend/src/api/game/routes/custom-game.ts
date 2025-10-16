@@ -2,7 +2,7 @@ export default {
   routes: [
     {
       method: "GET",
-      path: "/games/validate",
+      path: "/invite/validate",
       handler: "game.validate",
       config: {
         auth: false,

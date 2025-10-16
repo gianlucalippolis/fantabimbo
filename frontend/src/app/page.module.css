@@ -644,6 +644,13 @@
   color: #5f4634;
 }
 
+
+.gameActions {
+  margin-top: 1rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
 .gameInvite {
   display: grid;
   gap: 0.75rem;

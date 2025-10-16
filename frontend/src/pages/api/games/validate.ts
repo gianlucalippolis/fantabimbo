@@ -41,7 +41,7 @@ export default async function handler(
   try {
     let response: Response | undefined;
     const targets = buildFallbackUrls(
-      `${apiUrl}/api/games/validate?code=${encodeURIComponent(inviteCode)}`
+      `${apiUrl}/api/invite/validate?code=${encodeURIComponent(inviteCode)}`
     );
     let lastError: unknown;
     for (const target of targets) {
@@ -68,9 +68,7 @@ export default async function handler(
           )}). Dettagli: ${details}`
         );
       }
-      throw new Error(
-        `Impossibile contattare Strapi (${targets.join(", ")}).`
-      );
+      throw new Error(`Impossibile contattare Strapi (${targets.join(", ")}).`);
     }
 
     const payload = await response.json().catch(() => ({}));
@@ -87,7 +85,11 @@ export default async function handler(
       });
     }
 
-    const validPayload = payload as { valid?: boolean; name?: string; inviteCode?: string };
+    const validPayload = payload as {
+      valid?: boolean;
+      name?: string;
+      inviteCode?: string;
+    };
     if (!validPayload.valid) {
       return res.status(404).json({
         valid: false,

@@ -1,12 +1,15 @@
 "use client";
 
+import Link from "next/link";
 import { useSession } from "next-auth/react";
-import { FormEvent, useEffect, useMemo, useState } from "react";
+import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import type ISession from "types/session";
 import styles from "../app/page.module.css";
 import type { GameSummary } from "types/game";
 import api from "../lib/axios";
 import { joinGame } from "../lib/games";
+import { useAppDispatch, useAppSelector } from "../store/hooks";
+import { setUserGames } from "../store/user";
 
 interface GamesManagerProps {
   games: GameSummary[];
@@ -35,8 +38,13 @@ export function GamesManager({
 }: GamesManagerProps) {
   const { data: session } = useSession();
   const typedSession = session as ISession | null;
-  const strapiJwt = typedSession?.jwt ?? null;
-  const [items, setItems] = useState<GamesState>(games);
+  const profileFromStore = useAppSelector((state) => state.user.profile);
+  const strapiJwt = typedSession?.jwt ?? profileFromStore?.jwt ?? null;
+  const dispatch = useAppDispatch();
+  const storedGames = useAppSelector((state) => state.user.games);
+  const [items, setItems] = useState<GamesState>(
+    storedGames.length > 0 ? storedGames : games
+  );
   const [createForm, setCreateForm] =
     useState<CreateFormState>(INITIAL_CREATE_STATE);
   const [createError, setCreateError] = useState<string | null>(null);
@@ -50,6 +58,7 @@ export function GamesManager({
     useState<GameSummary | null>(null);
   const [deleteError, setDeleteError] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  const hasFetched = useRef(false);
 
   const creationNotAllowedMessage =
     "Solo i genitori possono creare una partita. Chiedi a un genitore di creare la lega.";
@@ -81,13 +90,35 @@ export function GamesManager({
   }
 
   async function retrieveGames() {
-    const res = await api.get("/api/games");
-    setItems(res.data.data);
+    try {
+      const res = await api.get("/api/games");
+      const fetched: GameSummary[] = res.data?.games ?? res.data?.data ?? [];
+      setItems(fetched);
+      dispatch(setUserGames(fetched));
+    } catch (error) {
+      console.error("Failed to load games from API", error);
+    }
   }
 
   useEffect(() => {
-    retrieveGames();
-  }, []);
+    if (storedGames.length > 0) {
+      setItems(storedGames);
+      return;
+    }
+
+    if (games.length > 0) {
+      setItems(games);
+      dispatch(setUserGames(games));
+      return;
+    }
+
+    if (!hasFetched.current) {
+      hasFetched.current = true;
+      retrieveGames().finally(() => {
+        hasFetched.current = false;
+      });
+    }
+  }, [dispatch, games, storedGames]);
 
   async function handleCreate(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -157,6 +188,8 @@ export function GamesManager({
         return;
       }
 
+      setJoinCode("");
+      setJoinError(null);
       retrieveGames();
     } catch (error: unknown) {
       console.error("Game join failed", error);
@@ -241,9 +274,13 @@ export function GamesManager({
       await api.delete(
         `/api/games/${encodeURIComponent(gamePendingDelete.id)}`
       );
-      setItems((prev) =>
-        prev.filter((game) => game.id !== gamePendingDelete.id)
-      );
+      setItems((prev) => {
+        const updated = prev.filter(
+          (game) => game.id !== gamePendingDelete.id
+        );
+        dispatch(setUserGames(updated));
+        return updated;
+      });
       setGamePendingDelete(null);
       setDeleteError(null);
     } catch (error) {
@@ -431,6 +468,20 @@ export function GamesManager({
                       </>
                     ) : null}
                   </div>
+                </div>
+                <div className={styles.gameActions}>
+                  <Link
+                    href={`/partite/${encodeURIComponent(game.id)}`}
+                    className={styles.gamesPrimaryButton}
+                  >
+                    Dettagli partita
+                  </Link>
+                  <Link
+                    href={`/lista-nomi?game=${encodeURIComponent(game.id)}`}
+                    className={styles.gamesSecondaryButton}
+                  >
+                    Compila nomi
+                  </Link>
                 </div>
               </article>
             );

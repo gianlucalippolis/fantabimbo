@@ -82,7 +82,7 @@ export default factories.createCoreController(
         {
           populate: DEFAULT_POPULATE as any,
         }
-      )) as PopulatedGame | null;
+      )) as any | null;
 
       if (!game) {
         return ctx.notFound("Partita non trovata.");

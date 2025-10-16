@@ -38,6 +38,30 @@ body {
   color: rgba(95, 70, 52, 0.7);
 }
 
+.backLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #7b604c;
+  text-decoration: none;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.backLink:hover {
+  color: #a58463;
+}
+
+.backLink:focus-visible {
+  outline: 3px solid rgba(194, 160, 131, 0.35);
+  outline-offset: 3px;
+}
+
 .notice {
   margin-top: 1rem;
   font-size: 0.9rem;
@@ -133,6 +157,49 @@ body {
 
 .helperLink:hover {
   color: #a58463;
+}
+
+.orderControls {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-top: 0.35rem;
+  margin-left: 0.5rem;
+}
+
+.orderButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 999px;
+  border: 1px solid rgba(194, 160, 131, 0.45);
+  background: rgba(255, 255, 255, 0.95);
+  color: #7b604c;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease,
+    background 0.15s ease;
+}
+
+.orderButton:hover:not(:disabled) {
+  background: rgba(194, 160, 131, 0.12);
+  box-shadow: 0 4px 10px rgba(194, 160, 131, 0.25);
+  transform: translateY(-1px);
+}
+
+.orderButton:focus-visible {
+  outline: 3px solid rgba(194, 160, 131, 0.35);
+  outline-offset: 2px;
+}
+
+.orderButton:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
 }
 
 .input {

@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { getServerSession } from "next-auth";
 import { Logo } from "components/Logo";
 import { UserDashboard } from "components/UserDashboard";
+import { UserHydrator } from "components/UserHydrator";
 import { authOptions } from "../lib/auth";
 import { getAppBaseUrl, getStrapiConfig } from "../lib/env";
 import { mapStrapiGamesResponse } from "../lib/games";
@@ -125,6 +126,16 @@ export default async function Home() {
 
   return (
     <Suspense>
+      <UserHydrator
+        profile={{
+          id: session.id,
+          displayName,
+          email: userEmail ?? null,
+          userType,
+          jwt: strapiJwt ?? null,
+        }}
+        games={games}
+      />
       <UserDashboard
         displayName={displayName}
         userEmail={userEmail}

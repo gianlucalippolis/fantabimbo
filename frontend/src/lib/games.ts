@@ -74,56 +74,6 @@ export function mapStrapiUsers(
   }));
 }
 
-export function mapStrapiGame(
-  entity: StrapiEntity<StrapiGameAttributes>,
-  currentUserId?: number | string | null
-): GameSummary {
-  const owner = mapStrapiUser(entity.attributes.owner);
-  const participants = mapStrapiUsers(entity.attributes.participants);
-  const numericCurrentUserId = (() => {
-    if (currentUserId == null) {
-      return null;
-    }
-    if (typeof currentUserId === "number" && !Number.isNaN(currentUserId)) {
-      return currentUserId;
-    }
-    if (typeof currentUserId === "string") {
-      const parsed = Number.parseInt(currentUserId, 10);
-      return Number.isNaN(parsed) ? null : parsed;
-    }
-    return null;
-  })();
-
-  const isOwner =
-    owner?.id != null && numericCurrentUserId != null
-      ? owner.id === numericCurrentUserId
-      : false;
-
-  const isParticipant =
-    numericCurrentUserId != null &&
-    participants.some((participant) => participant.id === numericCurrentUserId);
-
-  return {
-    id: entity.id,
-    name: entity.attributes.name,
-    slug: entity.attributes.slug ?? null,
-    description: entity.attributes.description ?? null,
-    inviteCode: entity.attributes.inviteCode,
-    owner: owner ?? {
-      id: 0,
-      email: null,
-      firstName: null,
-      lastName: null,
-      userType: null,
-    },
-    participants,
-    isOwner:
-      isOwner ||
-      (!isOwner && isParticipant && owner?.id === numericCurrentUserId),
-    createdAt: entity.attributes.createdAt,
-  };
-}
-
 export function mapStrapiGamesResponse(
   response: StrapiResponse<StrapiEntity<StrapiGameAttributes>[]>,
   currentUserId?: number | string | null
