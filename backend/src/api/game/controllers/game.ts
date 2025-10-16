@@ -32,6 +32,9 @@ interface PopulatedGame {
 const USER_FIELDS = ["id", "email", "firstName", "lastName", "userType"];
 
 const DEFAULT_POPULATE = {
+  owner: {
+    fields: USER_FIELDS,
+  },
   participants: {
     fields: USER_FIELDS,
   },

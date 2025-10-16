@@ -91,7 +91,7 @@ export function GamesManager({
 
   async function retrieveGames() {
     try {
-      const res = await api.get("/api/games");
+      const res = await api.get("/api/games?popuplate=[owner]");
       const fetched: GameSummary[] = res.data?.games ?? res.data?.data ?? [];
       setItems(fetched);
       dispatch(setUserGames(fetched));
@@ -275,9 +275,7 @@ export function GamesManager({
         `/api/games/${encodeURIComponent(gamePendingDelete.id)}`
       );
       setItems((prev) => {
-        const updated = prev.filter(
-          (game) => game.id !== gamePendingDelete.id
-        );
+        const updated = prev.filter((game) => game.id !== gamePendingDelete.id);
         dispatch(setUserGames(updated));
         return updated;
       });
@@ -398,7 +396,7 @@ export function GamesManager({
           </p>
         ) : (
           orderedGames.map((game) => {
-            const isOwner = game.owner?.id;
+            const isOwner = game.owner?.id === userId;
             const inviteLink = `${inviteBase}/registrazione?code=${encodeURIComponent(
               game.inviteCode
             )}`;
