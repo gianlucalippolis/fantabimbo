@@ -447,7 +447,18 @@
   gap: 0.4rem;
 }
 
-.gamesFormRow label {
+.gamesFormRow label { {
+
+.inputHint {
+  margin: 0.25rem 0 0;
+  font-size: 0.82rem;
+  color: rgba(47, 36, 27, 0.65);
+}
+  margin: 0.25rem 0 0;
+  font-size: 0.82rem;
+  color: rgba(47, 36, 27, 0.65);
+}
+
   font-weight: 600;
   color: rgba(47, 36, 27, 0.8);
 }

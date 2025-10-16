@@ -144,6 +144,27 @@ export default factories.createCoreController(
         return ctx.badRequest("Il nome della partita è obbligatorio.");
       }
 
+      const upperName = name.toUpperCase();
+
+      const existingSameName = await strapi.entityService.findMany(
+        "api::game.game",
+        {
+          filters: {
+            name: upperName,
+            owner: {
+              id: user.id,
+            },
+          },
+          limit: 1,
+        }
+      );
+
+      if (Array.isArray(existingSameName) && existingSameName.length > 0) {
+        return ctx.conflict(
+          "Hai già creato una partita con questo nome. Usa un nome diverso."
+        );
+      }
+
       try {
         const inviteCode = await strapi
           .service("api::game.game")

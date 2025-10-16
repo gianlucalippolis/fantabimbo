@@ -306,6 +306,10 @@ export function GamesManager({
             <h3>Crea una partita</h3>
             <div className={styles.gamesFormRow}>
               <label htmlFor="game-name">Nome della partita</label>
+              <p className={styles.inputHint}>
+                Evita di inserire il nome del bambino: sarà visibile a tutti i
+                partecipanti.
+              </p>
               <input
                 id="game-name"
                 name="game-name"
