@@ -96,24 +96,6 @@ export default async function Home() {
       console.error("Failed to fetch profile", error);
     }
 
-    try {
-      const response = await fetch(
-        `${strapiUrl}/api/games?populate[owner]=*&populate[participants]=*`,
-        {
-          headers: {
-            Authorization: `Bearer ${strapiJwt}`,
-          },
-          cache: "no-store",
-        }
-      );
-
-      if (response.ok) {
-        const payload = await response.json();
-        games = payload;
-      }
-    } catch (error) {
-      console.error("Failed to load games list", error);
-    }
   }
 
   if (requiresProfileCompletion) {

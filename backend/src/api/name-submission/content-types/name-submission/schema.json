@@ -1,0 +1,45 @@
+{
+  "kind": "collectionType",
+  "collectionName": "name_submissions",
+  "info": {
+    "singularName": "name-submission",
+    "pluralName": "name-submissions",
+    "displayName": "Name Submission",
+    "description": "Submissions dei nomi da parte di genitori e partecipanti"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "game": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::game.game",
+      "required": true
+    },
+    "submitter": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "plugin::users-permissions.user",
+      "required": true
+    },
+    "submitterType": {
+      "type": "enumeration",
+      "enum": ["parent", "participant"],
+      "required": true
+    },
+    "names": {
+      "type": "json",
+      "required": true
+    },
+    "isParentPreference": {
+      "type": "boolean",
+      "default": false
+    },
+    "submissionOrder": {
+      "type": "integer",
+      "required": false
+    }
+  }
+}

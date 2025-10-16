@@ -3,6 +3,7 @@ import { factories } from "@strapi/strapi";
 interface CreateGameBody {
   name?: string;
   description?: string | null;
+  revealAt?: string | null;
 }
 
 interface JoinGameBody {
@@ -24,6 +25,7 @@ interface PopulatedGame {
   name?: string | null;
   description?: string | null;
   inviteCode?: string | null;
+  revealAt?: string | null;
   owner?: PopulatedUser | null;
   participants?: PopulatedUser[] | null;
   [key: string]: unknown;
@@ -39,6 +41,24 @@ const DEFAULT_POPULATE = {
     fields: USER_FIELDS,
   },
 } as any;
+
+function parseRevealAt(value?: string | null): string | null {
+  if (typeof value !== "string") {
+    return null;
+  }
+
+  const trimmed = value.trim();
+  if (!trimmed) {
+    return null;
+  }
+
+  const timestamp = Date.parse(trimmed);
+  if (Number.isNaN(timestamp)) {
+    return null;
+  }
+
+  return new Date(timestamp).toISOString();
+}
 
 export default factories.createCoreController(
   "api::game.game",
@@ -139,21 +159,20 @@ export default factories.createCoreController(
 
       const name = rawBody.name?.trim();
       const description = rawBody.description?.trim();
+      const revealAt = parseRevealAt(rawBody.revealAt ?? null);
 
       if (!name) {
         return ctx.badRequest("Il nome della partita è obbligatorio.");
       }
 
-      const upperName = name.toUpperCase();
-
       const existingSameName = await strapi.entityService.findMany(
         "api::game.game",
         {
           filters: {
-            name: upperName,
-            owner: {
-              id: user.id,
+            name: {
+              $eqi: name,
             },
+            owner: user.id,
           },
           limit: 1,
         }
@@ -174,6 +193,7 @@ export default factories.createCoreController(
           name,
           slug: name,
           description: description || null,
+          revealAt,
           inviteCode,
           owner: user.id as ID,
           participants: [user.id as ID],
@@ -181,7 +201,14 @@ export default factories.createCoreController(
 
         const entity = (await strapi.entityService.create("api::game.game", {
           data: createData as any,
-          populate: DEFAULT_POPULATE as any,
+          populate: {
+            owner: {
+              fields: USER_FIELDS,
+            },
+            participants: {
+              fields: USER_FIELDS,
+            },
+          } as any,
         })) as PopulatedGame;
 
         const sanitized = await this.sanitizeOutput(entity, ctx);
@@ -190,6 +217,138 @@ export default factories.createCoreController(
         strapi.log.error("Game creation failed", error);
         return ctx.internalServerError(
           "Impossibile creare la partita. Riprova più tardi."
+        );
+      }
+    },
+
+    async update(this: any, ctx) {
+      const user = ctx.state.user;
+
+      if (!user) {
+        return ctx.unauthorized("Autenticazione richiesta.");
+      }
+
+      const gameId = ctx.params?.id;
+      if (!gameId) {
+        return ctx.badRequest("Identificativo della partita mancante.");
+      }
+
+      const existing = (await strapi.entityService.findOne(
+        "api::game.game",
+        gameId,
+        {
+          populate: {
+            owner: {
+              fields: ["id"],
+            },
+          },
+        }
+      )) as PopulatedGame | null;
+
+      if (!existing) {
+        return ctx.notFound("Partita non trovata.");
+      }
+
+      if (existing.owner?.id !== user.id) {
+        return ctx.forbidden(
+          "Solo il creatore della partita può modificarla."
+        );
+      }
+
+      const rawPayload = ((ctx.request.body as { data?: Record<string, unknown> })?.data ??
+        (ctx.request.body as Record<string, unknown>) ??
+        {}) as Record<string, unknown>;
+
+      const updateData: Record<string, unknown> = {};
+
+      if (Object.prototype.hasOwnProperty.call(rawPayload, "name")) {
+        const rawName = rawPayload.name;
+        const trimmed =
+          typeof rawName === "string"
+            ? rawName.trim()
+            : String(rawName ?? "").trim();
+
+        if (!trimmed) {
+          return ctx.badRequest("Il nome della partita è obbligatorio.");
+        }
+
+        if (trimmed !== existing.name) {
+          const conflicting = await strapi.entityService.findMany(
+            "api::game.game",
+            {
+              filters: {
+                name: {
+                  $eqi: trimmed,
+                },
+                owner: user.id,
+                id: {
+                  $ne: existing.id,
+                },
+              },
+              fields: ["id"],
+              limit: 1,
+            }
+          );
+
+          if (Array.isArray(conflicting) && conflicting.length > 0) {
+            return ctx.conflict(
+              "Hai già creato una partita con questo nome. Usa un nome diverso."
+            );
+          }
+        }
+
+        updateData.name = trimmed;
+        updateData.slug = trimmed;
+      }
+
+      if (Object.prototype.hasOwnProperty.call(rawPayload, "description")) {
+        const rawDescription = rawPayload.description;
+        if (typeof rawDescription === "string") {
+          const trimmedDescription = rawDescription.trim();
+          updateData.description = trimmedDescription || null;
+        } else if (rawDescription === null) {
+          updateData.description = null;
+        }
+      }
+
+      if (Object.prototype.hasOwnProperty.call(rawPayload, "revealAt")) {
+        const rawReveal = rawPayload.revealAt;
+        updateData.revealAt =
+          typeof rawReveal === "string"
+            ? parseRevealAt(rawReveal)
+            : rawReveal === null
+            ? null
+            : undefined;
+      }
+
+      if (Object.keys(updateData).length === 0) {
+        const sanitized = await this.sanitizeOutput(existing, ctx);
+        return this.transformResponse(sanitized);
+      }
+
+      try {
+        const updated = await strapi.entityService.update(
+          "api::game.game",
+          gameId,
+          {
+            data: updateData as any,
+            populate: {
+              owner: {
+                fields: USER_FIELDS,
+              },
+              participants: {
+                fields: USER_FIELDS,
+              },
+            } as any,
+          }
+        );
+
+        const sanitized = await this.sanitizeOutput(updated, ctx);
+        return this.transformResponse(sanitized);
+      } catch (error) {
+        strapi.log.error("Game update failed", error);
+        return ctx.internalServerError(
+          "Impossibile aggiornare la partita. Riprova più tardi."
         );
       }
     },

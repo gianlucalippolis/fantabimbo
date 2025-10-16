@@ -95,7 +95,6 @@ function RegisterContent() {
           return;
         }
 
-        debugger;
         const gameName = response.data.data.name ?? "Partita Fantanome";
         setInviteGameName(gameName);
         setInviteError(null);

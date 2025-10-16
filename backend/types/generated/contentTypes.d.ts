@@ -633,6 +633,7 @@ export interface ApiGameGame extends Struct.CollectionTypeSchema {
       'plugin::users-permissions.user'
     >;
     publishedAt: Schema.Attribute.DateTime;
+    revealAt: Schema.Attribute.DateTime;
     slug: Schema.Attribute.UID<'name'> & Schema.Attribute.Required;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
@@ -666,6 +667,48 @@ export interface ApiGlobalGlobal extends Struct.SingleTypeSchema {
     publishedAt: Schema.Attribute.DateTime;
     siteDescription: Schema.Attribute.Text & Schema.Attribute.Required;
     siteName: Schema.Attribute.String & Schema.Attribute.Required;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
+export interface ApiNameSubmissionNameSubmission
+  extends Struct.CollectionTypeSchema {
+  collectionName: 'name_submissions';
+  info: {
+    description: 'Submissions dei nomi da parte di genitori e partecipanti';
+    displayName: 'Name Submission';
+    pluralName: 'name-submissions';
+    singularName: 'name-submission';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    game: Schema.Attribute.Relation<'manyToOne', 'api::game.game'> &
+      Schema.Attribute.Required;
+    isParentPreference: Schema.Attribute.Boolean &
+      Schema.Attribute.DefaultTo<false>;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::name-submission.name-submission'
+    > &
+      Schema.Attribute.Private;
+    names: Schema.Attribute.JSON & Schema.Attribute.Required;
+    publishedAt: Schema.Attribute.DateTime;
+    submissionOrder: Schema.Attribute.Integer;
+    submitter: Schema.Attribute.Relation<
+      'manyToOne',
+      'plugin::users-permissions.user'
+    > &
+      Schema.Attribute.Required;
+    submitterType: Schema.Attribute.Enumeration<['parent', 'participant']> &
+      Schema.Attribute.Required;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -1195,6 +1238,7 @@ declare module '@strapi/strapi' {
       'api::category.category': ApiCategoryCategory;
       'api::game.game': ApiGameGame;
       'api::global.global': ApiGlobalGlobal;
+      'api::name-submission.name-submission': ApiNameSubmissionNameSubmission;
       'plugin::content-releases.release': PluginContentReleasesRelease;
       'plugin::content-releases.release-action': PluginContentReleasesReleaseAction;
       'plugin::i18n.locale': PluginI18NLocale;

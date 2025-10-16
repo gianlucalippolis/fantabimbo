@@ -68,6 +68,87 @@
   margin: 0;
 }
 
+.currentReveal {
+  margin: 0;
+  color: rgba(60, 46, 33, 0.75);
+  font-size: 0.95rem;
+}
+
+.revealForm {
+  display: grid;
+  gap: 0.75rem;
+  max-width: 360px;
+}
+
+.revealForm label {
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: rgba(47, 36, 27, 0.75);
+}
+
+.revealForm input[type="date"],
+.revealForm input[type="time"],
+.revealForm select {
+  border-radius: 12px;
+  border: 1px solid rgba(194, 160, 131, 0.35);
+  padding: 0.6rem 0.75rem;
+  font-size: 0.95rem;
+  color: #5f4634;
+  background: rgba(255, 255, 255, 0.95);
+}
+
+.revealForm input:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.revealActions {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.secondaryAction {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.85rem 1.4rem;
+  border-radius: 14px;
+  font-weight: 600;
+  color: #5f4634;
+  background: rgba(237, 227, 218, 0.9);
+  border: 1px solid rgba(194, 160, 131, 0.35);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.secondaryAction:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 24px rgba(194, 160, 131, 0.25);
+}
+
+.secondaryAction:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.successMessage {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #2f6c47;
+}
+
+.errorMessage {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #9e2b2b;
+}
+
+.noticeInfo {
+  margin: 0;
+  font-size: 0.8rem;
+  color: rgba(60, 46, 33, 0.65);
+}
+
 .participantList {
   list-style: none;
   margin: 0;

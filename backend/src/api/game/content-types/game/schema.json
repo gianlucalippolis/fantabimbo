@@ -24,6 +24,10 @@
     "description": {
       "type": "text"
     },
+    "revealAt": {
+      "type": "datetime",
+      "required": false
+    },
     "inviteCode": {
       "type": "string",
       "required": true,

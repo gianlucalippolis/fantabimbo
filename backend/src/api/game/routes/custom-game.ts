@@ -18,5 +18,10 @@ export default {
       path: "/games/:id/regenerate-invite",
       handler: "game.regenerateInvite",
     },
+    {
+      method: "PUT",
+      path: "/games/:id",
+      handler: "game.update",
+    },
   ],
 };

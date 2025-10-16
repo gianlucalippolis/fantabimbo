@@ -12,6 +12,7 @@ export interface GameSummary {
   slug: string | null;
   description: string | null;
   inviteCode: string;
+  revealAt: string | null;
   isOwner: boolean;
   owner: GameParticipant;
   participants: GameParticipant[];
