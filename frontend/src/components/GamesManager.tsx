@@ -342,7 +342,7 @@ export function GamesManager({
                 onChange={(event) =>
                   handleCreateFieldChange("name", event.target.value)
                 }
-                placeholder="Esempio: Lega classe 3A"
+                placeholder="Nome della partita"
                 className={styles.gamesInput}
               />
             </div>
