@@ -70,11 +70,12 @@ export function GamesManager({
   }, [dispatch, games]);
 
   useEffect(() => {
-    if (strapiJwt && gamesStatus === "idle") {
-      // Pass the userId to fetchGames to ensure it has the correct user context
+    if (strapiJwt) {
+      // Always refetch games when userId changes to ensure isOwner is recalculated
+      // This fixes the issue where isOwner was incorrectly calculated
       dispatch(fetchGames(userId));
     }
-  }, [dispatch, gamesStatus, strapiJwt, userId]);
+  }, [dispatch, strapiJwt, userId]);
 
   const orderedGames = useMemo(() => {
     return [...gamesFromStore].sort((a, b) => {
@@ -486,7 +487,11 @@ export function GamesManager({
           </p>
         ) : (
           orderedGames.map((game) => {
-            const inviteLink = `${inviteBaseClean}/registrazione?code=${encodeURIComponent(
+            // Ensure the invite link has https:// prefix
+            const baseUrlWithProtocol = inviteBaseClean.startsWith("http")
+              ? inviteBaseClean
+              : `https://${inviteBaseClean}`;
+            const inviteLink = `${baseUrlWithProtocol}/registrazione?code=${encodeURIComponent(
               game.inviteCode
             )}`;
             return (

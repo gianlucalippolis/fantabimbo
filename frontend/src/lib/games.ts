@@ -82,10 +82,6 @@ export function mapStrapiGame(
       ? owner.id === normalizedUserId
       : false;
 
-  const isParticipant =
-    normalizedUserId != null &&
-    participants.some((participant) => participant.id === normalizedUserId);
-
   return {
     id,
     name: asString(gameData.name) ?? "Partita senza titolo",
@@ -102,8 +98,7 @@ export function mapStrapiGame(
       userType: null,
     },
     participants,
-    isOwner:
-      isOwner || (!isOwner && isParticipant && owner?.id === normalizedUserId),
+    isOwner,
     createdAt: asString(gameData.createdAt) ?? undefined,
   };
 }

@@ -49,6 +49,7 @@ export const fetchGames = createAsyncThunk<
 
     // Use explicit user ID if provided, otherwise fall back to profile
     const currentUserId = explicitUserId ?? getState().user.profile?.id ?? null;
+    
     // Map games directly without the wrapper function
     const mappedGames = rawData
       .map((entity: unknown) => mapStrapiGame(entity, currentUserId))

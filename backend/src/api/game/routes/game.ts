@@ -4,5 +4,5 @@ export default factories.createCoreRouter("api::game.game", {
   config: {
     policies: ["api::is-authenticated"],
   },
-  only: ["find", "findOne", "create", "delete"],
+  only: ["find", "findOne", "create", "update", "delete"],
 } as any);
