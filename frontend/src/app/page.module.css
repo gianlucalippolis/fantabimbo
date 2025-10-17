@@ -936,8 +936,16 @@
     width: 100%;
   }
 
+  .main {
+    padding: 0;
+  }
+
   .dashboardCard {
-    padding: 2.25rem 1.75rem 2rem;
+    width: 100%;
+    padding: 2rem 1rem;
+    border-radius: 0;
+    border-left: none;
+    border-right: none;
   }
 
   .tutorial {
