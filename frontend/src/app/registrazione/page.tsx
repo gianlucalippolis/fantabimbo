@@ -35,11 +35,15 @@ function RegisterContent() {
     }
     return "";
   }, [searchParams]);
+
+  // Se c'è un codice invito nell'URL, l'utente è automaticamente un giocatore
+  const hasInviteInUrl = Boolean(initialInviteCode);
+
   const [form, setForm] = useState<RegisterFormState>({
     email: "",
     password: "",
     confirmPassword: "",
-    accountType: "",
+    accountType: hasInviteInUrl ? "player" : "",
   });
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
