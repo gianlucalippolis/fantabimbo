@@ -5,7 +5,7 @@ export default {
       path: "/user-profile/avatar",
       handler: "user-profile.uploadAvatar",
       config: {
-        policies: ["global::is-authenticated"],
+        policies: [],
       },
     },
   ],

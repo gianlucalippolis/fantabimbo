@@ -1,7 +1,24 @@
 export default {
   async uploadAvatar(ctx: any) {
     try {
-      const userId = ctx.state.user?.id;
+      // Manual JWT authentication
+      const authHeader = ctx.request.header.authorization;
+
+      if (!authHeader) {
+        return ctx.unauthorized("Token di autenticazione mancante");
+      }
+
+      const token = authHeader.split(" ")[1];
+
+      let userId;
+      try {
+        const decoded = await strapi
+          .service("plugin::users-permissions.jwt")
+          .verify(token);
+        userId = decoded.id;
+      } catch (err) {
+        return ctx.unauthorized("Token non valido");
+      }
 
       if (!userId) {
         return ctx.unauthorized("Non autenticato");
