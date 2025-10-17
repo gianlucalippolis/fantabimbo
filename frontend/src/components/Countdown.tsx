@@ -17,16 +17,15 @@ interface TimeLeft {
 }
 
 export default function Countdown({ targetDate, onExpire }: CountdownProps) {
-  const [timeLeft, setTimeLeft] = useState<TimeLeft>({
-    days: 0,
-    hours: 0,
-    minutes: 0,
-    seconds: 0,
-    isExpired: false,
-  });
+  const [timeLeft, setTimeLeft] = useState<TimeLeft | null>(null);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    if (!targetDate) return;
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!targetDate || !mounted) return;
 
     const calculateTimeLeft = (): TimeLeft => {
       const difference = new Date(targetDate).getTime() - new Date().getTime();
@@ -70,7 +69,7 @@ export default function Countdown({ targetDate, onExpire }: CountdownProps) {
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [targetDate, onExpire]);
+  }, [targetDate, onExpire, mounted]);
 
   if (!targetDate) {
     return (
@@ -80,7 +79,19 @@ export default function Countdown({ targetDate, onExpire }: CountdownProps) {
     );
   }
 
-  if (timeLeft.isExpired) {
+  // Don't render time-dependent content until mounted on client
+  if (!mounted || timeLeft === null) {
+    return (
+      <div className={styles.countdown}>
+        <p className={styles.label}>Caricamento countdown...</p>
+      </div>
+    );
+  }
+
+  // At this point, timeLeft is guaranteed to be non-null
+  const { days, hours, minutes, seconds, isExpired } = timeLeft;
+
+  if (isExpired) {
     return (
       <div className={styles.countdown}>
         <p className={styles.expired}>🎉 I nomi sono stati rivelati!</p>
@@ -93,29 +104,25 @@ export default function Countdown({ targetDate, onExpire }: CountdownProps) {
       <p className={styles.label}>Rivelazione nomi tra:</p>
       <div className={styles.timeUnits}>
         <div className={styles.timeUnit}>
-          <span className={styles.value}>{timeLeft.days}</span>
-          <span className={styles.unit}>
-            giorn{timeLeft.days === 1 ? "o" : "i"}
-          </span>
+          <span className={styles.value}>{days}</span>
+          <span className={styles.unit}>giorn{days === 1 ? "o" : "i"}</span>
         </div>
         <div className={styles.separator}>:</div>
         <div className={styles.timeUnit}>
-          <span className={styles.value}>
-            {String(timeLeft.hours).padStart(2, "0")}
-          </span>
+          <span className={styles.value}>{String(hours).padStart(2, "0")}</span>
           <span className={styles.unit}>ore</span>
         </div>
         <div className={styles.separator}>:</div>
         <div className={styles.timeUnit}>
           <span className={styles.value}>
-            {String(timeLeft.minutes).padStart(2, "0")}
+            {String(minutes).padStart(2, "0")}
           </span>
           <span className={styles.unit}>min</span>
         </div>
         <div className={styles.separator}>:</div>
         <div className={styles.timeUnit}>
           <span className={styles.value}>
-            {String(timeLeft.seconds).padStart(2, "0")}
+            {String(seconds).padStart(2, "0")}
           </span>
           <span className={styles.unit}>sec</span>
         </div>

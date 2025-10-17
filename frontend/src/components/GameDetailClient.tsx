@@ -60,6 +60,11 @@ export function GameDetailClient({ game }: GameDetailClientProps) {
   const [isSaving, setIsSaving] = useState(false);
   const [saveMessage, setSaveMessage] = useState<string | null>(null);
   const [saveError, setSaveError] = useState<string | null>(null);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     setSaveMessage(null);
@@ -93,8 +98,12 @@ export function GameDetailClient({ game }: GameDetailClientProps) {
     if (Number.isNaN(formatted.valueOf())) {
       return "Nessuna data impostata";
     }
-    return formatted.toLocaleString();
-  }, [currentReveal]);
+    // Only format on client side to avoid hydration mismatch
+    if (!mounted) {
+      return "Caricamento...";
+    }
+    return formatted.toLocaleString("it-IT");
+  }, [currentReveal, mounted]);
 
   async function handleSave() {
     if (!game.isOwner) {
