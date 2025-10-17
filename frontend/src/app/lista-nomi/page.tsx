@@ -98,17 +98,13 @@ function ListaNomiContent() {
 
   // Quando arrivano i dati da Redux, aggiorna lo stato locale
   useEffect(() => {
-    console.log("Submissions changed:", submissions);
-    console.log("First submission:", submissions[0]);
-    console.log("Checking attributes:", submissions[0]?.attributes);
-    console.log("Checking direct names:", submissions[0]?.names);
-
     if (submissions.length > 0) {
       // Prova prima con attributes (formato Strapi standard)
       let loadedNames = submissions[0].attributes?.names;
 
       // Se non esiste, prova senza attributes
       if (!loadedNames) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         loadedNames = (submissions[0] as any).names;
       }
 
