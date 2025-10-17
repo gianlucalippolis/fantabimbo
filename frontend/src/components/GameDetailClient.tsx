@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import type { GameSummary } from "types/game";
 import api from "../lib/axios";
+import { getStrapiMediaURL } from "../lib/utils";
 import styles from "../app/partite/[id]/page.module.css";
 import Countdown from "./Countdown";
 import Leaderboard from "./Leaderboard";
@@ -274,10 +275,11 @@ export function GameDetailClient({ game }: GameDetailClientProps) {
                 ]
                   .filter(Boolean)
                   .join(" ");
-                const avatarUrl =
+                const avatarRelativeUrl =
                   participant.avatar?.formats?.thumbnail?.url ||
                   participant.avatar?.url ||
                   null;
+                const avatarUrl = getStrapiMediaURL(avatarRelativeUrl);
                 return (
                   <li key={participant.id} className={styles.participantItem}>
                     <Avatar

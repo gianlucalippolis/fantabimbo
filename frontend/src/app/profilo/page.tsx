@@ -26,7 +26,8 @@ export default function ProfilePage() {
     return null;
   }
 
-  const avatarRelativeUrl = user.avatar?.formats?.small?.url || user.avatar?.url;
+  const avatarRelativeUrl =
+    user.avatar?.formats?.small?.url || user.avatar?.url;
   const avatarUrl = getStrapiMediaURL(avatarRelativeUrl);
   const displayName = user.displayName || "Utente";
   const initials = displayName
