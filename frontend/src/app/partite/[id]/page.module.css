@@ -357,16 +357,34 @@
 
   .revealForm input[type="date"],
   .revealForm input[type="time"] {
-    padding: 0.85rem 1rem;
-    font-size: 1rem;
-    min-height: 48px;
-    -webkit-appearance: none;
-    appearance: none;
+    padding: 1rem;
+    font-size: 1.1rem;
+    min-height: 52px;
+    font-weight: 600;
+    color: #5f4634;
+    background: #ffffff;
+    border: 2px solid rgba(194, 160, 131, 0.5);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  }
+
+  .revealForm input[type="date"]:focus,
+  .revealForm input[type="time"]:focus {
+    outline: none;
+    border-color: #c2a083;
+    box-shadow: 0 4px 12px rgba(194, 160, 131, 0.3);
+  }
+
+  .revealForm input[type="date"]::-webkit-date-and-time-value,
+  .revealForm input[type="time"]::-webkit-date-and-time-value {
+    text-align: left;
+    font-size: 1.1rem;
+    font-weight: 600;
   }
 
   .revealForm label {
-    font-size: 0.9rem;
+    font-size: 0.95rem;
     font-weight: 700;
+    color: #5f4634;
   }
 
   .participantItem {
