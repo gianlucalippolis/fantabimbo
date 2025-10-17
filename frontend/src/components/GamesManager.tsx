@@ -499,9 +499,7 @@ export function GamesManager({
 
                 {/* Countdown e rivelazione */}
                 {game.revealAt && (
-                  <div className={styles.gameRevealSection}>
-                    <Countdown targetDate={game.revealAt} gameId={game.id} />
-                  </div>
+                  <Countdown targetDate={game.revealAt} gameId={game.id} />
                 )}
 
                 {/* Azioni principali */}
