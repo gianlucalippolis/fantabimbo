@@ -33,27 +33,28 @@ export function UserDashboard({
   const tutorialSteps = useMemo(
     () => [
       {
-        title: "Prepara la rosa",
-        description:
-          "Seleziona i tuoi giovani talenti e bilancia i ruoli: avrai bisogno di portieri affidabili, difensori solidi e attaccanti fantasiosi.",
+        title: "Crea o unisciti a una partita",
+        description: canCreateGames
+          ? "Come genitore, crea una nuova partita e condividi il codice invito con i partecipanti. Imposta quando il nome verrà rivelato!"
+          : "Inserisci il codice invito ricevuto dai genitori per unirti alla partita e iniziare a indovinare!",
       },
       {
-        title: "Imposta la formazione",
+        title: "Compila la tua lista di nomi",
         description:
-          "Ogni giornata scegli modulo, titolari e riserve. Controlla lo stato di forma e gli avversari reali per massimizzare il punteggio.",
+          "Scegli fino a 10 nomi e disponili nell'ordine che preferisci. La posizione è importante per il punteggio finale!",
       },
       {
-        title: "Guadagna punti reali",
+        title: "Sistema di punteggio",
         description:
-          "Le prestazioni sul campo diventano punti Fantanome: goal, assist, parate e tanto altro alimentano la tua classifica.",
+          "Guadagni: 100 punti se indovini il nome esatto del bambino al 1° posto, 50 punti se lo indovini in qualsiasi altra posizione, 20 punti per ogni nome nella posizione corretta, 10 punti se un nome è a una sola posizione di distanza.",
       },
       {
-        title: "Scala la classifica",
+        title: "Rivelazione e classifica",
         description:
-          "Sfida gli altri allenatori nelle leghe settimanali e stagionali, completa missioni extra e conquista i premi esclusivi.",
+          "Allo scadere del countdown, il nome del bambino viene rivelato e puoi vedere la classifica con i punteggi di tutti i partecipanti!",
       },
     ],
-    []
+    [canCreateGames]
   );
 
   function toggleMenu() {
@@ -205,15 +206,22 @@ export function UserDashboard({
             >
               <h2 className={styles.tutorialTitle}>Come funziona Fantanome</h2>
               <ol className={styles.tutorialList}>
-                <li>Crea e personalizza la tua squadra di piccoli campioni.</li>
-                <li>Scegli la formazione migliore in base alle partite.</li>
                 <li>
-                  Ottieni punti in base alle prestazioni reali e scala la
-                  classifica.
+                  {canCreateGames
+                    ? "Crea una partita e condividi il codice invito con amici e parenti."
+                    : "Unisciti a una partita usando il codice invito ricevuto dai genitori."}
                 </li>
                 <li>
-                  Sfida gli altri allenatori nelle leghe settimanali e
-                  stagionali.
+                  Compila la tua lista con fino a 10 nomi, l&apos;ordine è
+                  importante!
+                </li>
+                <li>
+                  Guadagna punti indovinando il nome del bambino e la posizione
+                  dei nomi.
+                </li>
+                <li>
+                  Quando scade il countdown, scopri il nome del bambino e la
+                  classifica finale!
                 </li>
               </ol>
               <button
@@ -221,7 +229,7 @@ export function UserDashboard({
                 className={`${styles.action} ${styles.primary} ${styles.tutorialButton}`}
                 onClick={openTutorial}
               >
-                Avvia il tutorial interattivo
+                Scopri di più
               </button>
             </section>
           </div>

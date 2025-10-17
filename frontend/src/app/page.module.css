@@ -474,6 +474,14 @@
   color: #5f4634;
   background: rgba(255, 255, 255, 0.9);
   transition: border 0.2s ease, box-shadow 0.2s ease;
+  font-family: inherit;
+}
+
+.gamesInput[type="date"]::-webkit-calendar-picker-indicator,
+.gamesInput[type="time"]::-webkit-calendar-picker-indicator {
+  opacity: 1;
+  cursor: pointer;
+  filter: invert(0.5) sepia(1) saturate(5) hue-rotate(15deg);
 }
 
 .gamesInput:focus,
@@ -970,6 +978,32 @@
 
   .gamesForm h3 {
     font-size: 1rem;
+  }
+
+  .gamesInput[type="date"],
+  .gamesInput[type="time"] {
+    padding: 1rem;
+    font-size: 1.1rem;
+    min-height: 52px;
+    font-weight: 600;
+    color: #5f4634;
+    background: #ffffff;
+    border: 2px solid rgba(95, 70, 52, 0.35);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  }
+
+  .gamesInput[type="date"]:focus,
+  .gamesInput[type="time"]:focus {
+    outline: none;
+    border-color: #c2a083;
+    box-shadow: 0 4px 12px rgba(194, 160, 131, 0.3);
+  }
+
+  .gamesInput[type="date"]::-webkit-date-and-time-value,
+  .gamesInput[type="time"]::-webkit-date-and-time-value {
+    text-align: left;
+    font-size: 1.1rem;
+    font-weight: 600;
   }
 
   .gameCard {
