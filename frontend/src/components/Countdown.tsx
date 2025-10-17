@@ -1,11 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import styles from "./Countdown.module.css";
 
 interface CountdownProps {
   targetDate: string | null;
   onExpire?: () => void;
+  gameId?: string | number;
 }
 
 interface TimeLeft {
@@ -16,7 +18,11 @@ interface TimeLeft {
   isExpired: boolean;
 }
 
-export default function Countdown({ targetDate, onExpire }: CountdownProps) {
+export default function Countdown({
+  targetDate,
+  onExpire,
+  gameId,
+}: CountdownProps) {
   const [timeLeft, setTimeLeft] = useState<TimeLeft | null>(null);
   const [mounted, setMounted] = useState(false);
 
@@ -95,6 +101,14 @@ export default function Countdown({ targetDate, onExpire }: CountdownProps) {
     return (
       <div className={styles.countdown}>
         <p className={styles.expired}>🎉 I nomi sono stati rivelati!</p>
+        {gameId && (
+          <Link
+            href={`/partite/${encodeURIComponent(gameId)}`}
+            className={styles.revealButton}
+          >
+            Vedi classifica e risultati
+          </Link>
+        )}
       </div>
     );
   }

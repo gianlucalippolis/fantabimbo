@@ -199,11 +199,15 @@ function ListaNomiContent() {
       console.error("Error type:", typeof error);
       console.error("Error details:", JSON.stringify(error, null, 2));
 
+      // Extract error message - it's the payload from rejectWithValue
+      const errorMessage =
+        typeof error === "string" ? error : "Impossibile salvare la lista.";
+
       setPopup({
         isVisible: true,
         type: "error",
         title: "Errore",
-        message: "Impossibile salvare la lista.",
+        message: errorMessage,
       });
     }
   }
@@ -240,6 +244,7 @@ function ListaNomiContent() {
         {game?.attributes?.revealAt && (
           <Countdown
             targetDate={game.attributes.revealAt}
+            gameId={game.id}
             onExpire={() => setIsRevealExpired(true)}
           />
         )}

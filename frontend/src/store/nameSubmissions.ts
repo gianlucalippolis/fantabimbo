@@ -64,34 +64,52 @@ export const fetchNameSubmissions = createAsyncThunk(
 // Async thunk per salvare una submission
 export const saveNameSubmission = createAsyncThunk(
   "nameSubmissions/save",
-  async ({
-    gameId,
-    names,
-    submitterType,
-  }: {
-    gameId: string;
-    names: string[];
-    submitterType: "parent" | "participant";
-  }) => {
-    const filteredNames = names.filter((name) => name.trim().length > 0);
-
-    console.log("Saving submission with data:", {
-      gameId: Number(gameId),
-      names: filteredNames,
+  async (
+    {
+      gameId,
+      names,
       submitterType,
-    });
+    }: {
+      gameId: string;
+      names: string[];
+      submitterType: "parent" | "participant";
+    },
+    { rejectWithValue }
+  ) => {
+    try {
+      const filteredNames = names.filter((name) => name.trim().length > 0);
 
-    const response = await api.post("/api/name-submissions", {
-      data: {
+      console.log("Saving submission with data:", {
         gameId: Number(gameId),
         names: filteredNames,
         submitterType,
-        isParentPreference: false,
-      },
-    });
+      });
 
-    console.log("Save response:", response.data);
-    return response.data.data;
+      const response = await api.post("/api/name-submissions", {
+        data: {
+          gameId: Number(gameId),
+          names: filteredNames,
+          submitterType,
+          // Se è il genitore, questa è la sua preferenza ufficiale
+          isParentPreference: submitterType === "parent",
+        },
+      });
+
+      console.log("Save response:", response.data);
+      return response.data.data;
+    } catch (error: unknown) {
+      // Extract error message from backend response
+      const err = error as {
+        response?: { data?: { error?: { message?: string } } };
+        message?: string;
+      };
+      const errorMessage =
+        err.response?.data?.error?.message ||
+        err.message ||
+        "Impossibile salvare la lista.";
+      console.error("Save error:", errorMessage);
+      return rejectWithValue(errorMessage);
+    }
   }
 );
 

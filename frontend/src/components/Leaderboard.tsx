@@ -1,0 +1,195 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import api from "../lib/axios";
+import styles from "./Leaderboard.module.css";
+
+interface PlayerScore {
+  userId: number;
+  user: {
+    id: number;
+    email: string;
+    firstName?: string;
+    lastName?: string;
+  };
+  score: number;
+  details: {
+    exactNameFirstPosition: number;
+    exactNameAnyPosition: number;
+    correctPosition: number;
+    nearPosition: number;
+  };
+  guessedNames: string[];
+}
+
+interface LeaderboardData {
+  winners: PlayerScore[];
+  parentPreferences: string[];
+  babyName: string | null;
+  gameRevealed: boolean;
+}
+
+interface LeaderboardProps {
+  gameId: number | string;
+}
+
+export default function Leaderboard({ gameId }: LeaderboardProps) {
+  const [data, setData] = useState<LeaderboardData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function fetchLeaderboard() {
+      try {
+        setLoading(true);
+        const response = await api.get(
+          `/api/name-submissions/calculate-victory/${gameId}`
+        );
+        console.log("=== Leaderboard API Response ===");
+        console.log("Full response:", JSON.stringify(response.data, null, 2));
+
+        // Il backend Strapi wrappa la risposta in { data: {...}, meta: {} }
+        const leaderboardData = response.data.data || response.data;
+        console.log("Extracted leaderboard data:", leaderboardData);
+
+        setData(leaderboardData);
+      } catch (err: unknown) {
+        console.error("Failed to load leaderboard:", err);
+        setError("Impossibile caricare la classifica. Riprova più tardi.");
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchLeaderboard();
+  }, [gameId]);
+
+  if (loading) {
+    return (
+      <div className={styles.container}>
+        <p className={styles.noData}>Caricamento classifica...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className={styles.container}>
+        <p className={styles.noData}>{error}</p>
+      </div>
+    );
+  }
+
+  if (!data || !data.babyName) {
+    console.log("=== NO DATA OR NO BABY NAME ===");
+    console.log("data exists:", !!data);
+    console.log("data.babyName:", data?.babyName);
+    console.log("Full data object:", data);
+
+    return (
+      <div className={styles.container}>
+        <div className={styles.noData}>
+          <p>
+            La classifica sarà disponibile quando il genitore inserirà la sua
+            lista di nomi con il nome del bambino al primo posto.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className={styles.container}>
+      <div className={styles.babyNameReveal}>
+        <h2 className={styles.revealTitle}>Il nome scelto è:</h2>
+        <p className={styles.babyName}>🎉 {data.babyName} 🎉</p>
+      </div>
+
+      <div className={styles.leaderboard}>
+        <h3 className={styles.leaderboardTitle}>🏆 Classifica</h3>
+
+        {data.winners.length === 0 ? (
+          <p className={styles.noSubmissions}>
+            Nessun partecipante ha ancora inviato i propri nomi.
+          </p>
+        ) : (
+          <div className={styles.scoresList}>
+            {data.winners.map((score, index) => {
+              const playerName =
+                [score.user.firstName, score.user.lastName]
+                  .filter(Boolean)
+                  .join(" ") ||
+                score.user.email ||
+                "Giocatore";
+
+              return (
+                <div
+                  key={score.userId}
+                  className={`${styles.scoreCard} ${
+                    index === 0 ? styles.firstPlace : ""
+                  } ${index === 1 ? styles.secondPlace : ""} ${
+                    index === 2 ? styles.thirdPlace : ""
+                  }`}
+                >
+                  <div className={styles.scoreHeader}>
+                    <div className={styles.rank}>
+                      {index === 0 && "🥇"}
+                      {index === 1 && "🥈"}
+                      {index === 2 && "🥉"}
+                      {index > 2 && `${index + 1}°`}
+                    </div>
+                    <div className={styles.playerInfo}>
+                      <p className={styles.playerName}>{playerName}</p>
+                    </div>
+                    <div className={styles.totalScore}>{score.score} pt</div>
+                  </div>
+
+                  <div className={styles.scoreDetails}>
+                    {score.details.exactNameFirstPosition > 0 && (
+                      <div className={styles.scoreItem}>
+                        <span className={styles.scoreLabel}>
+                          Nome esatto 1° posto
+                        </span>
+                        <span className={styles.scoreValue}>
+                          +{score.details.exactNameFirstPosition}
+                        </span>
+                      </div>
+                    )}
+                    {score.details.exactNameAnyPosition > 0 && (
+                      <div className={styles.scoreItem}>
+                        <span className={styles.scoreLabel}>Nome esatto</span>
+                        <span className={styles.scoreValue}>
+                          +{score.details.exactNameAnyPosition}
+                        </span>
+                      </div>
+                    )}
+                    {score.details.correctPosition > 0 && (
+                      <div className={styles.scoreItem}>
+                        <span className={styles.scoreLabel}>
+                          Posizioni corrette
+                        </span>
+                        <span className={styles.scoreValue}>
+                          +{score.details.correctPosition}
+                        </span>
+                      </div>
+                    )}
+                    {score.details.nearPosition > 0 && (
+                      <div className={styles.scoreItem}>
+                        <span className={styles.scoreLabel}>
+                          Posizioni vicine
+                        </span>
+                        <span className={styles.scoreValue}>
+                          +{score.details.nearPosition}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}

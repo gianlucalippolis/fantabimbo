@@ -7,6 +7,7 @@ import type { GameSummary } from "types/game";
 import api from "../lib/axios";
 import styles from "../app/partite/[id]/page.module.css";
 import Countdown from "./Countdown";
+import Leaderboard from "./Leaderboard";
 
 interface GameDetailClientProps {
   game: GameSummary;
@@ -61,10 +62,19 @@ export function GameDetailClient({ game }: GameDetailClientProps) {
   const [saveMessage, setSaveMessage] = useState<string | null>(null);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [mounted, setMounted] = useState(false);
+  const [showLeaderboard, setShowLeaderboard] = useState(false);
 
   useEffect(() => {
     setMounted(true);
-  }, []);
+    // Check if reveal date is already expired
+    if (game.revealAt) {
+      const now = new Date().getTime();
+      const revealTime = new Date(game.revealAt).getTime();
+      if (now >= revealTime) {
+        setShowLeaderboard(true);
+      }
+    }
+  }, [game.revealAt]);
 
   useEffect(() => {
     setSaveMessage(null);
@@ -162,10 +172,8 @@ export function GameDetailClient({ game }: GameDetailClientProps) {
           {currentReveal && (
             <Countdown
               targetDate={currentReveal}
-              onExpire={() => {
-                // Opzionale: potresti mostrare un messaggio quando scade
-                console.log("Reveal date expired!");
-              }}
+              gameId={game.id}
+              onExpire={() => setShowLeaderboard(true)}
             />
           )}
           <Link
@@ -264,6 +272,13 @@ export function GameDetailClient({ game }: GameDetailClientProps) {
             </ul>
           )}
         </section>
+
+        {showLeaderboard && (
+          <section className={styles.section}>
+            <h2 className={styles.sectionTitle}>Risultati e Classifica</h2>
+            <Leaderboard gameId={game.id} />
+          </section>
+        )}
       </div>
     </div>
   );

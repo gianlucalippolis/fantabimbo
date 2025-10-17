@@ -1,11 +1,28 @@
-import { factories } from "@strapi/strapi";
-
-export default factories.createCoreRouter(
-  "api::name-submission.name-submission",
-  {
-    config: {
-      policies: ["global::is-authenticated"],
+export default {
+  routes: [
+    {
+      method: "GET",
+      path: "/name-submissions",
+      handler: "name-submission.find",
+      config: {
+        policies: ["global::is-authenticated"],
+      },
     },
-    only: ["find", "create"],
-  } as any
-);
+    {
+      method: "POST",
+      path: "/name-submissions",
+      handler: "name-submission.create",
+      config: {
+        policies: ["global::is-authenticated"],
+      },
+    },
+    {
+      method: "GET",
+      path: "/name-submissions/calculate-victory/:gameId",
+      handler: "name-submission.calculateVictory",
+      config: {
+        policies: ["global::is-authenticated"],
+      },
+    },
+  ],
+};

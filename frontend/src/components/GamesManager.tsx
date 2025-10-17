@@ -485,7 +485,9 @@ export function GamesManager({
 
                 {/* Sezione highlight con countdown e azione principale */}
                 <div className={styles.gameHighlight}>
-                  {game.revealAt && <Countdown targetDate={game.revealAt} />}
+                  {game.revealAt && (
+                    <Countdown targetDate={game.revealAt} gameId={game.id} />
+                  )}
                   <Link
                     href={`/lista-nomi?game=${encodeURIComponent(game.id)}`}
                     className={styles.highlightAction}

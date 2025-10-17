@@ -19,15 +19,16 @@ interface VictoryCalculationResult {
       lastName?: string;
     };
     score: number;
+    details: {
+      exactNameFirstPosition: number;
+      exactNameAnyPosition: number;
+      correctPosition: number;
+      nearPosition: number;
+    };
     guessedNames: string[];
-    exactMatches: string[];
-    orderMatches: Array<{
-      name: string;
-      guessedPosition: number;
-      actualPosition: number;
-    }>;
   }>;
   parentPreferences: string[];
+  babyName: string | null;
   gameRevealed: boolean;
 }
 
@@ -275,15 +276,50 @@ export default factories.createCoreController(
         }
       )) as any[];
 
+      console.log("=== DEBUG calculateVictory ===");
+      console.log("Total submissions found:", submissions.length);
+      console.log(
+        "Submissions:",
+        JSON.stringify(
+          submissions.map((s: any) => ({
+            id: s.id,
+            submitterType: s.submitterType,
+            isParentPreference: s.isParentPreference,
+            submitterId: s.submitter?.id,
+            namesCount: s.names?.length,
+          })),
+          null,
+          2
+        )
+      );
+
       // Find parent preferences (the "correct" answers)
-      const parentSubmission = submissions.find(
+      // Prima cerca con isParentPreference = true, poi fallback a qualsiasi submission del parent
+      let parentSubmission = submissions.find(
         (sub: any) => sub.submitterType === "parent" && sub.isParentPreference
       );
+
+      console.log(
+        "Parent submission with isParentPreference=true:",
+        parentSubmission?.id || "NOT FOUND"
+      );
+
+      // Fallback: se non trova con isParentPreference, cerca qualsiasi submission del parent
+      if (!parentSubmission) {
+        parentSubmission = submissions.find(
+          (sub: any) => sub.submitterType === "parent"
+        );
+        console.log(
+          "Fallback parent submission:",
+          parentSubmission?.id || "NOT FOUND"
+        );
+      }
 
       if (!parentSubmission) {
         return this.transformResponse({
           winners: [],
           parentPreferences: [],
+          babyName: null,
           gameRevealed,
           message: "Nessuna preferenza del genitore trovata.",
         });
@@ -292,6 +328,10 @@ export default factories.createCoreController(
       const parentPreferences = Array.isArray(parentSubmission.names)
         ? (parentSubmission.names as string[])
         : [];
+
+      // Il primo nome della lista del genitore è il nome del bambino
+      const babyName =
+        parentPreferences.length > 0 ? parentPreferences[0] : null;
 
       const participantSubmissions = submissions.filter(
         (sub: any) => sub.submitterType === "participant"
@@ -304,46 +344,68 @@ export default factories.createCoreController(
             ? (submission.names as string[])
             : [];
 
-          let score = 0;
-          const exactMatches: string[] = [];
-          const orderMatches: Array<{
-            name: string;
-            guessedPosition: number;
-            actualPosition: number;
-          }> = [];
+          const details = {
+            exactNameFirstPosition: 0,
+            exactNameAnyPosition: 0,
+            correctPosition: 0,
+            nearPosition: 0,
+          };
 
-          // Check for exact matches (correct name in correct position)
-          guessedNames.forEach((guessedName, guessedIndex) => {
-            const actualIndex = parentPreferences.findIndex(
-              (parentName) =>
-                parentName.toLowerCase().trim() ===
-                guessedName.toLowerCase().trim()
-            );
+          if (!babyName) {
+            return {
+              userId: submission.submitter.id,
+              user: submission.submitter,
+              score: 0,
+              details,
+              guessedNames,
+            };
+          }
 
-            if (actualIndex !== -1) {
-              if (actualIndex === guessedIndex) {
-                // Exact match (correct position)
-                score += 10;
-                exactMatches.push(guessedName);
-              } else {
-                // Name matches but wrong position
-                score += 5;
-                orderMatches.push({
-                  name: guessedName,
-                  guessedPosition: guessedIndex + 1,
-                  actualPosition: actualIndex + 1,
-                });
+          // Normalizza i nomi per confronto case-insensitive
+          const normalizedBabyName = babyName.trim().toLowerCase();
+          const normalizedParentNames = parentPreferences.map((n) =>
+            n.trim().toLowerCase()
+          );
+          const normalizedGuessed = guessedNames.map((n) =>
+            n.trim().toLowerCase()
+          );
+
+          // 100 punti se indovina il nome esatto del bambino al 1° posto
+          if (normalizedGuessed[0] === normalizedBabyName) {
+            details.exactNameFirstPosition = 100;
+          }
+          // 50 punti se indovina il nome esatto in qualsiasi altra posizione
+          else if (normalizedGuessed.includes(normalizedBabyName)) {
+            details.exactNameAnyPosition = 50;
+          }
+
+          // Calcola punti per posizioni corrette e vicine
+          normalizedGuessed.forEach((guessedName, guessedIndex) => {
+            const parentIndex = normalizedParentNames.indexOf(guessedName);
+
+            if (parentIndex !== -1 && guessedName !== normalizedBabyName) {
+              // 20 punti per posizione corretta (escludendo il nome del bambino già contato)
+              if (parentIndex === guessedIndex) {
+                details.correctPosition += 20;
+              }
+              // 10 punti se è a una posizione di distanza
+              else if (Math.abs(parentIndex - guessedIndex) === 1) {
+                details.nearPosition += 10;
               }
             }
           });
+
+          const score = Object.values(details).reduce(
+            (sum, val) => sum + val,
+            0
+          );
 
           return {
             userId: submission.submitter.id,
             user: submission.submitter,
             score,
+            details,
             guessedNames,
-            exactMatches,
-            orderMatches,
           };
         })
         .sort((a, b) => b.score - a.score); // Sort by score descending
@@ -351,8 +413,14 @@ export default factories.createCoreController(
       const result: VictoryCalculationResult = {
         winners,
         parentPreferences,
+        babyName,
         gameRevealed,
       };
+
+      console.log("=== Result to return ===");
+      console.log("Baby name:", babyName);
+      console.log("Winners count:", winners.length);
+      console.log("Game revealed:", gameRevealed);
 
       return this.transformResponse(result);
     },
