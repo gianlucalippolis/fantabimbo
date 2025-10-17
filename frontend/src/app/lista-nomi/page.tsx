@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, useState, Suspense } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import type ISession from "../../types/session";
@@ -21,7 +21,7 @@ function buildInitialNames(): string[] {
   return Array.from({ length: MAX_NAMES }, () => "");
 }
 
-export default function ListaNomiPage() {
+function ListaNomiContent() {
   const { data: session } = useSession();
   const typedSession = session as ISession;
   const router = useRouter();
@@ -128,7 +128,7 @@ export default function ListaNomiPage() {
         <div className={styles.wrapper}>
           <div className={styles.errorState}>
             <h1 className={styles.errorTitle}>Errore - ID partita mancante</h1>
-            <button 
+            <button
               className={styles.errorButton}
               onClick={() => router.push("/")}
             >
@@ -143,10 +143,7 @@ export default function ListaNomiPage() {
   return (
     <div className={styles.container}>
       <div className={styles.wrapper}>
-        <button 
-          className={styles.backButton}
-          onClick={() => router.push("/")}
-        >
+        <button className={styles.backButton} onClick={() => router.push("/")}>
           ← Torna alla dashboard
         </button>
 
@@ -161,7 +158,7 @@ export default function ListaNomiPage() {
                 <span className={styles.positionLabel}>
                   {index + 1}° posizione
                 </span>
-                
+
                 <input
                   className={styles.nameInput}
                   type="text"
@@ -171,7 +168,7 @@ export default function ListaNomiPage() {
                     handleNameChange(index, event.target.value)
                   }
                 />
-                
+
                 <div className={styles.controls}>
                   <button
                     className={styles.controlButton}
@@ -196,9 +193,9 @@ export default function ListaNomiPage() {
             ))}
           </div>
 
-          <button 
+          <button
             className={styles.submitButton}
-            type="submit" 
+            type="submit"
             disabled={isLoading}
           >
             {isLoading ? "Salvataggio..." : "Salva la lista"}
@@ -216,5 +213,27 @@ export default function ListaNomiPage() {
         )}
       </div>
     </div>
+  );
+}
+
+// Loading component per Suspense
+function LoadingListaNomi() {
+  return (
+    <div className={styles.container}>
+      <div className={styles.wrapper}>
+        <div className={styles.errorState}>
+          <p>Caricamento...</p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Componente principale con Suspense boundary
+export default function ListaNomiPage() {
+  return (
+    <Suspense fallback={<LoadingListaNomi />}>
+      <ListaNomiContent />
+    </Suspense>
   );
 }
