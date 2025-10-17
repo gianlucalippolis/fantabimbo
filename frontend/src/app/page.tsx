@@ -64,6 +64,7 @@ export default async function Home() {
   const strapiJwt = session.jwt;
   let userType = session.userType ?? null;
   let requiresProfileCompletion = false;
+  let userAvatar = null;
 
   if (strapiUrl && strapiJwt) {
     try {
@@ -88,6 +89,10 @@ export default async function Home() {
         if (typeof profile?.userType === "string") {
           userType = profile.userType;
         }
+        // Get avatar if available
+        if (profile?.avatar) {
+          userAvatar = profile.avatar;
+        }
       }
     } catch (error) {
       console.error("Failed to fetch profile", error);
@@ -109,6 +114,7 @@ export default async function Home() {
           displayName,
           email: userEmail ?? null,
           userType,
+          avatar: userAvatar,
           jwt: strapiJwt ?? null,
         }}
       />

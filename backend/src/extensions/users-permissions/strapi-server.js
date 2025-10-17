@@ -1,5 +1,19 @@
-export default {
-  async updateAvatar(ctx: any) {
+"use strict";
+
+module.exports = (plugin) => {
+  // Add custom routes
+  plugin.routes["content-api"].routes.push({
+    method: "POST",
+    path: "/users/avatar",
+    handler: "user.updateAvatar",
+    config: {
+      policies: [],
+      prefix: "",
+    },
+  });
+
+  // Add custom controller
+  plugin.controllers.user.updateAvatar = async (ctx) => {
     try {
       const userId = ctx.state.user?.id;
 
@@ -41,12 +55,14 @@ export default {
         success: true,
         avatar: uploadedFiles[0],
       };
-    } catch (error: any) {
+    } catch (error) {
       console.error("Avatar upload error:", error);
       ctx.status = 500;
       ctx.body = {
         error: error.message || "Errore durante il caricamento dell'avatar",
       };
     }
-  },
+  };
+
+  return plugin;
 };

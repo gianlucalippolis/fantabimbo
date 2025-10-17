@@ -1,19 +1,17 @@
 export default {
-  async updateAvatar(ctx: any) {
+  async uploadAvatar(ctx: any) {
     try {
       const userId = ctx.state.user?.id;
 
       if (!userId) {
-        ctx.status = 401;
-        return (ctx.body = { error: "Non autenticato" });
+        return ctx.unauthorized("Non autenticato");
       }
 
       // Get uploaded files from request
       const files = ctx.request.files;
 
       if (!files || !files.avatar) {
-        ctx.status = 400;
-        return (ctx.body = { error: "Nessun file caricato" });
+        return ctx.badRequest("Nessun file caricato");
       }
 
       let avatarFile = files.avatar;
@@ -23,7 +21,7 @@ export default {
         avatarFile = avatarFile[0];
       }
 
-      // Upload the file
+      // Upload the file using Strapi's upload service
       const uploadedFiles = await strapi
         .plugin("upload")
         .service("upload")
@@ -36,17 +34,15 @@ export default {
           files: avatarFile,
         });
 
-      ctx.status = 200;
-      ctx.body = {
+      return ctx.send({
         success: true,
         avatar: uploadedFiles[0],
-      };
+      });
     } catch (error: any) {
       console.error("Avatar upload error:", error);
-      ctx.status = 500;
-      ctx.body = {
-        error: error.message || "Errore durante il caricamento dell'avatar",
-      };
+      return ctx.internalServerError(
+        error.message || "Errore durante il caricamento dell'avatar"
+      );
     }
   },
 };

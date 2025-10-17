@@ -8,6 +8,7 @@ import { SignOutButton } from "./SignOutButton";
 import { GamesManager } from "./GamesManager";
 import { useAppSelector } from "../store/hooks";
 import Avatar from "./Avatar";
+import { getStrapiMediaURL } from "../lib/utils";
 
 interface UserDashboardProps {
   displayName: string;
@@ -32,8 +33,9 @@ export function UserDashboard({
   const [tutorialOpen, setTutorialOpen] = useState(false);
   const [tutorialStep, setTutorialStep] = useState(0);
 
-  const avatarUrl =
+  const avatarRelativeUrl =
     userProfile?.avatar?.formats?.small?.url || userProfile?.avatar?.url;
+  const avatarUrl = getStrapiMediaURL(avatarRelativeUrl);
 
   const tutorialSteps = useMemo(
     () => [

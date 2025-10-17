@@ -2,14 +2,17 @@
 
 import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { useAppSelector } from "../../store/hooks";
+import { useAppSelector, useAppDispatch } from "../../store/hooks";
+import { setUserProfile } from "../../store/user";
 import Link from "next/link";
 import styles from "./page.module.css";
 import api from "../../lib/axios";
+import { getStrapiMediaURL } from "../../lib/utils";
 import type { AxiosError } from "axios";
 
 export default function ProfilePage() {
   const router = useRouter();
+  const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.user.profile);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -23,7 +26,8 @@ export default function ProfilePage() {
     return null;
   }
 
-  const avatarUrl = user.avatar?.formats?.small?.url || user.avatar?.url;
+  const avatarRelativeUrl = user.avatar?.formats?.small?.url || user.avatar?.url;
+  const avatarUrl = getStrapiMediaURL(avatarRelativeUrl);
   const displayName = user.displayName || "Utente";
   const initials = displayName
     .split(" ")
@@ -73,7 +77,7 @@ export default function ProfilePage() {
       console.log("Uploading avatar for user:", user.id);
       console.log("File:", file.name, file.type, file.size);
 
-      const response = await api.post("/api/users/avatar", formData, {
+      const response = await api.post("/api/user-profile/avatar", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
@@ -81,14 +85,24 @@ export default function ProfilePage() {
 
       console.log("Upload response:", response.data);
 
+      // Update Redux store with new avatar
+      if (response.data?.avatar && user) {
+        dispatch(
+          setUserProfile({
+            ...user,
+            avatar: response.data.avatar,
+          })
+        );
+      }
+
       setUploadSuccess(true);
       setTimeout(() => {
         setUploadSuccess(false);
       }, 3000);
 
-      // Reload page to update avatar
+      // Clear preview after success
       setTimeout(() => {
-        window.location.reload();
+        setPreviewUrl(null);
       }, 1500);
     } catch (error) {
       const axiosError = error as AxiosError<{

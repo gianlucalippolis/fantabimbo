@@ -1,3 +1,5 @@
+"use strict";
+
 module.exports = {
   routes: [
     {
@@ -6,7 +8,7 @@ module.exports = {
       handler: "user.updateAvatar",
       config: {
         policies: [],
-        middlewares: [],
+        prefix: "",
       },
     },
   ],
