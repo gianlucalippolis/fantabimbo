@@ -198,7 +198,7 @@ export function GameDetailClient({ game }: GameDetailClientProps) {
             ) : null}
             {!game.isOwner ? (
               <p className={styles.noticeInfo}>
-                Solo l'organizzatore può modificare la data di rivelazione.
+                Solo l&apos;organizzatore può modificare la data di rivelazione.
               </p>
             ) : null}
           </div>

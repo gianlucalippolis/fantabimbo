@@ -1,0 +1,235 @@
+/* Lista Nomi Page Styles */
+.container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  background: linear-gradient(135deg, #ede3da, #c2a083);
+}
+
+.wrapper {
+  width: min(600px, 100%);
+  background-color: #ffffff;
+  border-radius: 24px;
+  padding: 2.5rem 2rem;
+  box-shadow: 0 20px 45px rgba(194, 160, 131, 0.25);
+  border: 1px solid rgba(194, 160, 131, 0.25);
+}
+
+.backButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-bottom: 1.5rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #7b604c;
+  text-decoration: none;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.backButton:hover {
+  color: #a58463;
+}
+
+.title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #5f4634;
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.form {
+  display: grid;
+  gap: 2rem;
+}
+
+.namesList {
+  display: grid;
+  gap: 1rem;
+}
+
+.nameItem {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 1rem;
+  align-items: center;
+  padding: 1rem;
+  background: rgba(237, 227, 218, 0.35);
+  border: 1px solid rgba(194, 160, 131, 0.3);
+  border-radius: 12px;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.nameItem:hover {
+  background: rgba(237, 227, 218, 0.5);
+  border-color: rgba(194, 160, 131, 0.4);
+}
+
+.positionLabel {
+  font-weight: 600;
+  color: #5f4634;
+  font-size: 0.9rem;
+  min-width: 100px;
+}
+
+.nameInput {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  border: 1px solid rgba(194, 160, 131, 0.3);
+  background-color: #ffffff;
+  color: #362820;
+  font-size: 1rem;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.nameInput::placeholder {
+  color: rgba(95, 70, 52, 0.4);
+}
+
+.nameInput:focus {
+  outline: none;
+  border-color: #c2a083;
+  box-shadow: 0 0 0 3px rgba(194, 160, 131, 0.25);
+}
+
+.controls {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.controlButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 8px;
+  border: 1px solid rgba(194, 160, 131, 0.45);
+  background: rgba(255, 255, 255, 0.95);
+  color: #7b604c;
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+}
+
+.controlButton:hover:not(:disabled) {
+  background: rgba(194, 160, 131, 0.12);
+  box-shadow: 0 4px 10px rgba(194, 160, 131, 0.25);
+  transform: translateY(-1px);
+}
+
+.controlButton:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}
+
+.submitButton {
+  width: 100%;
+  padding: 1rem;
+  border-radius: 12px;
+  border: none;
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: #ffffff;
+  background: linear-gradient(135deg, #c2a083, #a58463);
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  justify-self: center;
+  max-width: 300px;
+}
+
+.submitButton:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 14px 30px rgba(194, 160, 131, 0.3);
+}
+
+.submitButton:disabled {
+  opacity: 0.7;
+  cursor: wait;
+  transform: none;
+  box-shadow: none;
+}
+
+.errorState {
+  text-align: center;
+  padding: 2rem;
+}
+
+.errorTitle {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #c55a4f;
+  margin-bottom: 1rem;
+}
+
+.errorButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.9rem 1.4rem;
+  border-radius: 12px;
+  border: 1px solid rgba(194, 160, 131, 0.35);
+  background: rgba(255, 255, 255, 0.9);
+  color: #5f4634;
+  font-weight: 600;
+  font-size: 1rem;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.errorButton:hover {
+  background: rgba(194, 160, 131, 0.12);
+  box-shadow: 0 10px 25px rgba(194, 160, 131, 0.25);
+  transform: translateY(-1px);
+}
+
+@media (max-width: 768px) {
+  .wrapper {
+    padding: 2rem 1.5rem;
+  }
+  
+  .nameItem {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+    text-align: center;
+  }
+  
+  .controls {
+    justify-content: center;
+  }
+  
+  .positionLabel {
+    min-width: auto;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 1rem;
+  }
+  
+  .wrapper {
+    padding: 1.5rem 1rem;
+  }
+  
+  .title {
+    font-size: 1.5rem;
+  }
+  
+  .controlButton {
+    width: 2rem;
+    height: 2rem;
+    font-size: 1rem;
+  }
+}

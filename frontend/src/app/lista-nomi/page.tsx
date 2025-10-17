@@ -5,7 +5,7 @@ import { useSession } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import type ISession from "../../types/session";
 import api from "../../lib/axios";
-import styles from "../../styles/Login.module.css";
+import styles from "./page.module.css";
 import Popup from "../../components/Popup";
 
 interface PopupState {
@@ -124,54 +124,83 @@ export default function ListaNomiPage() {
 
   if (!gameId) {
     return (
-      <div className={styles.login}>
+      <div className={styles.container}>
         <div className={styles.wrapper}>
-          <h1>Errore - ID partita mancante</h1>
-          <button onClick={() => router.push("/")}>Torna alla dashboard</button>
+          <div className={styles.errorState}>
+            <h1 className={styles.errorTitle}>Errore - ID partita mancante</h1>
+            <button 
+              className={styles.errorButton}
+              onClick={() => router.push("/")}
+            >
+              Torna alla dashboard
+            </button>
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className={styles.login}>
+    <div className={styles.container}>
       <div className={styles.wrapper}>
-        <button onClick={() => router.push("/")}>← Torna alla dashboard</button>
+        <button 
+          className={styles.backButton}
+          onClick={() => router.push("/")}
+        >
+          ← Torna alla dashboard
+        </button>
 
-        <h1>{isParent ? "Le tue preferenze" : "I tuoi tentativi"}</h1>
+        <h1 className={styles.title}>
+          {isParent ? "Le tue preferenze" : "I tuoi tentativi"}
+        </h1>
 
-        <form onSubmit={handleSubmit}>
-          <div>
+        <form className={styles.form} onSubmit={handleSubmit}>
+          <div className={styles.namesList}>
             {names.map((name, index) => (
-              <div key={index}>
-                <span>{index + 1}. posizione</span>
-                <button
-                  type="button"
-                  onClick={() => handleMoveUp(index)}
-                  disabled={index === 0}
-                >
-                  ↑
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleMoveDown(index)}
-                  disabled={index === names.length - 1}
-                >
-                  ↓
-                </button>
+              <div key={index} className={styles.nameItem}>
+                <span className={styles.positionLabel}>
+                  {index + 1}° posizione
+                </span>
+                
                 <input
+                  className={styles.nameInput}
                   type="text"
                   value={name}
-                  placeholder={"Nome #" + (index + 1)}
+                  placeholder={`Nome #${index + 1}`}
                   onChange={(event) =>
                     handleNameChange(index, event.target.value)
                   }
                 />
+                
+                <div className={styles.controls}>
+                  <button
+                    className={styles.controlButton}
+                    type="button"
+                    onClick={() => handleMoveUp(index)}
+                    disabled={index === 0}
+                    title="Sposta su"
+                  >
+                    ↑
+                  </button>
+                  <button
+                    className={styles.controlButton}
+                    type="button"
+                    onClick={() => handleMoveDown(index)}
+                    disabled={index === names.length - 1}
+                    title="Sposta giù"
+                  >
+                    ↓
+                  </button>
+                </div>
               </div>
             ))}
           </div>
 
-          <button type="submit" disabled={isLoading}>
+          <button 
+            className={styles.submitButton}
+            type="submit" 
+            disabled={isLoading}
+          >
             {isLoading ? "Salvataggio..." : "Salva la lista"}
           </button>
         </form>
