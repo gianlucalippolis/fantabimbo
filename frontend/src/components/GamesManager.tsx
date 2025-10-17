@@ -483,9 +483,7 @@ export function GamesManager({
                   </span>
                 </header>
 
-                {game.revealAt && (
-                  <Countdown targetDate={game.revealAt} />
-                )}
+                {game.revealAt && <Countdown targetDate={game.revealAt} />}
 
                 <dl className={styles.gameMeta}>
                   <div>

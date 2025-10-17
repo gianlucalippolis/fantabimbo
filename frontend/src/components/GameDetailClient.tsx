@@ -149,7 +149,7 @@ export function GameDetailClient({ game }: GameDetailClientProps) {
         </header>
 
         {currentReveal && (
-          <Countdown 
+          <Countdown
             targetDate={currentReveal}
             onExpire={() => {
               // Opzionale: potresti mostrare un messaggio quando scade
