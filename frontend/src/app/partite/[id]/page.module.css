@@ -121,6 +121,14 @@
   font-size: 0.95rem;
   color: #5f4634;
   background: rgba(255, 255, 255, 0.95);
+  font-family: inherit;
+}
+
+.revealForm input[type="date"]::-webkit-calendar-picker-indicator,
+.revealForm input[type="time"]::-webkit-calendar-picker-indicator {
+  opacity: 1;
+  cursor: pointer;
+  filter: invert(0.5) sepia(1) saturate(5) hue-rotate(15deg);
 }
 
 .revealForm input:disabled {
