@@ -6,6 +6,7 @@ import { useAppSelector } from "../../store/hooks";
 import Link from "next/link";
 import styles from "./page.module.css";
 import api from "../../lib/axios";
+import type { AxiosError } from "axios";
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -67,16 +68,18 @@ export default function ProfilePage() {
       setUploadSuccess(false);
 
       const formData = new FormData();
-      formData.append("files", file);
-      formData.append("ref", "plugin::users-permissions.user");
-      formData.append("refId", String(user.id));
-      formData.append("field", "avatar");
+      formData.append("avatar", file);
 
-      await api.post("/api/upload", formData, {
+      console.log("Uploading avatar for user:", user.id);
+      console.log("File:", file.name, file.type, file.size);
+
+      const response = await api.post("/api/users/avatar", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
       });
+
+      console.log("Upload response:", response.data);
 
       setUploadSuccess(true);
       setTimeout(() => {
@@ -88,8 +91,19 @@ export default function ProfilePage() {
         window.location.reload();
       }, 1500);
     } catch (error) {
-      console.error("Avatar upload failed", error);
-      setUploadError("Impossibile caricare l'immagine. Riprova più tardi.");
+      const axiosError = error as AxiosError<{
+        error?: { message?: string };
+        message?: string;
+      }>;
+      console.error("Avatar upload failed", axiosError);
+      console.error("Error response:", axiosError.response?.data);
+      console.error("Error status:", axiosError.response?.status);
+
+      const errorMessage =
+        axiosError.response?.data?.error?.message ||
+        axiosError.response?.data?.message ||
+        "Impossibile caricare l'immagine. Riprova più tardi.";
+      setUploadError(errorMessage);
     } finally {
       setIsUploading(false);
     }
