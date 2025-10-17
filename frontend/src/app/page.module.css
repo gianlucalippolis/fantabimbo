@@ -189,19 +189,26 @@
   background: #5f4634;
   border-radius: 2px;
   transition: transform 0.2s ease, opacity 0.2s ease;
+  position: relative;
 }
 
 .hamburgerLine::before,
 .hamburgerLine::after {
+  content: "";
+  position: absolute;
   width: 20px;
+  height: 2px;
+  background: #5f4634;
+  border-radius: 2px;
+  left: 0;
 }
 
 .hamburgerLine::before {
-  transform: translateY(-6px);
+  top: -7px;
 }
 
 .hamburgerLine::after {
-  transform: translateY(6px);
+  top: 7px;
 }
 
 .hamburgerOpen .hamburgerLine {
@@ -209,10 +216,12 @@
 }
 
 .hamburgerOpen .hamburgerLine::before {
+  top: 0;
   transform: rotate(45deg);
 }
 
 .hamburgerOpen .hamburgerLine::after {
+  top: 0;
   transform: rotate(-45deg);
 }
 
