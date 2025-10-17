@@ -1017,23 +1017,28 @@
     font-size: 1rem;
   }
 
+  .gamesFormRow label {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #5f4634;
+  }
+
+  .inlineFields {
+    gap: 0.75rem;
+  }
+
   .gamesInput[type="date"],
   .gamesInput[type="time"] {
     padding: 1rem;
     font-size: 1.1rem;
     min-height: 52px;
     font-weight: 600;
-    color: #5f4634;
-    background: #ffffff;
-    border: 2px solid rgba(95, 70, 52, 0.35);
+    color: #5f4634 !important;
+    background: #ffffff !important;
+    border: 2px solid rgba(95, 70, 52, 0.5) !important;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  }
-
-  .gamesInput[type="date"]:focus,
-  .gamesInput[type="time"]:focus {
-    outline: none;
-    border-color: #c2a083;
-    box-shadow: 0 4px 12px rgba(194, 160, 131, 0.3);
+    -webkit-appearance: none;
+    appearance: none;
   }
 
   .gamesInput[type="date"]::-webkit-date-and-time-value,
@@ -1041,6 +1046,24 @@
     text-align: left;
     font-size: 1.1rem;
     font-weight: 600;
+    color: #5f4634;
+  }
+
+  .gamesInput[type="date"]::-webkit-calendar-picker-indicator,
+  .gamesInput[type="time"]::-webkit-calendar-picker-indicator {
+    width: 24px;
+    height: 24px;
+    opacity: 1;
+    cursor: pointer;
+    filter: invert(0.5) sepia(1) saturate(5) hue-rotate(15deg);
+    margin-left: 8px;
+  }
+
+  .gamesInput[type="date"]:focus,
+  .gamesInput[type="time"]:focus {
+    outline: none;
+    border-color: #c2a083 !important;
+    box-shadow: 0 4px 12px rgba(194, 160, 131, 0.3) !important;
   }
 
   .gameCard {

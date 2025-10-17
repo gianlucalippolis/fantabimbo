@@ -186,20 +186,6 @@ export function UserDashboard({
                   {userType === "parent" ? "Genitore" : "Giocatore"}
                 </span>
               ) : null}
-              <div className={styles.actions}>
-                <button
-                  className={`${styles.action} ${styles.primary}`}
-                  type="button"
-                  disabled
-                >
-                  Gestisci squadra (presto disponibile)
-                </button>
-                <SignOutButton
-                  className={`${styles.action} ${styles.secondary}`}
-                >
-                  Esci
-                </SignOutButton>
-              </div>
             </div>
             <section
               className={`${styles.tutorial} ${styles.dashboardTutorial}`}
