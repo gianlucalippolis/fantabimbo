@@ -320,11 +320,14 @@ function ListaNomiContent() {
           </div>
         )}
 
-        {!isParent && !hasParentSubmission && parentNames.length === 0 && !isLoading && (
-          <div className={styles.warningBox}>
-            ⚠️ Il genitore non ha ancora inserito i nomi. Torna più tardi!
-          </div>
-        )}
+        {!isParent &&
+          !hasParentSubmission &&
+          parentNames.length === 0 &&
+          !isLoading && (
+            <div className={styles.warningBox}>
+              ⚠️ Il genitore non ha ancora inserito i nomi. Torna più tardi!
+            </div>
+          )}
 
         <form className={styles.form} onSubmit={handleSubmit}>
           <div className={styles.namesList}>
