@@ -157,15 +157,24 @@ export function GameDetailClient({ game }: GameDetailClientProps) {
           </p>
         </header>
 
-        {currentReveal && (
-          <Countdown
-            targetDate={currentReveal}
-            onExpire={() => {
-              // Opzionale: potresti mostrare un messaggio quando scade
-              console.log("Reveal date expired!");
-            }}
-          />
-        )}
+        {/* Sezione highlight con countdown e azione principale */}
+        <div className={styles.gameHighlight}>
+          {currentReveal && (
+            <Countdown
+              targetDate={currentReveal}
+              onExpire={() => {
+                // Opzionale: potresti mostrare un messaggio quando scade
+                console.log("Reveal date expired!");
+              }}
+            />
+          )}
+          <Link
+            className={styles.highlightAction}
+            href={`/lista-nomi?game=${encodeURIComponent(game.id)}`}
+          >
+            Compila la tua lista dei nomi
+          </Link>
+        </div>
 
         <section className={styles.section}>
           <h2 className={styles.sectionTitle}>Data di rivelazione</h2>
@@ -255,15 +264,6 @@ export function GameDetailClient({ game }: GameDetailClientProps) {
             </ul>
           )}
         </section>
-
-        <footer className={styles.footer}>
-          <Link
-            className={styles.primaryAction}
-            href={`/lista-nomi?game=${encodeURIComponent(game.id)}`}
-          >
-            La tua lista dei nomi
-          </Link>
-        </footer>
       </div>
     </div>
   );

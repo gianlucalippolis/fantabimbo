@@ -483,7 +483,16 @@ export function GamesManager({
                   </span>
                 </header>
 
-                {game.revealAt && <Countdown targetDate={game.revealAt} />}
+                {/* Sezione highlight con countdown e azione principale */}
+                <div className={styles.gameHighlight}>
+                  {game.revealAt && <Countdown targetDate={game.revealAt} />}
+                  <Link
+                    href={`/lista-nomi?game=${encodeURIComponent(game.id)}`}
+                    className={styles.highlightAction}
+                  >
+                    Compila i tuoi nomi
+                  </Link>
+                </div>
 
                 <dl className={styles.gameMeta}>
                   <div>
@@ -548,15 +557,9 @@ export function GamesManager({
                 <div className={styles.gameActions}>
                   <Link
                     href={`/partite/${encodeURIComponent(game.id)}`}
-                    className={styles.gamesPrimaryButton}
-                  >
-                    Dettagli partita
-                  </Link>
-                  <Link
-                    href={`/lista-nomi?game=${encodeURIComponent(game.id)}`}
                     className={styles.gamesSecondaryButton}
                   >
-                    Compila nomi
+                    Dettagli partita
                   </Link>
                 </div>
               </article>
