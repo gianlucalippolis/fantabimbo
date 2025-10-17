@@ -76,11 +76,14 @@ export default factories.createCoreController(
         return ctx.forbidden("Non hai accesso a questa partita.");
       }
 
-      // Get all submissions for this game
+      // Get only the current user's submission for this game
       const submissions = await strapi.entityService.findMany(
         "api::name-submission.name-submission",
         {
-          filters: { game: { id: Number(gameId) } },
+          filters: {
+            game: { id: Number(gameId) },
+            submitter: { id: user.id },
+          },
           populate: {
             submitter: true,
             game: true,

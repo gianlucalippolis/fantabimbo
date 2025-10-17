@@ -1,24 +1,22 @@
 "use client";
 
-import { FormEvent, useState, Suspense } from "react";
+import { FormEvent, useState, Suspense, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import type ISession from "../../types/session";
-import api from "../../lib/axios";
 import styles from "./page.module.css";
 import Popup from "../../components/Popup";
+import { useAppDispatch, useAppSelector } from "../../store/hooks";
+import {
+  fetchNameSubmissions,
+  saveNameSubmission,
+} from "../../store/nameSubmissions";
 
 interface PopupState {
   isVisible: boolean;
   message: string;
   type: "success" | "error" | "warning" | "info";
   title?: string;
-}
-
-const MAX_NAMES = 10;
-
-function buildInitialNames(): string[] {
-  return Array.from({ length: MAX_NAMES }, () => "");
 }
 
 function ListaNomiContent() {
@@ -28,27 +26,81 @@ function ListaNomiContent() {
   const searchParams = useSearchParams();
   const gameId = searchParams?.get("game");
 
-  const [names, setNames] = useState<string[]>(() => buildInitialNames());
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const dispatch = useAppDispatch();
+  const { submissions, isLoading } = useAppSelector(
+    (state) => state.nameSubmissions
+  );
+
+  // Stato locale per i nomi (inizializzato dai dati Redux)
+  const [names, setNames] = useState<string[]>(
+    Array.from({ length: 10 }, () => "")
+  );
+
   const [popup, setPopup] = useState<PopupState | null>(null);
 
   const isParent = typedSession?.userType === "parent";
 
+  // Carica i nomi esistenti quando il componente si monta
+  useEffect(() => {
+    async function loadExistingNames() {
+      if (!gameId) {
+        return;
+      }
+
+      try {
+        await dispatch(
+          fetchNameSubmissions({
+            gameId,
+          })
+        ).unwrap();
+      } catch (error) {
+        console.error("Errore nel caricamento dei nomi:", error);
+      }
+    }
+
+    loadExistingNames();
+  }, [gameId, dispatch]);
+
+  // Quando arrivano i dati da Redux, aggiorna lo stato locale
+  useEffect(() => {
+    console.log("Submissions changed:", submissions);
+    console.log("First submission:", submissions[0]);
+    console.log("Checking attributes:", submissions[0]?.attributes);
+    console.log("Checking direct names:", submissions[0]?.names);
+
+    if (submissions.length > 0) {
+      // Prova prima con attributes (formato Strapi standard)
+      let loadedNames = submissions[0].attributes?.names;
+
+      // Se non esiste, prova senza attributes
+      if (!loadedNames) {
+        loadedNames = (submissions[0] as any).names;
+      }
+
+      console.log("Loaded names:", loadedNames);
+
+      if (loadedNames && Array.isArray(loadedNames)) {
+        const fullNames = Array.from(
+          { length: 10 },
+          (_, index) => loadedNames[index] || ""
+        );
+        setNames(fullNames);
+        console.log("Nomi caricati e impostati:", fullNames);
+      }
+    }
+  }, [submissions]);
+
   function handleNameChange(index: number, value: string): void {
-    setNames((prev) => {
-      const next = [...prev];
-      next[index] = value;
-      return next;
-    });
+    const newNames = [...names];
+    newNames[index] = value;
+    setNames(newNames);
   }
 
   function swapPositions(from: number, to: number): void {
     if (to < 0 || to >= names.length) return;
-    setNames((prev) => {
-      const next = [...prev];
-      [next[from], next[to]] = [next[to], next[from]];
-      return next;
-    });
+    const newNames = [...names];
+    [newNames[from], newNames[to]] = [newNames[to], newNames[from]];
+    setNames(newNames);
   }
 
   function handleMoveUp(index: number): void {
@@ -78,7 +130,9 @@ function ListaNomiContent() {
       return;
     }
 
-    const filteredNames = names.filter((name) => name.trim().length > 0);
+    const filteredNames = names.filter(
+      (name: string) => name.trim().length > 0
+    );
 
     if (filteredNames.length === 0) {
       setPopup({
@@ -93,16 +147,15 @@ function ListaNomiContent() {
     if (isLoading) return;
 
     try {
-      setIsLoading(true);
-
-      await api.post("/api/name-submissions", {
-        data: {
-          gameId: Number(gameId),
-          names: filteredNames,
+      const result = await dispatch(
+        saveNameSubmission({
+          gameId,
+          names: names,
           submitterType: isParent ? "parent" : "participant",
-          isParentPreference: false,
-        },
-      });
+        })
+      ).unwrap();
+
+      console.log("Save successful, result:", result);
 
       setPopup({
         isVisible: true,
@@ -110,15 +163,17 @@ function ListaNomiContent() {
         title: "Successo!",
         message: "Lista salvata con successo!",
       });
-    } catch {
+    } catch (error) {
+      console.error("Errore catturato nel catch:", error);
+      console.error("Error type:", typeof error);
+      console.error("Error details:", JSON.stringify(error, null, 2));
+
       setPopup({
         isVisible: true,
         type: "error",
         title: "Errore",
         message: "Impossibile salvare la lista.",
       });
-    } finally {
-      setIsLoading(false);
     }
   }
 
@@ -153,7 +208,7 @@ function ListaNomiContent() {
 
         <form className={styles.form} onSubmit={handleSubmit}>
           <div className={styles.namesList}>
-            {names.map((name, index) => (
+            {names.map((name: string, index: number) => (
               <div key={index} className={styles.nameItem}>
                 <span className={styles.positionLabel}>
                   {index + 1}° posizione
