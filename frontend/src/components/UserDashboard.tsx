@@ -6,13 +6,12 @@ import styles from "../app/page.module.css";
 import { Logo } from "./Logo";
 import { SignOutButton } from "./SignOutButton";
 import { GamesManager } from "./GamesManager";
-import type { GameSummary } from "types/game";
+import { useAppSelector } from "../store/hooks";
 
 interface UserDashboardProps {
   displayName: string;
   userEmail?: string | null;
   userId: string | number;
-  games: GameSummary[];
   inviteBaseUrl: string;
   canCreateGames: boolean;
   userType: "parent" | "player" | null;
@@ -22,11 +21,11 @@ export function UserDashboard({
   displayName,
   userEmail,
   userId,
-  games,
   inviteBaseUrl,
   canCreateGames,
   userType,
 }: UserDashboardProps) {
+  const games = useAppSelector((state) => state.user.games);
   const [menuOpen, setMenuOpen] = useState(false);
   const [tutorialOpen, setTutorialOpen] = useState(false);
   const [tutorialStep, setTutorialStep] = useState(0);

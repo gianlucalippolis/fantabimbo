@@ -1,16 +1,14 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import type { GameSummary } from "types/game";
 import { useAppDispatch } from "../store/hooks";
-import { setUserGames, setUserProfile, type UserProfile } from "../store/user";
+import { setUserProfile, type UserProfile, fetchGames } from "../store/user";
 
 interface UserHydratorProps {
   profile: UserProfile | null;
-  games: GameSummary[];
 }
 
-export function UserHydrator({ profile, games }: UserHydratorProps) {
+export function UserHydrator({ profile }: UserHydratorProps) {
   const dispatch = useAppDispatch();
   const hydratedRef = useRef(false);
 
@@ -23,12 +21,13 @@ export function UserHydrator({ profile, games }: UserHydratorProps) {
 
     if (profile) {
       dispatch(setUserProfile(profile));
-    }
 
-    if (Array.isArray(games) && games.length > 0) {
-      dispatch(setUserGames(games));
+      // Fetch games from the store
+      if (profile.jwt) {
+        dispatch(fetchGames(profile.jwt));
+      }
     }
-  }, [dispatch, games, profile]);
+  }, [dispatch, profile]);
 
   return null;
 }

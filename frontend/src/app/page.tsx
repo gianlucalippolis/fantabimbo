@@ -7,7 +7,6 @@ import { UserDashboard } from "components/UserDashboard";
 import { UserHydrator } from "components/UserHydrator";
 import { authOptions } from "../lib/auth";
 import { getAppBaseUrl, getStrapiConfig } from "../lib/env";
-import type { GameSummary } from "types/game";
 import styles from "./page.module.css";
 import { Suspense } from "react";
 
@@ -63,10 +62,8 @@ export default async function Home() {
     session.user?.name?.trim() || userEmail?.split("@")[0] || "Allenatore";
 
   const strapiJwt = session.jwt;
-  const currentUserId = session.id ?? null;
   let userType = session.userType ?? null;
   let requiresProfileCompletion = false;
-  let games: GameSummary[] = [];
 
   if (strapiUrl && strapiJwt) {
     try {
@@ -95,7 +92,6 @@ export default async function Home() {
     } catch (error) {
       console.error("Failed to fetch profile", error);
     }
-
   }
 
   if (requiresProfileCompletion) {
@@ -115,13 +111,11 @@ export default async function Home() {
           userType,
           jwt: strapiJwt ?? null,
         }}
-        games={games}
       />
       <UserDashboard
         displayName={displayName}
         userEmail={userEmail}
         userId={session.id}
-        games={games}
         inviteBaseUrl={inviteBaseUrl}
         canCreateGames={canCreateGames}
         userType={userType}
