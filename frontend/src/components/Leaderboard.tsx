@@ -184,6 +184,20 @@ export default function Leaderboard({ gameId }: LeaderboardProps) {
                       </div>
                     )}
                   </div>
+
+                  {/* Lista dei nomi indovinati */}
+                  {score.guessedNames && score.guessedNames.length > 0 && (
+                    <div className={styles.guessedNames}>
+                      <p className={styles.guessedNamesTitle}>Nomi proposti:</p>
+                      <ol className={styles.namesList}>
+                        {score.guessedNames.map((name, idx) => (
+                          <li key={idx} className={styles.nameItem}>
+                            {name}
+                          </li>
+                        ))}
+                      </ol>
+                    </div>
+                  )}
                 </div>
               );
             })}

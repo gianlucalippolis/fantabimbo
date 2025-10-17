@@ -167,21 +167,31 @@ export function GameDetailClient({ game }: GameDetailClientProps) {
           </p>
         </header>
 
+        {/* Mostra risultati e classifica in cima quando il gioco è stato rivelato */}
+        {showLeaderboard && (
+          <section className={styles.section}>
+            <h2 className={styles.sectionTitle}>🎉 Risultati e Classifica</h2>
+            <Leaderboard gameId={game.id} />
+          </section>
+        )}
+
         {/* Sezione highlight con countdown e azione principale */}
         <div className={styles.gameHighlight}>
-          {currentReveal && (
+          {currentReveal && !showLeaderboard && (
             <Countdown
               targetDate={currentReveal}
               gameId={game.id}
               onExpire={() => setShowLeaderboard(true)}
             />
           )}
-          <Link
-            className={styles.highlightAction}
-            href={`/lista-nomi?game=${encodeURIComponent(game.id)}`}
-          >
-            Compila la tua lista dei nomi
-          </Link>
+          {!showLeaderboard && (
+            <Link
+              className={styles.highlightAction}
+              href={`/lista-nomi?game=${encodeURIComponent(game.id)}`}
+            >
+              Compila la tua lista dei nomi
+            </Link>
+          )}
         </div>
 
         <section className={styles.section}>
@@ -272,13 +282,6 @@ export function GameDetailClient({ game }: GameDetailClientProps) {
             </ul>
           )}
         </section>
-
-        {showLeaderboard && (
-          <section className={styles.section}>
-            <h2 className={styles.sectionTitle}>Risultati e Classifica</h2>
-            <Leaderboard gameId={game.id} />
-          </section>
-        )}
       </div>
     </div>
   );
