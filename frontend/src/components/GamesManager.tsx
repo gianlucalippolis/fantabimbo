@@ -470,100 +470,110 @@ export function GamesManager({
             return (
               <article key={game.id} className={styles.gameCard}>
                 <header className={styles.gameCardHeader}>
-                  <div>
+                  <div className={styles.gameCardTitle}>
                     <h3>{game.name}</h3>
-                    {game.description ? (
-                      <p className={styles.gameDescription}>
-                        {game.description}
-                      </p>
-                    ) : null}
+                    <span className={styles.gameRole}>
+                      {game.isOwner ? "Creatrice" : "Partecipante"}
+                    </span>
                   </div>
-                  <span className={styles.gameRole}>
-                    {game.isOwner ? "Creatrice" : "Partecipante"}
-                  </span>
+                  {game.description ? (
+                    <p className={styles.gameDescription}>{game.description}</p>
+                  ) : null}
                 </header>
 
-                {/* Sezione highlight con countdown e azione principale */}
-                <div className={styles.gameHighlight}>
-                  {game.revealAt && (
+                {/* Info rapide della partita */}
+                <div className={styles.gameInfo}>
+                  <div className={styles.gameInfoItem}>
+                    <span className={styles.gameInfoLabel}>Codice</span>
+                    <span className={styles.gameInfoValue}>
+                      {game.inviteCode}
+                    </span>
+                  </div>
+                  <div className={styles.gameInfoItem}>
+                    <span className={styles.gameInfoLabel}>Partecipanti</span>
+                    <span className={styles.gameInfoValue}>
+                      {game.participants.length}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Countdown e rivelazione */}
+                {game.revealAt && (
+                  <div className={styles.gameRevealSection}>
                     <Countdown targetDate={game.revealAt} gameId={game.id} />
-                  )}
+                  </div>
+                )}
+
+                {/* Azioni principali */}
+                <div className={styles.gamePrimaryActions}>
                   <Link
                     href={`/lista-nomi?game=${encodeURIComponent(game.id)}`}
-                    className={styles.highlightAction}
+                    className={styles.gamePrimaryButton}
                   >
                     Compila i tuoi nomi
                   </Link>
-                </div>
-
-                <dl className={styles.gameMeta}>
-                  <div>
-                    <dt>Codice invito</dt>
-                    <dd>{game.inviteCode}</dd>
-                  </div>
-                  <div>
-                    <dt>Partecipanti</dt>
-                    <dd>{game.participants.length}</dd>
-                  </div>
-                  <div>
-                    <dt>Rivelazione</dt>
-                    <dd>
-                      {game.revealAt
-                        ? new Date(game.revealAt).toLocaleString()
-                        : "Non impostata"}
-                    </dd>
-                  </div>
-                </dl>
-                <div className={styles.gameInvite}>
-                  <input
-                    readOnly
-                    value={inviteLink}
-                    className={styles.gamesInput}
-                    onFocus={(event) => event.target.select()}
-                    aria-label={`Link invito per ${game.name}`}
-                  />
-                  <div className={styles.gameInviteActions}>
-                    <button
-                      type="button"
-                      className={styles.gamesSecondaryButton}
-                      onClick={() => handleCopy(inviteLink, game.id)}
-                    >
-                      {copiedGameId === game.id ? "Copiato!" : "Copia link"}
-                    </button>
-                    {isOwner ? (
-                      <>
-                        <button
-                          type="button"
-                          className={styles.gamesTertiaryButton}
-                          onClick={() => handleRegenerate(game.id)}
-                          disabled={regeneratingId === game.id}
-                        >
-                          {regeneratingId === game.id
-                            ? "Rigenerazione…"
-                            : "Nuovo codice"}
-                        </button>
-                        <button
-                          type="button"
-                          className={styles.gamesDangerButton}
-                          onClick={() => handleDeleteRequest(game)}
-                          disabled={isDeleting}
-                        >
-                          {isDeleting && gamePendingDelete?.id === game.id
-                            ? "Eliminazione…"
-                            : "Elimina"}
-                        </button>
-                      </>
-                    ) : null}
-                  </div>
-                </div>
-                <div className={styles.gameActions}>
                   <Link
                     href={`/partite/${encodeURIComponent(game.id)}`}
-                    className={styles.gamesSecondaryButton}
+                    className={styles.gameSecondaryButton}
                   >
                     Dettagli partita
                   </Link>
                 </div>
+
+                {/* Sezione invito */}
+                <details className={styles.gameInviteSection}>
+                  <summary className={styles.gameInviteSummary}>
+                    Condividi invito
+                  </summary>
+                  <div className={styles.gameInviteContent}>
+                    <div className={styles.gameInviteInput}>
+                      <label htmlFor={`invite-link-${game.id}`}>
+                        Link invito
+                      </label>
+                      <input
+                        id={`invite-link-${game.id}`}
+                        readOnly
+                        value={inviteLink}
+                        className={styles.gamesInput}
+                        onFocus={(event) => event.target.select()}
+                        aria-label={`Link invito per ${game.name}`}
+                      />
+                    </div>
+                    <div className={styles.gameInviteActions}>
+                      <button
+                        type="button"
+                        className={styles.gamesSecondaryButton}
+                        onClick={() => handleCopy(inviteLink, game.id)}
+                      >
+                        {copiedGameId === game.id ? "✓ Copiato!" : "Copia link"}
+                      </button>
+                      {isOwner ? (
+                        <>
+                          <button
+                            type="button"
+                            className={styles.gamesTertiaryButton}
+                            onClick={() => handleRegenerate(game.id)}
+                            disabled={regeneratingId === game.id}
+                          >
+                            {regeneratingId === game.id
+                              ? "Rigenerazione…"
+                              : "Nuovo codice"}
+                          </button>
+                          <button
+                            type="button"
+                            className={styles.gamesDangerButton}
+                            onClick={() => handleDeleteRequest(game)}
+                            disabled={isDeleting}
+                          >
+                            {isDeleting && gamePendingDelete?.id === game.id
+                              ? "Eliminazione…"
+                              : "Elimina partita"}
+                          </button>
+                        </>
+                      ) : null}
+                    </div>
+                  </div>
+                </details>
               </article>
             );
           })
