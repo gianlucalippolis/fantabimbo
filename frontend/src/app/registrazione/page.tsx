@@ -261,7 +261,7 @@ function RegisterContent() {
       if (signInResult?.ok) {
         if (form.accountType === "player" && normalizedInviteCode) {
           try {
-            const joinResponse = joinGame(normalizedInviteCode);
+            await joinGame(normalizedInviteCode);
           } catch (joinError) {
             console.error("Failed to join via invite code", joinError);
             setError(
@@ -344,13 +344,15 @@ function RegisterContent() {
           <div className={styles.var}>
             <div className={styles.labelRow}>
               <span>Tipo di account</span>
-              <button
-                type="button"
-                className={styles.helperLink}
-                onClick={resetAccountType}
-              >
-                Cambia
-              </button>
+              {!hasInviteInUrl && (
+                <button
+                  type="button"
+                  className={styles.helperLink}
+                  onClick={resetAccountType}
+                >
+                  Cambia
+                </button>
+              )}
             </div>
             <div className={styles.notice}>
               <p className={styles.noticeText}>
