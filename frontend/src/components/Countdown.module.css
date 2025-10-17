@@ -1,0 +1,155 @@
+.countdown {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 16px;
+  padding: 16px 12px;
+  color: white;
+  text-align: center;
+  box-shadow: 0 8px 24px rgba(102, 126, 234, 0.3);
+  margin: 16px 0;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.label {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0 0 12px 0;
+  opacity: 0.9;
+}
+
+.timeUnits {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
+  margin: 12px 0;
+  flex-wrap: wrap;
+}
+
+.timeUnit {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 60px;
+  flex: 0 1 auto;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
+  padding: 10px 6px;
+}
+
+.value {
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+
+.unit {
+  font-size: 11px;
+  text-transform: uppercase;
+  opacity: 0.8;
+  letter-spacing: 0.5px;
+}
+
+.separator {
+  font-size: 24px;
+  font-weight: 700;
+  opacity: 0.6;
+  padding: 0 2px;
+}
+
+.revealDate {
+  font-size: 13px;
+  margin: 12px 0 0 0;
+  opacity: 0.8;
+  font-weight: 500;
+  word-break: break-word;
+}
+
+.expired {
+  font-size: 20px;
+  font-weight: 700;
+  margin: 0;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.noDate {
+  font-size: 14px;
+  margin: 0;
+  opacity: 0.9;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.05);
+  }
+}
+
+@media (max-width: 640px) {
+  .countdown {
+    padding: 14px 10px;
+    margin: 12px 0;
+  }
+
+  .timeUnit {
+    min-width: 50px;
+    padding: 8px 4px;
+  }
+
+  .value {
+    font-size: 22px;
+  }
+
+  .unit {
+    font-size: 9px;
+  }
+
+  .separator {
+    font-size: 18px;
+    padding: 0 1px;
+  }
+
+  .label {
+    font-size: 14px;
+  }
+
+  .revealDate {
+    font-size: 12px;
+  }
+
+  .expired {
+    font-size: 18px;
+  }
+}
+
+@media (max-width: 480px) {
+  .countdown {
+    padding: 12px 8px;
+  }
+
+  .timeUnits {
+    gap: 2px;
+  }
+
+  .timeUnit {
+    min-width: 45px;
+    padding: 6px 3px;
+  }
+
+  .value {
+    font-size: 20px;
+  }
+
+  .separator {
+    font-size: 16px;
+  }
+}

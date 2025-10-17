@@ -39,4 +39,12 @@ api.interceptors.request.use(async (config: any) => {
   return config;
 });
 
+// Client pubblico senza autenticazione per endpoint pubblici
+export const publicApi = axios.create({
+  baseURL: STRAPI_API_URL,
+  headers: {
+    "Content-Type": "application/json",
+  },
+});
+
 export default api;

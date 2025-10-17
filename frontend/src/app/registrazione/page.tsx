@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { FormEvent, Suspense, useEffect, useMemo, useState } from "react";
 import styles from "../../styles/Login.module.css";
 import { Button } from "components/Button";
-import api from "../../lib/axios";
+import { publicApi } from "../../lib/axios";
 import { joinGame } from "../../lib/games";
 
 const MIN_PASSWORD_LENGTH = 8;
@@ -83,8 +83,8 @@ function RegisterContent() {
       setInviteError(null);
       setInviteGameName(null);
       try {
-        const response = await api.get(
-          `/api/games/validate?code=${encodeURIComponent(code)}`
+        const response = await publicApi.get(
+          `/api/invite/validate?code=${encodeURIComponent(code)}`
         );
         if (!isMounted) {
           return;

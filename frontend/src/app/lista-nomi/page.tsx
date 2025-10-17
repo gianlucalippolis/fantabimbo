@@ -6,17 +6,27 @@ import { useRouter, useSearchParams } from "next/navigation";
 import type ISession from "../../types/session";
 import styles from "./page.module.css";
 import Popup from "../../components/Popup";
+import Countdown from "../../components/Countdown";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import {
   fetchNameSubmissions,
   saveNameSubmission,
 } from "../../store/nameSubmissions";
+import api from "../../lib/axios";
 
 interface PopupState {
   isVisible: boolean;
   message: string;
   type: "success" | "error" | "warning" | "info";
   title?: string;
+}
+
+interface Game {
+  id: number;
+  attributes: {
+    name: string;
+    revealAt: string | null;
+  };
 }
 
 function ListaNomiContent() {
@@ -37,8 +47,33 @@ function ListaNomiContent() {
   );
 
   const [popup, setPopup] = useState<PopupState | null>(null);
+  const [game, setGame] = useState<Game | null>(null);
+  const [isRevealExpired, setIsRevealExpired] = useState(false);
 
   const isParent = typedSession?.userType === "parent";
+
+  // Carica i dati del game
+  useEffect(() => {
+    async function loadGame() {
+      if (!gameId) return;
+
+      try {
+        const response = await api.get(`/api/games/${gameId}`);
+        setGame(response.data.data);
+
+        // Check if reveal date has already passed
+        if (response.data.data?.attributes?.revealAt) {
+          const now = new Date();
+          const revealDate = new Date(response.data.data.attributes.revealAt);
+          setIsRevealExpired(now >= revealDate);
+        }
+      } catch (error) {
+        console.error("Errore nel caricamento del game:", error);
+      }
+    }
+
+    loadGame();
+  }, [gameId]);
 
   // Carica i nomi esistenti quando il componente si monta
   useEffect(() => {
@@ -206,6 +241,20 @@ function ListaNomiContent() {
           {isParent ? "Le tue preferenze" : "I tuoi tentativi"}
         </h1>
 
+        {game?.attributes?.revealAt && (
+          <Countdown
+            targetDate={game.attributes.revealAt}
+            onExpire={() => setIsRevealExpired(true)}
+          />
+        )}
+
+        {isRevealExpired && (
+          <div className={styles.warningBox}>
+            ⚠️ La data di rivelazione è scaduta. Non è più possibile modificare
+            i nomi.
+          </div>
+        )}
+
         <form className={styles.form} onSubmit={handleSubmit}>
           <div className={styles.namesList}>
             {names.map((name: string, index: number) => (
@@ -251,9 +300,14 @@ function ListaNomiContent() {
           <button
             className={styles.submitButton}
             type="submit"
-            disabled={isLoading}
+            disabled={isLoading || isRevealExpired}
+            title={isRevealExpired ? "La data di rivelazione è scaduta" : ""}
           >
-            {isLoading ? "Salvataggio..." : "Salva la lista"}
+            {isLoading
+              ? "Salvataggio..."
+              : isRevealExpired
+              ? "Modifiche non consentite"
+              : "Salva la lista"}
           </button>
         </form>
 

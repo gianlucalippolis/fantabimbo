@@ -44,6 +44,18 @@
   text-align: center;
 }
 
+.warningBox {
+  background: linear-gradient(135deg, #ff6b6b, #ee5a6f);
+  color: white;
+  padding: 1rem 1.5rem;
+  border-radius: 12px;
+  text-align: center;
+  font-weight: 600;
+  font-size: 1rem;
+  margin: 1rem 0;
+  box-shadow: 0 4px 15px rgba(238, 90, 111, 0.3);
+}
+
 .form {
   display: grid;
   gap: 2rem;
@@ -198,17 +210,17 @@
   .wrapper {
     padding: 2rem 1.5rem;
   }
-  
+
   .nameItem {
     grid-template-columns: 1fr;
     gap: 0.75rem;
     text-align: center;
   }
-  
+
   .controls {
     justify-content: center;
   }
-  
+
   .positionLabel {
     min-width: auto;
   }
@@ -218,15 +230,15 @@
   .container {
     padding: 1rem;
   }
-  
+
   .wrapper {
     padding: 1.5rem 1rem;
   }
-  
+
   .title {
     font-size: 1.5rem;
   }
-  
+
   .controlButton {
     width: 2rem;
     height: 2rem;

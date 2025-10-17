@@ -10,6 +10,7 @@ import type { GameSummary } from "types/game";
 import api from "../lib/axios";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
 import { fetchGames, setUserGames } from "../store/user";
+import Countdown from "./Countdown";
 
 interface GamesManagerProps {
   games: GameSummary[];
@@ -481,6 +482,11 @@ export function GamesManager({
                     {game.isOwner ? "Creatrice" : "Partecipante"}
                   </span>
                 </header>
+
+                {game.revealAt && (
+                  <Countdown targetDate={game.revealAt} />
+                )}
+
                 <dl className={styles.gameMeta}>
                   <div>
                     <dt>Codice invito</dt>

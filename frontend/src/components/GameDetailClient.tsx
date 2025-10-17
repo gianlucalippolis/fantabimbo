@@ -6,6 +6,7 @@ import Link from "next/link";
 import type { GameSummary } from "types/game";
 import api from "../lib/axios";
 import styles from "../app/partite/[id]/page.module.css";
+import Countdown from "./Countdown";
 
 interface GameDetailClientProps {
   game: GameSummary;
@@ -146,6 +147,16 @@ export function GameDetailClient({ game }: GameDetailClientProps) {
             </strong>
           </p>
         </header>
+
+        {currentReveal && (
+          <Countdown 
+            targetDate={currentReveal}
+            onExpire={() => {
+              // Opzionale: potresti mostrare un messaggio quando scade
+              console.log("Reveal date expired!");
+            }}
+          />
+        )}
 
         <section className={styles.section}>
           <h2 className={styles.sectionTitle}>Data di rivelazione</h2>

@@ -141,6 +141,17 @@ export default factories.createCoreController(
         return ctx.forbidden("Non hai accesso a questa partita.");
       }
 
+      // Check if reveal date has passed
+      if (game.revealAt) {
+        const now = new Date();
+        const revealDate = new Date(game.revealAt);
+        if (now >= revealDate) {
+          return ctx.forbidden(
+            "Non è più possibile modificare i nomi dopo la data di rivelazione."
+          );
+        }
+      }
+
       // Validate submitter type against user role
       const userProfile = (await strapi.entityService.findOne(
         "plugin::users-permissions.user",
