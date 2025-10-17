@@ -3,6 +3,7 @@ import { factories } from "@strapi/strapi";
 interface CreateGameBody {
   name?: string;
   description?: string | null;
+  prize?: string | null;
   revealAt?: string | null;
 }
 
@@ -24,6 +25,7 @@ interface PopulatedGame {
   id: ID;
   name?: string | null;
   description?: string | null;
+  prize?: string | null;
   inviteCode?: string | null;
   revealAt?: string | null;
   owner?: PopulatedUser | null;
@@ -159,6 +161,7 @@ export default factories.createCoreController(
 
       const name = rawBody.name?.trim();
       const description = rawBody.description?.trim();
+      const prize = rawBody.prize?.trim();
       const revealAt = parseRevealAt(rawBody.revealAt ?? null);
 
       if (!name) {
@@ -193,6 +196,7 @@ export default factories.createCoreController(
           name,
           slug: name,
           description: description || null,
+          prize: prize || null,
           revealAt,
           inviteCode,
           owner: user.id as ID,
@@ -250,12 +254,12 @@ export default factories.createCoreController(
       }
 
       if (existing.owner?.id !== user.id) {
-        return ctx.forbidden(
-          "Solo il creatore della partita può modificarla."
-        );
+        return ctx.forbidden("Solo il creatore della partita può modificarla.");
       }
 
-      const rawPayload = ((ctx.request.body as { data?: Record<string, unknown> })?.data ??
+      const rawPayload = ((
+        ctx.request.body as { data?: Record<string, unknown> }
+      )?.data ??
         (ctx.request.body as Record<string, unknown>) ??
         {}) as Record<string, unknown>;
 
@@ -311,14 +315,24 @@ export default factories.createCoreController(
         }
       }
 
+      if (Object.prototype.hasOwnProperty.call(rawPayload, "prize")) {
+        const rawPrize = rawPayload.prize;
+        if (typeof rawPrize === "string") {
+          const trimmedPrize = rawPrize.trim();
+          updateData.prize = trimmedPrize || null;
+        } else if (rawPrize === null) {
+          updateData.prize = null;
+        }
+      }
+
       if (Object.prototype.hasOwnProperty.call(rawPayload, "revealAt")) {
         const rawReveal = rawPayload.revealAt;
         updateData.revealAt =
           typeof rawReveal === "string"
             ? parseRevealAt(rawReveal)
             : rawReveal === null
-            ? null
-            : undefined;
+              ? null
+              : undefined;
       }
 
       if (Object.keys(updateData).length === 0) {

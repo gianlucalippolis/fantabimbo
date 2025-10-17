@@ -56,6 +56,41 @@
   margin: 0;
 }
 
+.prize {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 215, 0, 0.15),
+    rgba(255, 193, 7, 0.1)
+  );
+  border: 1px solid rgba(255, 193, 7, 0.3);
+  border-radius: 12px;
+  padding: 0.9rem 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+.prizeLabel {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: rgba(95, 70, 52, 0.75);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  flex-shrink: 0;
+}
+
+.prizeIcon {
+  font-size: 1.4rem;
+  line-height: 1;
+}
+
+.prizeText {
+  color: #5f4634;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
 .gameHighlight {
   display: grid;
   gap: 1.25rem;

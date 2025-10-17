@@ -165,6 +165,13 @@ export function GameDetailClient({ game }: GameDetailClientProps) {
                 : game.owner?.email || "Genitore"}
             </strong>
           </p>
+          {game.prize ? (
+            <div className={styles.prize}>
+              <span className={styles.prizeLabel}>Premio:</span>
+              <span className={styles.prizeIcon}>🏆</span>
+              <span className={styles.prizeText}>{game.prize}</span>
+            </div>
+          ) : null}
         </header>
 
         {/* Mostra risultati e classifica in cima quando il gioco è stato rivelato */}

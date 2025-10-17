@@ -24,6 +24,11 @@
     "description": {
       "type": "text"
     },
+    "prize": {
+      "type": "string",
+      "required": false,
+      "maxLength": 150
+    },
     "revealAt": {
       "type": "datetime",
       "required": false

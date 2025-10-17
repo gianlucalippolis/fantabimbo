@@ -22,11 +22,13 @@ interface GamesManagerProps {
 interface CreateFormState {
   name: string;
   description: string;
+  prize: string;
 }
 
 const INITIAL_CREATE_STATE: CreateFormState = {
   name: "",
   description: "",
+  prize: "",
 };
 
 export function GamesManager({
@@ -124,6 +126,7 @@ export function GamesManager({
 
     const trimmedName = createForm.name.trim();
     const trimmedDescription = createForm.description.trim();
+    const trimmedPrize = createForm.prize.trim();
     const trimmedRevealDate = revealDate.trim();
     const trimmedRevealTime = revealTime.trim();
 
@@ -151,6 +154,7 @@ export function GamesManager({
         data: {
           name: trimmedName,
           description: trimmedDescription,
+          prize: trimmedPrize || null,
           revealAt,
         },
       });
@@ -397,6 +401,25 @@ export function GamesManager({
                 className={styles.gamesTextArea}
               />
             </div>
+            <div className={styles.gamesFormRow}>
+              <label htmlFor="game-prize">Premio (opzionale)</label>
+              <p className={styles.inputHint}>
+                Indica se c&apos;è un premio per il vincitore. Sarà visibile a
+                tutti i partecipanti.
+              </p>
+              <input
+                id="game-prize"
+                name="game-prize"
+                type="text"
+                value={createForm.prize}
+                onChange={(event) =>
+                  handleCreateFieldChange("prize", event.target.value)
+                }
+                placeholder="Es. Cena offerta, Trofeo personalizzato…"
+                className={styles.gamesInput}
+                maxLength={150}
+              />
+            </div>
             {createError ? (
               <div className={styles.gamesError} role="alert">
                 {createError}
@@ -477,6 +500,13 @@ export function GamesManager({
                   </div>
                   {game.description ? (
                     <p className={styles.gameDescription}>{game.description}</p>
+                  ) : null}
+                  {game.prize ? (
+                    <div className={styles.gamePrize}>
+                      <span className={styles.gamePrizeLabel}>Premio:</span>
+                      <span className={styles.gamePrizeIcon}>🏆</span>
+                      <span className={styles.gamePrizeText}>{game.prize}</span>
+                    </div>
                   ) : null}
                 </header>
 

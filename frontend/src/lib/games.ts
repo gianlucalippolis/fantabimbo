@@ -91,6 +91,7 @@ export function mapStrapiGame(
     name: asString(gameData.name) ?? "Partita senza titolo",
     slug: asString(gameData.slug) ?? null,
     description: asString(gameData.description) ?? null,
+    prize: asString(gameData.prize) ?? null,
     inviteCode: asString(gameData.inviteCode) ?? "",
     revealAt: asString(gameData.revealAt) ?? null,
     owner: owner ?? {
