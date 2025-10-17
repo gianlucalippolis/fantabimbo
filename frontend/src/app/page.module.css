@@ -811,8 +811,32 @@
   padding: 0.8rem 1.2rem;
 }
 
-.gameInviteActions .gamesDangerButton {
-  padding: 0.8rem 1.2rem;
+/* Sezione elimina partita */
+.gameDeleteSection {
+  border-top: 1px solid rgba(220, 38, 38, 0.2);
+  padding-top: 1.25rem;
+  display: flex;
+  justify-content: center;
+}
+
+.gameDeleteSection .gamesDangerButton {
+  padding: 0.85rem 2rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  min-width: 200px;
+}
+
+/* Azioni amministrative (deprecato, usa gameDeleteSection) */
+.gameAdminActions {
+  border-top: 1px solid rgba(194, 160, 131, 0.2);
+  padding-top: 1rem;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.gameAdminActions .gamesDangerButton {
+  padding: 0.75rem 1.5rem;
+  font-size: 0.95rem;
 }
 
 .gamesModalBackdrop {

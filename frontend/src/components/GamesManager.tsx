@@ -463,7 +463,6 @@ export function GamesManager({
           </p>
         ) : (
           orderedGames.map((game) => {
-            const isOwner = game.owner?.id === userId;
             const inviteLink = `${inviteBaseClean}/registrazione?code=${encodeURIComponent(
               game.inviteCode
             )}`;
@@ -545,33 +544,37 @@ export function GamesManager({
                       >
                         {copiedGameId === game.id ? "✓ Copiato!" : "Copia link"}
                       </button>
-                      {isOwner ? (
-                        <>
-                          <button
-                            type="button"
-                            className={styles.gamesTertiaryButton}
-                            onClick={() => handleRegenerate(game.id)}
-                            disabled={regeneratingId === game.id}
-                          >
-                            {regeneratingId === game.id
-                              ? "Rigenerazione…"
-                              : "Nuovo codice"}
-                          </button>
-                          <button
-                            type="button"
-                            className={styles.gamesDangerButton}
-                            onClick={() => handleDeleteRequest(game)}
-                            disabled={isDeleting}
-                          >
-                            {isDeleting && gamePendingDelete?.id === game.id
-                              ? "Eliminazione…"
-                              : "Elimina partita"}
-                          </button>
-                        </>
+                      {game.isOwner ? (
+                        <button
+                          type="button"
+                          className={styles.gamesTertiaryButton}
+                          onClick={() => handleRegenerate(game.id)}
+                          disabled={regeneratingId === game.id}
+                        >
+                          {regeneratingId === game.id
+                            ? "Rigenerazione…"
+                            : "Nuovo codice"}
+                        </button>
                       ) : null}
                     </div>
                   </div>
                 </details>
+
+                {/* Pulsante elimina partita (solo proprietario) */}
+                {game.isOwner ? (
+                  <div className={styles.gameDeleteSection}>
+                    <button
+                      type="button"
+                      className={styles.gamesDangerButton}
+                      onClick={() => handleDeleteRequest(game)}
+                      disabled={isDeleting}
+                    >
+                      {isDeleting && gamePendingDelete?.id === game.id
+                        ? "Eliminazione…"
+                        : "Elimina partita"}
+                    </button>
+                  </div>
+                ) : null}
               </article>
             );
           })

@@ -27,13 +27,23 @@ export function getStrapiConfig(options: StrapiConfigOptions = {}): {
 }
 
 export function getAppBaseUrl(): string {
+  // Lato client: usa l'origin del browser
   if (typeof window !== "undefined" && window.location?.origin) {
     return window.location.origin;
   }
 
-  return (
-    process.env.NEXT_PUBLIC_SITE_URL ??
-    process.env.NEXTAUTH_URL ??
-    "http://localhost:3000"
-  );
+  // Lato server: usa solo variabili d'ambiente (mai localhost in produzione)
+  const siteUrl =
+    process.env.NEXT_PUBLIC_SITE_URL ?? process.env.NEXTAUTH_URL ?? "";
+
+  // Se non c'è una URL configurata, ritorna stringa vuota invece di localhost
+  // L'app dovrà gestire questo caso
+  if (!siteUrl) {
+    console.warn(
+      "NEXT_PUBLIC_SITE_URL o NEXTAUTH_URL non configurati. Imposta una di queste variabili nel file .env per i link di invito."
+    );
+    return "";
+  }
+
+  return siteUrl;
 }
