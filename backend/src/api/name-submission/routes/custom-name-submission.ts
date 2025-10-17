@@ -8,5 +8,13 @@ export default {
         policies: ["global::is-authenticated"],
       },
     },
+    {
+      method: "GET",
+      path: "/name-submissions/parent-names/:gameId",
+      handler: "name-submission.getParentNames",
+      config: {
+        policies: ["global::is-authenticated"],
+      },
+    },
   ],
 };

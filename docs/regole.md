@@ -1,16 +1,51 @@
 Regole di Base:
 
-Lista Nomi: Prepara una lista di 10 nomi (ad esempio, 5 maschili e 5 femminili, o tutti di un genere se conosci già il sesso del bambino/a). Questi saranno i nomi "in gara".
-Ordine di Preferenza: Ogni partecipante riceve la lista dei 10 nomi e deve ordinarli dal 1° al 10° in base a quello che pensa sarà il nome scelto dai futuri genitori.
-Il Primo Nome: L'obiettivo principale è indovinare il nome esatto che verrà scelto e la sua posizione (il 1° posto).
- Sistema di Punteggio (per rendere il gioco più avvincente):
+## Per il Genitore (Owner):
+- **Lista Nomi**: Il genitore crea una partita e inserisce una lista di 10 nomi candidati (ad esempio, 5 maschili e 5 femminili, o tutti di un genere se si conosce già il sesso del bambino/a).
+- **Ordine di Preferenza**: Il genitore ordina i nomi dal 1° al 10° in base alla propria preferenza. Il **primo nome della lista è il nome che verrà scelto per il bambino**.
+- **Privacy**: I giocatori NON vedono l'ordine originale dei nomi del genitore, ma solo i nomi in ordine casuale.
 
-Puoi assegnare punti in base a quanto i partecipanti si avvicinano all'ordine corretto o al nome scelto. Ecco alcune opzioni:
-Punti per il Nome Esatto al 1° Posto:
-100 punti se si indovina il nome esatto del bambino/a e lo si posiziona al 1° posto.
-Punti per il Nome Esatto (indipendentemente dalla posizione): 50 punti se si indovina il nome esatto del bambino/a, anche se non è al 1° posto nella propria lista.
-Punti per la Posizione Corretta: 20 punti per ogni nome che si trova nella posizione corretta (es. se "Sofia" è il 3° nome scelto dai genitori e un partecipante l'ha messa al 3° posto nella sua lista).
-Punti per la Vicinanza alla Posizione Corretta: 10 punti se un nome è a una sola posizione di distanza da quella corretta (es. se "Marco" è il 5° nome e il partecipante l'ha messo al 4° o al 6° posto).
-Punti Bonus/Malus (per un tocco alla Fanta Sanremo):
-Bonus: +20 punti se un partecipante ha inserito nella sua lista un nome che i genitori avevano scartato all'ultimo ma che piaceva molto.
-Malus: -10 punti se un partecipante inserisce un nome che i genitori avevano espressamente detto di non volere.
+## Per il Giocatore (Player):
+- **Ricezione Nomi**: Ogni giocatore riceve la **stessa lista di 10 nomi** inseriti dal genitore, ma presentati in **ordine casuale** per evitare bias.
+- **Obiettivo**: Riordinare i nomi dal 1° al 10° cercando di indovinare l'ordine di preferenza dei genitori.
+- **Il Nome Vincente**: L'obiettivo principale è indovinare quale sarà il nome scelto per il bambino (il 1° nella lista del genitore) e posizionarlo al 1° posto nella propria lista.
+- **Rivelazione**: I risultati vengono rivelati alla data impostata dal genitore, mostrando la classifica dei giocatori.
+ ## Sistema di Punteggio:
+
+I punti vengono assegnati in base a quanto i giocatori si avvicinano all'ordine corretto stabilito dal genitore:
+
+### Punti Principali:
+- **100 punti**: Se si indovina il **nome esatto del bambino** (1° posto della lista del genitore) e lo si posiziona al **1° posto** nella propria lista
+- **50 punti**: Se si indovina il nome esatto del bambino, anche se **non è al 1° posto** nella propria lista
+- **20 punti**: Per **ogni nome** che si trova nella **posizione corretta** rispetto alla lista del genitore (escluso il nome del bambino già conteggiato)
+- **10 punti**: Se un nome è a **una sola posizione di distanza** da quella corretta nella lista del genitore
+
+### Esempio di Calcolo Punteggio:
+
+**Lista del genitore (ordine corretto):**
+1. Leonardo (nome scelto) ⭐
+2. Matteo
+3. Sofia
+4. Emma
+5. Alessandro
+6. Giulia
+7. Lorenzo
+8. Chiara
+9. Marco
+10. Alice
+
+**Lista di un giocatore:**
+1. Leonardo → **100 punti** (nome esatto al 1° posto)
+2. Sofia → **10 punti** (vicino: era al 3°, ora al 2°)
+3. Matteo → **10 punti** (vicino: era al 2°, ora al 3°)
+4. Emma → **20 punti** (posizione corretta!)
+5. Alessandro → **20 punti** (posizione corretta!)
+...
+
+**Punteggio totale esempio: 160 punti**
+
+### Note Importanti:
+- Il nome del bambino (1° nella lista del genitore) vale molti più punti per incentivare la competizione
+- Indovinare le posizioni esatte degli altri nomi porta comunque punti significativi
+- Essere "vicini" alla posizione corretta dà comunque qualche punto
+- I giocatori vedono i nomi in ordine casuale per evitare bias e devono riordinarli secondo la propria previsione

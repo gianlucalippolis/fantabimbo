@@ -424,5 +424,91 @@ export default factories.createCoreController(
 
       return this.transformResponse(result);
     },
+
+    async getParentNames(this: any, ctx) {
+      const user = ctx.state.user;
+      if (!user) {
+        return ctx.unauthorized("Autenticazione richiesta.");
+      }
+
+      const gameId = ctx.params.gameId;
+      if (!gameId) {
+        return ctx.badRequest("ID partita mancante.");
+      }
+
+      // Check if user has access to this game
+      const game = (await strapi.entityService.findOne(
+        "api::game.game",
+        Number(gameId),
+        {
+          populate: DEFAULT_POPULATE,
+        }
+      )) as any;
+
+      if (!game) {
+        return ctx.notFound("Partita non trovata.");
+      }
+
+      const isOwner = game.owner?.id === user.id;
+      const isParticipant = Array.isArray(game.participants)
+        ? game.participants.some((p: any) => p.id === user.id)
+        : false;
+
+      if (!isOwner && !isParticipant) {
+        return ctx.forbidden("Non hai accesso a questa partita.");
+      }
+
+      // Get parent's submission
+      const submissions = (await strapi.entityService.findMany(
+        "api::name-submission.name-submission",
+        {
+          filters: {
+            game: { id: Number(gameId) },
+            submitterType: "parent",
+          },
+          populate: {
+            submitter: true,
+          },
+        }
+      )) as any[];
+
+      let parentSubmission = submissions.find(
+        (sub: any) => sub.isParentPreference
+      );
+
+      // Fallback to any parent submission
+      if (!parentSubmission && submissions.length > 0) {
+        parentSubmission = submissions[0];
+      }
+
+      if (!parentSubmission || !Array.isArray(parentSubmission.names)) {
+        return this.transformResponse({
+          names: [],
+          shuffled: [],
+          hasParentSubmission: false,
+        });
+      }
+
+      const parentNames = parentSubmission.names as string[];
+
+      // Shuffle names for participants (but not for the parent)
+      let shuffledNames = [...parentNames];
+      if (!isOwner) {
+        // Fisher-Yates shuffle algorithm
+        for (let i = shuffledNames.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [shuffledNames[i], shuffledNames[j]] = [
+            shuffledNames[j],
+            shuffledNames[i],
+          ];
+        }
+      }
+
+      return this.transformResponse({
+        names: isOwner ? parentNames : [], // Only owner sees original order
+        shuffled: shuffledNames, // Participants see shuffled
+        hasParentSubmission: true,
+      });
+    },
   })
 );

@@ -10,6 +10,7 @@ import Countdown from "../../components/Countdown";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import {
   fetchNameSubmissions,
+  fetchParentNames,
   saveNameSubmission,
 } from "../../store/nameSubmissions";
 import api from "../../lib/axios";
@@ -37,9 +38,8 @@ function ListaNomiContent() {
   const gameId = searchParams?.get("game");
 
   const dispatch = useAppDispatch();
-  const { submissions, isLoading } = useAppSelector(
-    (state) => state.nameSubmissions
-  );
+  const { submissions, parentNames, hasParentSubmission, isLoading } =
+    useAppSelector((state) => state.nameSubmissions);
 
   // Stato locale per i nomi (inizializzato dai dati Redux)
   const [names, setNames] = useState<string[]>(
@@ -75,6 +75,23 @@ function ListaNomiContent() {
     loadGame();
   }, [gameId]);
 
+  // Carica i nomi del genitore per i giocatori
+  useEffect(() => {
+    async function loadParentNamesForPlayers() {
+      if (!gameId || !typedSession || isParent) {
+        return;
+      }
+
+      try {
+        await dispatch(fetchParentNames({ gameId })).unwrap();
+      } catch (error) {
+        console.error("Errore nel caricamento dei nomi del genitore:", error);
+      }
+    }
+
+    loadParentNamesForPlayers();
+  }, [gameId, dispatch, isParent, typedSession]);
+
   // Carica i nomi esistenti quando il componente si monta
   useEffect(() => {
     async function loadExistingNames() {
@@ -98,17 +115,47 @@ function ListaNomiContent() {
 
   // Quando arrivano i dati da Redux, aggiorna lo stato locale
   useEffect(() => {
-    if (submissions.length > 0) {
-      // Prova prima con attributes (formato Strapi standard)
-      let loadedNames = submissions[0].attributes?.names;
+    // Se è un giocatore e ci sono i nomi del genitore, usa quelli come base
+    if (!isParent && hasParentSubmission && parentNames.length > 0) {
+      // Se il giocatore ha già una submission, caricala
+      if (submissions.length > 0) {
+        let loadedNames = submissions[0].attributes?.names;
+        if (!loadedNames) {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          loadedNames = (submissions[0] as any).names;
+        }
 
-      // Se non esiste, prova senza attributes
+        if (loadedNames && Array.isArray(loadedNames)) {
+          const fullNames = Array.from(
+            { length: 10 },
+            (_, index) => loadedNames[index] || ""
+          );
+          setNames(fullNames);
+          console.log("Giocatore - nomi submission caricati:", fullNames);
+          return;
+        }
+      }
+
+      // Altrimenti usa i nomi del genitore (shuffled)
+      const fullNames = Array.from(
+        { length: 10 },
+        (_, index) => parentNames[index] || ""
+      );
+      setNames(fullNames);
+      console.log(
+        "Giocatore - nomi del genitore (shuffled) caricati:",
+        fullNames
+      );
+    }
+    // Se è il genitore, carica la sua submission
+    else if (isParent && submissions.length > 0) {
+      let loadedNames = submissions[0].attributes?.names;
       if (!loadedNames) {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         loadedNames = (submissions[0] as any).names;
       }
 
-      console.log("Loaded names:", loadedNames);
+      console.log("Genitore - loaded names:", loadedNames);
 
       if (loadedNames && Array.isArray(loadedNames)) {
         const fullNames = Array.from(
@@ -116,10 +163,10 @@ function ListaNomiContent() {
           (_, index) => loadedNames[index] || ""
         );
         setNames(fullNames);
-        console.log("Nomi caricati e impostati:", fullNames);
+        console.log("Genitore - nomi caricati e impostati:", fullNames);
       }
     }
-  }, [submissions]);
+  }, [submissions, parentNames, hasParentSubmission, isParent]);
 
   function handleNameChange(index: number, value: string): void {
     const newNames = [...names];
@@ -238,8 +285,25 @@ function ListaNomiContent() {
         </button>
 
         <h1 className={styles.title}>
-          {isParent ? "Le tue preferenze" : "I tuoi tentativi"}
+          {isParent ? "Le tue preferenze" : "Riordina i nomi"}
         </h1>
+
+        {!isParent && (
+          <div className={styles.infoBox}>
+            💡 <strong>Istruzioni:</strong> Riordina i nomi dal 1° al 10° posto
+            secondo la tua previsione. Il genitore ha inserito questi nomi, ma
+            tu li vedi in ordine casuale. Cerca di indovinare quale sarà il nome
+            scelto (1° posto)!
+          </div>
+        )}
+
+        {isParent && (
+          <div className={styles.infoBox}>
+            💡 <strong>Info:</strong> Inserisci i tuoi 10 nomi preferiti in
+            ordine. Il <strong>primo nome</strong> della lista sarà quello
+            scelto per il bambino!
+          </div>
+        )}
 
         {game?.attributes?.revealAt && (
           <Countdown
@@ -253,6 +317,12 @@ function ListaNomiContent() {
           <div className={styles.warningBox}>
             ⚠️ La data di rivelazione è scaduta. Non è più possibile modificare
             i nomi.
+          </div>
+        )}
+
+        {!isParent && !hasParentSubmission && !isLoading && (
+          <div className={styles.warningBox}>
+            ⚠️ Il genitore non ha ancora inserito i nomi. Torna più tardi!
           </div>
         )}
 
@@ -272,6 +342,8 @@ function ListaNomiContent() {
                   onChange={(event) =>
                     handleNameChange(index, event.target.value)
                   }
+                  disabled={!isParent && hasParentSubmission}
+                  readOnly={!isParent && hasParentSubmission}
                 />
 
                 <div className={styles.controls}>

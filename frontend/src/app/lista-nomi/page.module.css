@@ -44,6 +44,23 @@
   text-align: center;
 }
 
+.infoBox {
+  background: linear-gradient(135deg, #4ecdc4, #44a8a8);
+  color: white;
+  padding: 1rem 1.5rem;
+  border-radius: 12px;
+  text-align: left;
+  font-weight: 500;
+  font-size: 0.95rem;
+  margin: 1rem 0;
+  box-shadow: 0 4px 15px rgba(78, 205, 196, 0.3);
+  line-height: 1.6;
+}
+
+.infoBox strong {
+  font-weight: 700;
+}
+
 .warningBox {
   background: linear-gradient(135deg, #ff6b6b, #ee5a6f);
   color: white;
@@ -109,6 +126,13 @@
   outline: none;
   border-color: #c2a083;
   box-shadow: 0 0 0 3px rgba(194, 160, 131, 0.25);
+}
+
+.nameInput:disabled,
+.nameInput:read-only {
+  background-color: #f5f5f5;
+  color: #666;
+  cursor: not-allowed;
 }
 
 .controls {

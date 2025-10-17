@@ -22,12 +22,16 @@ interface NameSubmission {
 
 interface NameSubmissionsState {
   submissions: NameSubmission[];
+  parentNames: string[]; // Nomi del genitore (shuffled per i giocatori)
+  hasParentSubmission: boolean;
   isLoading: boolean;
   error: string | null;
 }
 
 const initialState: NameSubmissionsState = {
   submissions: [],
+  parentNames: [],
+  hasParentSubmission: false,
   isLoading: false,
   error: null,
 };
@@ -58,6 +62,17 @@ export const fetchNameSubmissions = createAsyncThunk(
       userSubmission,
       userNames,
     };
+  }
+);
+
+// Async thunk per ottenere i nomi del genitore (shuffled per i giocatori)
+export const fetchParentNames = createAsyncThunk(
+  "nameSubmissions/fetchParentNames",
+  async ({ gameId }: { gameId: string }) => {
+    const response = await api.get(
+      `/api/name-submissions/parent-names/${gameId}`
+    );
+    return response.data;
   }
 );
 
@@ -139,6 +154,21 @@ const nameSubmissionsSlice = createSlice({
       .addCase(fetchNameSubmissions.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.error.message || "Errore nel caricamento";
+      })
+      // Fetch parent names
+      .addCase(fetchParentNames.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(fetchParentNames.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.parentNames = action.payload.shuffled || [];
+        state.hasParentSubmission = action.payload.hasParentSubmission || false;
+        console.log("Loaded parent names:", action.payload);
+      })
+      .addCase(fetchParentNames.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.error.message || "Errore nel caricamento dei nomi";
       })
       // Save submission
       .addCase(saveNameSubmission.pending, (state) => {
