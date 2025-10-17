@@ -4,6 +4,14 @@ export interface GameParticipant {
   firstName: string | null;
   lastName: string | null;
   userType: "parent" | "player" | null;
+  avatar?: {
+    url: string;
+    formats?: {
+      thumbnail?: { url: string };
+      small?: { url: string };
+      medium?: { url: string };
+    };
+  } | null;
 }
 
 export interface GameSummary {

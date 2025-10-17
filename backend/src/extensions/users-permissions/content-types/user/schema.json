@@ -78,6 +78,12 @@
       "default": "player",
       "required": true
     },
+    "avatar": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
+      "allowedTypes": ["images"]
+    },
     "ownedGames": {
       "type": "relation",
       "relation": "oneToMany",

@@ -7,6 +7,7 @@ import { Logo } from "./Logo";
 import { SignOutButton } from "./SignOutButton";
 import { GamesManager } from "./GamesManager";
 import { useAppSelector } from "../store/hooks";
+import Avatar from "./Avatar";
 
 interface UserDashboardProps {
   displayName: string;
@@ -26,9 +27,13 @@ export function UserDashboard({
   userType,
 }: UserDashboardProps) {
   const games = useAppSelector((state) => state.user.games);
+  const userProfile = useAppSelector((state) => state.user.profile);
   const [menuOpen, setMenuOpen] = useState(false);
   const [tutorialOpen, setTutorialOpen] = useState(false);
   const [tutorialStep, setTutorialStep] = useState(0);
+
+  const avatarUrl =
+    userProfile?.avatar?.formats?.small?.url || userProfile?.avatar?.url;
 
   const tutorialSteps = useMemo(
     () => [
@@ -93,6 +98,9 @@ export function UserDashboard({
             <div className={styles.brandLogo}>
               <Logo />
             </div>
+            <Link href="/profilo" className={styles.headerAvatarLink}>
+              <Avatar imageUrl={avatarUrl} name={displayName} size="small" />
+            </Link>
             <div className={styles.brandText}>
               <span className={styles.brandGreeting}>Ciao,</span>
               <span className={styles.brandName}>{displayName}</span>
@@ -134,6 +142,15 @@ export function UserDashboard({
                 </Link>
               </li>
               <li className={styles.menuItem}>
+                <Link
+                  href="/profilo"
+                  className={styles.menuLink}
+                  onClick={closeMenu}
+                >
+                  Il mio profilo
+                </Link>
+              </li>
+              <li className={styles.menuItem}>
                 <button
                   type="button"
                   className={styles.menuButton}
@@ -169,23 +186,35 @@ export function UserDashboard({
         <section className={styles.dashboardCard}>
           <div className={styles.dashboardGrid}>
             <div className={styles.dashboardIntro}>
-              <h1 className={styles.title}>Ciao, {displayName}!</h1>
+              <div className={styles.dashboardHeader}>
+                <Link href="/profilo" className={styles.avatarLink}>
+                  <Avatar
+                    imageUrl={avatarUrl}
+                    name={displayName}
+                    size="large"
+                  />
+                  <span className={styles.avatarEditHint}>Modifica foto</span>
+                </Link>
+                <div>
+                  <h1 className={styles.title}>Ciao, {displayName}!</h1>
+                  {userType ? (
+                    <span
+                      className={`${styles.roleBadge} ${
+                        userType === "parent"
+                          ? styles.roleBadgeParent
+                          : styles.roleBadgePlayer
+                      }`}
+                    >
+                      Ruolo:&nbsp;
+                      {userType === "parent" ? "Genitore" : "Giocatore"}
+                    </span>
+                  ) : null}
+                </div>
+              </div>
               <p className={styles.subtitle}>
                 Sei nella tua area Fantanome. Presto potrai gestire la rosa,
                 monitorare le prestazioni e sfidare gli altri allenatori.
               </p>
-              {userType ? (
-                <span
-                  className={`${styles.roleBadge} ${
-                    userType === "parent"
-                      ? styles.roleBadgeParent
-                      : styles.roleBadgePlayer
-                  }`}
-                >
-                  Ruolo:&nbsp;
-                  {userType === "parent" ? "Genitore" : "Giocatore"}
-                </span>
-              ) : null}
             </div>
             <section
               className={`${styles.tutorial} ${styles.dashboardTutorial}`}

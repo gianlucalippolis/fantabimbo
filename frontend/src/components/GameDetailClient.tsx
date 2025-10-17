@@ -8,6 +8,7 @@ import api from "../lib/axios";
 import styles from "../app/partite/[id]/page.module.css";
 import Countdown from "./Countdown";
 import Leaderboard from "./Leaderboard";
+import Avatar from "./Avatar";
 
 interface GameDetailClientProps {
   game: GameSummary;
@@ -273,16 +274,27 @@ export function GameDetailClient({ game }: GameDetailClientProps) {
                 ]
                   .filter(Boolean)
                   .join(" ");
+                const avatarUrl =
+                  participant.avatar?.formats?.thumbnail?.url ||
+                  participant.avatar?.url ||
+                  null;
                 return (
                   <li key={participant.id} className={styles.participantItem}>
-                    <span className={styles.participantName}>
-                      {displayName || participant.email || "Partecipante"}
-                    </span>
-                    <span className={styles.participantRole}>
-                      {participant.userType === "parent"
-                        ? "Genitore"
-                        : "Giocatore"}
-                    </span>
+                    <Avatar
+                      imageUrl={avatarUrl}
+                      name={displayName || participant.email || "Partecipante"}
+                      size="small"
+                    />
+                    <div className={styles.participantInfo}>
+                      <span className={styles.participantName}>
+                        {displayName || participant.email || "Partecipante"}
+                      </span>
+                      <span className={styles.participantRole}>
+                        {participant.userType === "parent"
+                          ? "Genitore"
+                          : "Giocatore"}
+                      </span>
+                    </div>
                   </li>
                 );
               })}

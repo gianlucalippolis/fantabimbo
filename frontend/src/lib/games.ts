@@ -165,7 +165,65 @@ function mapRelationEntity(value: unknown): GameParticipant | null {
     firstName: asString(userAttributes.firstName),
     lastName: asString(userAttributes.lastName),
     userType: asString(userAttributes.userType) as "parent" | "player" | null,
+    avatar: mapAvatar(userAttributes.avatar),
   };
+}
+
+function mapAvatar(value: unknown): GameParticipant["avatar"] {
+  if (!value || typeof value !== "object") {
+    return null;
+  }
+
+  // Handle Strapi media format with data wrapper
+  let mediaData: unknown;
+  if ("data" in value) {
+    mediaData = (value as { data?: unknown }).data;
+  } else {
+    mediaData = value;
+  }
+
+  if (!mediaData || typeof mediaData !== "object") {
+    return null;
+  }
+
+  // Extract attributes
+  let attributes: Record<string, unknown>;
+  if ("attributes" in mediaData) {
+    const mediaAttrs = mediaData as { attributes?: Record<string, unknown> };
+    if (!mediaAttrs.attributes) return null;
+    attributes = mediaAttrs.attributes;
+  } else {
+    attributes = mediaData as Record<string, unknown>;
+  }
+
+  const url = asString(attributes.url);
+  if (!url) return null;
+
+  const formats = attributes.formats;
+  let formatsData:
+    | {
+        thumbnail?: { url: string };
+        small?: { url: string };
+        medium?: { url: string };
+      }
+    | undefined = undefined;
+
+  if (formats && typeof formats === "object") {
+    const formatsObj = formats as Record<string, unknown>;
+    formatsData = {
+      thumbnail: extractFormat(formatsObj.thumbnail),
+      small: extractFormat(formatsObj.small),
+      medium: extractFormat(formatsObj.medium),
+    };
+  }
+
+  return { url, formats: formatsData };
+}
+
+function extractFormat(value: unknown): { url: string } | undefined {
+  if (!value || typeof value !== "object") return undefined;
+  const url = asString((value as Record<string, unknown>).url);
+  return url ? { url } : undefined;
 }
 
 function mapRelationCollection(value: unknown): GameParticipant[] {

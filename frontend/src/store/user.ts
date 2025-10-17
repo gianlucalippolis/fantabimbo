@@ -9,6 +9,14 @@ export interface UserProfile {
   displayName: string;
   email: string | null | undefined;
   userType: "parent" | "player" | null;
+  avatar?: {
+    url: string;
+    formats?: {
+      thumbnail?: { url: string };
+      small?: { url: string };
+      medium?: { url: string };
+    };
+  } | null;
   jwt?: string | null;
 }
 
