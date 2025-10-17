@@ -196,9 +196,13 @@
 }
 
 @media (max-width: 640px) {
+  .container {
+    padding: 1.5rem 1rem;
+  }
+
   .card {
-    padding: 2rem;
-    gap: 2rem;
+    padding: 1.5rem;
+    gap: 1.5rem;
   }
 
   .title {
@@ -212,5 +216,18 @@
 
   .avatarPlaceholder {
     font-size: 2.5rem;
+  }
+
+  .infoItem {
+    padding: 1rem;
+  }
+
+  .infoLabel {
+    font-size: 0.8rem;
+  }
+
+  .infoValue {
+    font-size: 0.95rem;
+    word-break: break-word;
   }
 }

@@ -393,7 +393,7 @@
   padding: 0.25rem 0.6rem;
   border-radius: 999px;
   white-space: nowrap;
-  opacity: 0;
+  opacity: 1;
   transition: opacity 0.2s ease, bottom 0.2s ease;
   pointer-events: none;
 }
@@ -1327,6 +1327,16 @@
     width: min(420px, calc(100% - 2rem));
     padding: 1.75rem 1.5rem;
     gap: 1.25rem;
+  }
+
+  .avatarEditHint {
+    font-size: 0.75rem;
+    padding: 0.35rem 0.75rem;
+    bottom: -10px;
+  }
+
+  .avatarLink:hover .avatarEditHint {
+    bottom: -14px;
   }
 }
 
