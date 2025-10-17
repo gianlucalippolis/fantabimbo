@@ -343,6 +343,24 @@
     font-size: 1.6rem;
   }
 
+  .revealForm {
+    max-width: 100%;
+  }
+
+  .revealForm input[type="date"],
+  .revealForm input[type="time"] {
+    padding: 0.85rem 1rem;
+    font-size: 1rem;
+    min-height: 48px;
+    -webkit-appearance: none;
+    appearance: none;
+  }
+
+  .revealForm label {
+    font-size: 0.9rem;
+    font-weight: 700;
+  }
+
   .participantItem {
     flex-direction: column;
     align-items: flex-start;
