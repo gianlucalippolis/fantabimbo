@@ -1,14 +1,22 @@
 .container {
   min-height: 100vh;
+  min-height: 100dvh; /* Dynamic viewport height for mobile browsers */
+  height: auto; /* Allow container to grow beyond viewport */
   display: flex;
-  align-items: center;
+  align-items: flex-start; /* Changed from center to flex-start */
   justify-content: center;
-  padding: 2.5rem 1.5rem;
+  padding: 2.5rem 1.5rem 6rem 1.5rem; /* Extra padding at bottom */
   background: linear-gradient(135deg, #ede3da, #c2a083);
+  overflow-x: hidden; /* Prevent horizontal scroll */
+  overflow-y: auto; /* Ensure vertical scroll works */
+  width: 100%;
+  max-width: 100vw;
+  box-sizing: border-box;
 }
 
 .card {
   width: min(720px, 100%);
+  max-width: 100%; /* Ensure it never exceeds container */
   background: #ffffff;
   border-radius: 28px;
   padding: 2.5rem;
@@ -16,6 +24,7 @@
   border: 1px solid rgba(194, 160, 131, 0.25);
   display: grid;
   gap: 2rem;
+  box-sizing: border-box;
 }
 
 .header {
@@ -385,17 +394,38 @@
 }
 
 @media (max-width: 640px) {
+  .container {
+    padding: 1.5rem 1rem 8rem 1rem; /* Extra generous bottom padding for mobile scroll */
+    min-height: 100vh;
+    min-height: 100dvh;
+    align-items: flex-start;
+  }
+
   .card {
-    padding: 2rem;
+    padding: 1.5rem;
     gap: 1.5rem;
+    width: 100%;
+    max-width: 100%;
+    border-radius: 20px;
+    margin-bottom: 4rem; /* Extra space at bottom for scroll */
   }
 
   .title {
     font-size: 1.6rem;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+  }
+
+  .subtitle,
+  .prizeText,
+  .participantName {
+    word-wrap: break-word;
+    overflow-wrap: break-word;
   }
 
   .revealForm {
     max-width: 100%;
+    width: 100%;
   }
 
   .revealForm input[type="date"],
@@ -408,6 +438,8 @@
     background: #ffffff;
     border: 2px solid rgba(194, 160, 131, 0.5);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    width: 100%;
+    box-sizing: border-box;
   }
 
   .revealForm input[type="date"]:focus,
@@ -430,16 +462,32 @@
     color: #5f4634;
   }
 
+  .revealActions {
+    width: 100%;
+    flex-direction: column;
+  }
+
+  .secondaryAction,
+  .primaryAction,
+  .highlightAction {
+    width: 100%;
+    box-sizing: border-box;
+  }
+
   .participantItem {
     flex-direction: row;
     align-items: center;
     gap: 0.75rem;
+    width: 100%;
+    box-sizing: border-box;
   }
 
   .participantInfo {
     flex-direction: column;
     align-items: flex-start;
     gap: 0.35rem;
+    min-width: 0; /* Allow text to shrink */
+    flex: 1;
   }
 
   .footer {
