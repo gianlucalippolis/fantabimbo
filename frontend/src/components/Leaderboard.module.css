@@ -14,11 +14,11 @@
 }
 
 .babyNameReveal {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #89b5af 0%, #6b9080 100%);
   border-radius: 20px;
   padding: 2.5rem 2rem;
   text-align: center;
-  box-shadow: 0 12px 36px rgba(102, 126, 234, 0.3);
+  box-shadow: 0 12px 36px rgba(107, 144, 128, 0.3);
   color: white;
 }
 
@@ -147,7 +147,7 @@
 .totalScore {
   font-size: 1.8rem;
   font-weight: 800;
-  color: #667eea;
+  color: #6b9080;
   text-align: right;
   white-space: nowrap;
 }
