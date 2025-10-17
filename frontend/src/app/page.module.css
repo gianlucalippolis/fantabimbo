@@ -776,15 +776,28 @@
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: min(480px, calc(100% - 2.5rem));
+  width: min(520px, calc(100% - 2.5rem));
   background: #ffffff;
-  border-radius: 24px;
-  box-shadow: 0 30px 80px rgba(47, 36, 27, 0.35);
+  border-radius: 28px;
+  box-shadow: 0 30px 80px rgba(47, 36, 27, 0.35),
+    0 0 0 1px rgba(194, 160, 131, 0.15);
   display: flex;
   flex-direction: column;
-  padding: 2rem;
-  gap: 1.5rem;
+  padding: 2.5rem;
+  gap: 1.75rem;
   z-index: 40;
+  animation: dialogAppear 0.3s ease-out;
+}
+
+@keyframes dialogAppear {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -45%);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(-50%, -50%);
+  }
 }
 
 .tutorialDialogHeader {
@@ -795,17 +808,24 @@
 }
 
 .tutorialDialogProgress {
-  font-size: 0.85rem;
-  letter-spacing: 0.08em;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: rgba(95, 70, 52, 0.6);
+  color: #ffffff;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  padding: 0.4rem 0.9rem;
+  border-radius: 999px;
+  display: inline-block;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.25);
 }
 
 .tutorialDialogTitle {
-  margin: 0.35rem 0 0;
-  font-size: 1.5rem;
+  margin: 0.75rem 0 0;
+  font-size: 1.65rem;
   font-weight: 700;
   color: #5f4634;
+  line-height: 1.2;
 }
 
 .tutorialDialogClose {
@@ -830,47 +850,64 @@
 }
 
 .tutorialDialogBody {
-  font-size: 1rem;
+  font-size: 1.05rem;
   color: rgba(47, 36, 27, 0.85);
-  line-height: 1.6;
+  line-height: 1.7;
+  padding: 1.5rem;
+  background: linear-gradient(
+    135deg,
+    rgba(237, 227, 218, 0.3),
+    rgba(194, 160, 131, 0.15)
+  );
+  border-radius: 16px;
+  border: 1px solid rgba(194, 160, 131, 0.2);
+}
+
+.tutorialDialogBody p {
+  margin: 0;
 }
 
 .tutorialDialogFooter {
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
   gap: 0.75rem;
+  padding-top: 0.5rem;
 }
 
 .tutorialDialogPrimary,
 .tutorialDialogSecondary {
   border-radius: 14px;
-  padding: 0.75rem 1.5rem;
+  padding: 0.9rem 1.75rem;
   font-weight: 600;
+  font-size: 0.95rem;
   cursor: pointer;
   border: none;
   transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+  flex: 1;
 }
 
 .tutorialDialogPrimary {
-  background: linear-gradient(135deg, #c2a083, #a58463);
+  background: linear-gradient(135deg, #667eea, #764ba2);
   color: #ffffff;
-  box-shadow: 0 14px 30px rgba(194, 160, 131, 0.3);
+  box-shadow: 0 8px 20px rgba(102, 126, 234, 0.35);
 }
 
 .tutorialDialogPrimary:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 18px 40px rgba(194, 160, 131, 0.35);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px rgba(102, 126, 234, 0.45);
 }
 
 .tutorialDialogSecondary {
   background: rgba(237, 227, 218, 0.9);
   color: #5f4634;
-  border: 1px solid rgba(194, 160, 131, 0.25);
+  border: 1px solid rgba(194, 160, 131, 0.3);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 .tutorialDialogSecondary:hover {
-  transform: translateY(-1px);
-  background: rgba(194, 160, 131, 0.2);
+  transform: translateY(-2px);
+  background: rgba(194, 160, 131, 0.25);
+  box-shadow: 0 4px 12px rgba(194, 160, 131, 0.2);
 }
 
 .actions {
