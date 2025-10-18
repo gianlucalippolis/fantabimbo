@@ -169,6 +169,67 @@
   transform: none;
 }
 
+/* Reorder controls for players - more prominent */
+.reorderControls {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.positionBadge {
+  font-size: 1.1rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, #89b5af, #6b9080);
+  color: white;
+  width: 2rem;
+  height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  box-shadow: 0 2px 8px rgba(107, 144, 128, 0.3);
+}
+
+.reorderButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 8px;
+  border: 2px solid rgba(107, 144, 128, 0.5);
+  background: linear-gradient(135deg, #ffffff, #f0faf9);
+  color: #6b9080;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.reorderButton:hover:not(:disabled) {
+  background: linear-gradient(135deg, #89b5af, #6b9080);
+  color: white;
+  border-color: #6b9080;
+  box-shadow: 0 4px 12px rgba(107, 144, 128, 0.4);
+  transform: scale(1.05);
+}
+
+.reorderButtonUp:hover:not(:disabled) {
+  transform: translateY(-2px) scale(1.05);
+}
+
+.reorderButtonDown:hover:not(:disabled) {
+  transform: translateY(2px) scale(1.05);
+}
+
+.reorderButton:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
 .submitButton {
   width: 100%;
   padding: 1rem;
@@ -247,6 +308,12 @@
 
   .positionLabel {
     min-width: auto;
+  }
+
+  .reorderControls {
+    flex-direction: row;
+    justify-content: center;
+    gap: 0.5rem;
   }
 }
 

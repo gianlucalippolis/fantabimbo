@@ -1,9 +1,7 @@
 "use client";
 
 import { FormEvent, useState, Suspense, useEffect } from "react";
-import { useSession } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
-import type ISession from "../../types/session";
 import styles from "./page.module.css";
 import Popup from "../../components/Popup";
 import Countdown from "../../components/Countdown";
@@ -32,8 +30,6 @@ interface Game {
 }
 
 function ListaNomiContent() {
-  const { data: session } = useSession();
-  const typedSession = session as ISession;
   const router = useRouter();
   const searchParams = useSearchParams();
   const gameId = searchParams?.get("game");
@@ -41,6 +37,9 @@ function ListaNomiContent() {
   const dispatch = useAppDispatch();
   const { submissions, parentNames, hasParentSubmission, isLoading } =
     useAppSelector((state) => state.nameSubmissions);
+  
+  // Get user profile from Redux (populated by useReduxHydration)
+  const userProfile = useAppSelector((state) => state.user.profile);
 
   // Hook per hydration automatica del Redux store
   const { isLoading: isHydrating } = useReduxHydration();
@@ -54,7 +53,7 @@ function ListaNomiContent() {
   const [game, setGame] = useState<Game | null>(null);
   const [isRevealExpired, setIsRevealExpired] = useState(false);
 
-  const isParent = typedSession?.userType === "parent";
+  const isParent = userProfile?.userType === "parent";
 
   // Carica i dati del game
   useEffect(() => {
@@ -82,7 +81,7 @@ function ListaNomiContent() {
   // Carica i nomi del genitore per i giocatori
   useEffect(() => {
     async function loadParentNamesForPlayers() {
-      if (!gameId || !typedSession || isParent) {
+      if (!gameId || !userProfile || isParent) {
         return;
       }
 
@@ -94,7 +93,7 @@ function ListaNomiContent() {
     }
 
     loadParentNamesForPlayers();
-  }, [gameId, dispatch, isParent, typedSession]);
+  }, [gameId, dispatch, isParent, userProfile]);
 
   // Carica i nomi esistenti quando il componente si monta
   useEffect(() => {
@@ -355,15 +354,41 @@ function ListaNomiContent() {
           <div className={styles.namesList}>
             {names.map((name: string, index: number) => (
               <div key={index} className={styles.nameItem}>
-                <span className={styles.positionLabel}>
-                  {index + 1}° posizione
-                </span>
+                {!isParent && hasParentSubmission && (
+                  <div className={styles.reorderControls}>
+                    <button
+                      className={`${styles.reorderButton} ${styles.reorderButtonUp}`}
+                      type="button"
+                      onClick={() => handleMoveUp(index)}
+                      disabled={index === 0}
+                      title="Sposta su"
+                    >
+                      ▲
+                    </button>
+                    <span className={styles.positionBadge}>{index + 1}</span>
+                    <button
+                      className={`${styles.reorderButton} ${styles.reorderButtonDown}`}
+                      type="button"
+                      onClick={() => handleMoveDown(index)}
+                      disabled={index === names.length - 1}
+                      title="Sposta giù"
+                    >
+                      ▼
+                    </button>
+                  </div>
+                )}
+
+                {isParent && (
+                  <span className={styles.positionLabel}>
+                    {index + 1}° posizione
+                  </span>
+                )}
 
                 <input
                   className={styles.nameInput}
                   type="text"
                   value={name}
-                  placeholder={`Nome #${index + 1}`}
+                  placeholder={isParent ? `Nome #${index + 1}` : ""}
                   onChange={(event) =>
                     handleNameChange(index, event.target.value)
                   }
@@ -371,26 +396,28 @@ function ListaNomiContent() {
                   readOnly={!isParent && hasParentSubmission}
                 />
 
-                <div className={styles.controls}>
-                  <button
-                    className={styles.controlButton}
-                    type="button"
-                    onClick={() => handleMoveUp(index)}
-                    disabled={index === 0}
-                    title="Sposta su"
-                  >
-                    ↑
-                  </button>
-                  <button
-                    className={styles.controlButton}
-                    type="button"
-                    onClick={() => handleMoveDown(index)}
-                    disabled={index === names.length - 1}
-                    title="Sposta giù"
-                  >
-                    ↓
-                  </button>
-                </div>
+                {isParent && (
+                  <div className={styles.controls}>
+                    <button
+                      className={styles.controlButton}
+                      type="button"
+                      onClick={() => handleMoveUp(index)}
+                      disabled={index === 0}
+                      title="Sposta su"
+                    >
+                      ↑
+                    </button>
+                    <button
+                      className={styles.controlButton}
+                      type="button"
+                      onClick={() => handleMoveDown(index)}
+                      disabled={index === names.length - 1}
+                      title="Sposta giù"
+                    >
+                      ↓
+                    </button>
+                  </div>
+                )}
               </div>
             ))}
           </div>
