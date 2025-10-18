@@ -71,9 +71,9 @@ export function GamesManager({
   useEffect(() => {
     if (strapiJwt && !hasFetchedGames.current) {
       hasFetchedGames.current = true;
-      dispatch(fetchGames(strapiJwt));
+      dispatch(fetchGames(userId));
     }
-  }, [dispatch, strapiJwt]);
+  }, [dispatch, strapiJwt, userId]);
 
   const orderedGames = useMemo(() => {
     return [...gamesFromStore].sort((a, b) => {

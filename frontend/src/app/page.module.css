@@ -661,12 +661,12 @@
 .gamesDangerButton {
   background: linear-gradient(135deg, #c25b50, #8a1f1f);
   color: #ffffff;
-  box-shadow: 0 14px 30px rgba(138, 31, 31, 0.3);
+  box-shadow: 0 4px 12px rgba(138, 31, 31, 0.15);
 }
 
 .gamesDangerButton:hover {
   transform: translateY(-1px);
-  box-shadow: 0 18px 40px rgba(138, 31, 31, 0.35);
+  box-shadow: 0 6px 16px rgba(138, 31, 31, 0.2);
   background: linear-gradient(135deg, #b14e45, #7a1b1b);
 }
 
