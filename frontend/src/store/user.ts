@@ -104,4 +104,5 @@ const userSlice = createSlice({
 });
 
 export const { setUserProfile, setUserGames, clearUser } = userSlice.actions;
-export const userReducer = userSlice.reducer;
+
+export default userSlice.reducer;
