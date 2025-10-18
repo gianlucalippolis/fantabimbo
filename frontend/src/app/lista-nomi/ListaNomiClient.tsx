@@ -14,6 +14,7 @@ import {
 } from "../../store/nameSubmissions";
 import api from "../../lib/axios";
 import LoadingScreen from "../../components/LoadingScreen";
+import BackIcon from "../../components/icons/BackIcon";
 
 interface PopupState {
   isVisible: boolean;
@@ -58,6 +59,7 @@ function ListaNomiContent() {
   const [popup, setPopup] = useState<PopupState | null>(null);
   const [game, setGame] = useState<Game | null>(null);
   const [isRevealExpired, setIsRevealExpired] = useState(false);
+  const [isLoadingData, setIsLoadingData] = useState(true);
 
   const isParent = userProfile?.userType === "parent";
 
@@ -193,6 +195,27 @@ function ListaNomiContent() {
     }
   }, [submissions, parentNames, hasParentSubmission, isParent]);
 
+  // Gestisci lo stato di caricamento iniziale
+  useEffect(() => {
+    // Se non c'è gameId, non possiamo caricare nulla
+    if (!gameId || !userProfile) {
+      setIsLoadingData(false);
+      return;
+    }
+
+    // Verifica se tutti i dati necessari sono stati caricati
+    const gameLoaded = game !== null || hasFetchedGame.current;
+    const submissionsLoaded = hasFetchedSubmissions.current;
+
+    // Per i giocatori, dobbiamo anche attendere i nomi del genitore
+    const parentNamesLoaded = isParent || hasFetchedParentNames.current;
+
+    // Quando tutti i dati sono pronti, disattiva il loading
+    if (gameLoaded && submissionsLoaded && parentNamesLoaded) {
+      setIsLoadingData(false);
+    }
+  }, [game, gameId, userProfile, isParent]);
+
   function handleNameChange(index: number, value: string): void {
     const newNames = [...names];
     newNames[index] = value;
@@ -294,7 +317,7 @@ function ListaNomiContent() {
               className={styles.errorButton}
               onClick={() => router.push("/")}
             >
-              Torna alla dashboard
+              <BackIcon size={20} /> Torna alla dashboard
             </button>
           </div>
         </div>
@@ -307,11 +330,16 @@ function ListaNomiContent() {
     return <LoadingScreen />;
   }
 
+  // Show loading state while fetching initial data
+  if (isLoadingData) {
+    return <LoadingScreen />;
+  }
+
   return (
     <div className={styles.container}>
       <div className={styles.wrapper}>
         <button className={styles.backButton} onClick={() => router.push("/")}>
-          ← Torna alla dashboard
+          <BackIcon size={20} /> Torna alla dashboard
         </button>
 
         <h1 className={styles.title}>

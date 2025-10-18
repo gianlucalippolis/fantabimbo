@@ -546,7 +546,20 @@ export function GamesManager({
                     href={`/lista-nomi?game=${encodeURIComponent(game.id)}`}
                     className={styles.gamePrimaryButton}
                   >
-                    Compila i tuoi nomi
+                    {(() => {
+                      // Trova il partecipante corrente nella lista
+                      const currentParticipant = game.participants.find(
+                        (p) => p.id === Number(userId)
+                      );
+                      // Determina il testo in base al userType
+                      if (currentParticipant?.userType === "parent") {
+                        return "Inserisci i nomi";
+                      } else if (currentParticipant?.userType === "player") {
+                        return "Gioca";
+                      }
+                      // Fallback generico
+                      return "Partecipa";
+                    })()}
                   </Link>
                   <Link
                     href={`/partite/${encodeURIComponent(game.id)}`}

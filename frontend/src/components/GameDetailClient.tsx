@@ -10,6 +10,7 @@ import styles from "../app/partite/[id]/page.module.css";
 import Countdown from "./Countdown";
 import Leaderboard from "./Leaderboard";
 import Avatar from "./Avatar";
+import BackIcon from "./icons/BackIcon";
 
 interface GameDetailClientProps {
   game: GameSummary;
@@ -154,7 +155,7 @@ export function GameDetailClient({ game }: GameDetailClientProps) {
       <div className={styles.card}>
         <header className={styles.header}>
           <Link className={styles.backLink} href="/">
-            ← Torna alla dashboard
+            <BackIcon size={20} /> Torna alla dashboard
           </Link>
           <h1 className={styles.title}>{game.name}</h1>
           <p className={styles.subtitle}>

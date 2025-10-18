@@ -11,6 +11,7 @@ import api from "../../lib/axios";
 import { getStrapiMediaURL } from "../../lib/utils";
 import type { AxiosError } from "axios";
 import LoadingScreen from "../../components/LoadingScreen";
+import BackIcon from "../../components/icons/BackIcon";
 
 export default function ProfiloClient() {
   const router = useRouter();
@@ -156,7 +157,7 @@ export default function ProfiloClient() {
       <div className={styles.card}>
         <header className={styles.header}>
           <Link className={styles.backLink} href="/">
-            ← Torna alla dashboard
+            <BackIcon size={20} /> Torna alla dashboard
           </Link>
           <h1 className={styles.title}>Il mio profilo</h1>
         </header>

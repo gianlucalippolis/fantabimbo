@@ -100,9 +100,6 @@ export function UserDashboard({
             <div className={styles.brandLogo}>
               <Logo />
             </div>
-            <Link href="/profilo" className={styles.headerAvatarLink}>
-              <Avatar imageUrl={avatarUrl} name={displayName} size="small" />
-            </Link>
             <div className={styles.brandText}>
               <span className={styles.brandGreeting}>Ciao,</span>
               <span className={styles.brandName}>{displayName}</span>
@@ -221,32 +218,12 @@ export function UserDashboard({
             <section
               className={`${styles.tutorial} ${styles.dashboardTutorial}`}
             >
-              <h2 className={styles.tutorialTitle}>Come funziona Fantanome</h2>
-              <ol className={styles.tutorialList}>
-                <li>
-                  {canCreateGames
-                    ? "Crea una partita e condividi il codice invito con amici e parenti."
-                    : "Unisciti a una partita usando il codice invito ricevuto dai genitori."}
-                </li>
-                <li>
-                  Compila la tua lista con fino a 10 nomi, l&apos;ordine è
-                  importante!
-                </li>
-                <li>
-                  Guadagna punti indovinando il nome del bambino e la posizione
-                  dei nomi.
-                </li>
-                <li>
-                  Quando scade il countdown, scopri il nome del bambino e la
-                  classifica finale!
-                </li>
-              </ol>
               <button
                 type="button"
                 className={`${styles.action} ${styles.primary} ${styles.tutorialButton}`}
                 onClick={openTutorial}
               >
-                Scopri di più
+                Come funziona Fantanome?
               </button>
             </section>
           </div>
