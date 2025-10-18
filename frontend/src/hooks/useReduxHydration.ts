@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
-import { setUserProfile } from "../store/user";
+import { setUserProfile, fetchGames } from "../store/user";
 import api from "../lib/axios";
 import type { Session } from "next-auth";
 
@@ -85,6 +85,11 @@ export function useReduxHydration() {
 
         // Popola il Redux store
         dispatch(setUserProfile(userProfile));
+
+        // Fetch games - importante per le pagine che mostrano le partite
+        if (jwt) {
+          dispatch(fetchGames(jwt));
+        }
 
         console.log("✅ Redux store hydrated successfully from session");
       } catch (err) {
