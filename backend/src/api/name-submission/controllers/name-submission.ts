@@ -483,7 +483,6 @@ export default factories.createCoreController(
 
       if (!parentSubmission || !Array.isArray(parentSubmission.names)) {
         return this.transformResponse({
-          names: [],
           shuffled: [],
           hasParentSubmission: false,
         });
@@ -505,8 +504,7 @@ export default factories.createCoreController(
       }
 
       return this.transformResponse({
-        names: isOwner ? parentNames : [], // Only owner sees original order
-        shuffled: shuffledNames, // Participants see shuffled
+        shuffled: shuffledNames, // Shuffled for participants, original for owner
         hasParentSubmission: true,
       });
     },
