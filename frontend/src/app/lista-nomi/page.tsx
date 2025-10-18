@@ -8,6 +8,7 @@ import styles from "./page.module.css";
 import Popup from "../../components/Popup";
 import Countdown from "../../components/Countdown";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
+import { useReduxHydration } from "../../hooks/useReduxHydration";
 import {
   fetchNameSubmissions,
   fetchParentNames,
@@ -40,6 +41,9 @@ function ListaNomiContent() {
   const dispatch = useAppDispatch();
   const { submissions, parentNames, hasParentSubmission, isLoading } =
     useAppSelector((state) => state.nameSubmissions);
+
+  // Hook per hydration automatica del Redux store
+  const { isLoading: isHydrating } = useReduxHydration();
 
   // Stato locale per i nomi (inizializzato dai dati Redux)
   const [names, setNames] = useState<string[]>(
@@ -271,6 +275,19 @@ function ListaNomiContent() {
             >
               Torna alla dashboard
             </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Show loading state while hydrating Redux store
+  if (isHydrating) {
+    return (
+      <div className={styles.container}>
+        <div className={styles.wrapper}>
+          <div className={styles.errorState}>
+            <p>Caricamento...</p>
           </div>
         </div>
       </div>

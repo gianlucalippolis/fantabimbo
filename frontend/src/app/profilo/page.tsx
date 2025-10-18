@@ -3,20 +3,14 @@
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
-import type { Session } from "next-auth";
 import { useAppSelector, useAppDispatch } from "../../store/hooks";
 import { setUserProfile } from "../../store/user";
+import { useReduxHydration } from "../../hooks/useReduxHydration";
 import Link from "next/link";
 import styles from "./page.module.css";
 import api from "../../lib/axios";
 import { getStrapiMediaURL } from "../../lib/utils";
 import type { AxiosError } from "axios";
-
-type SessionWithStrapi = Session & {
-  jwt?: string;
-  id?: number | string;
-  userType?: "parent" | "player" | null;
-};
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -25,15 +19,17 @@ export default function ProfilePage() {
   const user = useAppSelector((state) => state.user.profile);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // Hook per hydration automatica del Redux store
+  const { isLoading: isHydrating } = useReduxHydration();
+
   const [isUploading, setIsUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [uploadSuccess, setUploadSuccess] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
 
-  // Hydrate Redux store from session if empty
+  // Redirect to login if not authenticated
   useEffect(() => {
-    if (status === "loading") {
+    if (status === "loading" || isHydrating) {
       return;
     }
 
@@ -42,65 +38,13 @@ export default function ProfilePage() {
       return;
     }
 
-    // If Redux store is empty but we have a session, hydrate it
-    if (!user && session?.user) {
-      const typedSession = session as SessionWithStrapi;
-
-      // Fetch user profile from API to hydrate Redux
-      const fetchProfile = async () => {
-        try {
-          const jwt = typedSession.jwt;
-          if (!jwt) {
-            router.push("/");
-            return;
-          }
-
-          const response = await api.get("/api/users/me?populate=avatar", {
-            headers: {
-              Authorization: `Bearer ${jwt}`,
-            },
-          });
-
-          const profile = response.data;
-          const firstName = profile?.firstName ?? "";
-          const lastName = profile?.lastName ?? "";
-          const displayName =
-            [firstName, lastName].filter(Boolean).join(" ").trim() ||
-            session.user?.name ||
-            session.user?.email?.split("@")[0] ||
-            "Utente";
-
-          dispatch(
-            setUserProfile({
-              id: typedSession.id || profile.id,
-              displayName,
-              email: profile.email || session.user?.email || null,
-              userType: profile.userType || null,
-              avatar: profile.avatar || null,
-              jwt,
-            })
-          );
-
-          setIsLoading(false);
-        } catch (error) {
-          console.error("Failed to fetch profile", error);
-          router.push("/");
-        }
-      };
-
-      fetchProfile();
-      return;
-    }
-
     if (!user) {
       router.push("/");
       return;
     }
+  }, [status, session, user, router, isHydrating]);
 
-    setIsLoading(false);
-  }, [status, session, user, router, dispatch]);
-
-  if (status === "loading" || isLoading) {
+  if (status === "loading" || isHydrating) {
     return (
       <div className={styles.container}>
         <div className={styles.card}>
