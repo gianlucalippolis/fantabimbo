@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 import { useAppSelector, useAppDispatch } from "../../store/hooks";
 import { setUserProfile } from "../../store/user";
 import Link from "next/link";
@@ -13,6 +14,7 @@ import type { AxiosError } from "axios";
 export default function ProfilePage() {
   const router = useRouter();
   const dispatch = useAppDispatch();
+  const { data: session, status } = useSession();
   const user = useAppSelector((state) => state.user.profile);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -20,9 +22,37 @@ export default function ProfilePage() {
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [uploadSuccess, setUploadSuccess] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    if (status === "loading") {
+      return;
+    }
+
+    if (status === "unauthenticated" || !session) {
+      router.push("/login");
+      return;
+    }
+
+    if (!user) {
+      router.push("/");
+      return;
+    }
+
+    setIsLoading(false);
+  }, [status, session, user, router]);
+
+  if (status === "loading" || isLoading) {
+    return (
+      <div className={styles.container}>
+        <div className={styles.card}>
+          <p className={styles.loading}>Caricamento...</p>
+        </div>
+      </div>
+    );
+  }
 
   if (!user) {
-    router.push("/");
     return null;
   }
 

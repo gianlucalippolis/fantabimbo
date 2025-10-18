@@ -154,6 +154,14 @@
   font-weight: 600;
 }
 
+.loading {
+  color: #5f4634;
+  font-size: 1rem;
+  margin: 0;
+  text-align: center;
+  padding: 3rem;
+}
+
 .infoSection {
   display: grid;
   gap: 1.5rem;
