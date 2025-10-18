@@ -119,6 +119,14 @@ function ListaNomiContent() {
 
   // Quando arrivano i dati da Redux, aggiorna lo stato locale
   useEffect(() => {
+    console.log("🔍 Lista nomi - stato Redux:", {
+      isParent,
+      hasParentSubmission,
+      parentNamesLength: parentNames.length,
+      parentNames,
+      submissions: submissions.length,
+    });
+
     // Se è un giocatore e ci sono i nomi del genitore, usa quelli come base
     if (!isParent && hasParentSubmission && parentNames.length > 0) {
       // Se il giocatore ha già una submission, caricala
@@ -337,14 +345,11 @@ function ListaNomiContent() {
           </div>
         )}
 
-        {!isParent &&
-          !hasParentSubmission &&
-          parentNames.length === 0 &&
-          !isLoading && (
-            <div className={styles.warningBox}>
-              ⚠️ Il genitore non ha ancora inserito i nomi. Torna più tardi!
-            </div>
-          )}
+        {!isParent && !hasParentSubmission && !isLoading && (
+          <div className={styles.warningBox}>
+            ⚠️ Il genitore non ha ancora inserito i nomi. Torna più tardi!
+          </div>
+        )}
 
         <form className={styles.form} onSubmit={handleSubmit}>
           <div className={styles.namesList}>

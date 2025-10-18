@@ -72,7 +72,8 @@ export const fetchParentNames = createAsyncThunk(
     const response = await api.get(
       `/api/name-submissions/parent-names/${gameId}`
     );
-    return response.data;
+    // L'API ritorna { data: { names, shuffled, hasParentSubmission }, meta }
+    return response.data.data;
   }
 );
 
