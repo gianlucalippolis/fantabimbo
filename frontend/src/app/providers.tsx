@@ -1,10 +1,11 @@
-'use client';
+"use client";
 
 import { SessionProvider } from "next-auth/react";
 import { Provider as ReduxProvider } from "react-redux";
 import { useEffect } from "react";
 import type { ReactNode } from "react";
 import { store } from "../store";
+import { AuthProvider } from "../providers/AuthProvider";
 
 interface ProvidersProps {
   children: ReactNode;
@@ -15,7 +16,8 @@ export function Providers({ children }: ProvidersProps) {
     if (
       typeof window !== "undefined" &&
       "serviceWorker" in navigator &&
-      (process.env.NODE_ENV === "production" || window.location.hostname === "localhost")
+      (process.env.NODE_ENV === "production" ||
+        window.location.hostname === "localhost")
     ) {
       const register = async () => {
         try {
@@ -31,7 +33,9 @@ export function Providers({ children }: ProvidersProps) {
 
   return (
     <ReduxProvider store={store}>
-      <SessionProvider>{children}</SessionProvider>
+      <SessionProvider refetchInterval={0} refetchOnWindowFocus={false}>
+        <AuthProvider>{children}</AuthProvider>
+      </SessionProvider>
     </ReduxProvider>
   );
 }

@@ -1,18 +1,19 @@
 "use client";
 
-import { FormEvent, useState, Suspense, useEffect } from "react";
+import { FormEvent, useState, Suspense, useEffect, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import styles from "./page.module.css";
 import Popup from "../../components/Popup";
 import Countdown from "../../components/Countdown";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
-import { useReduxHydration } from "../../hooks/useReduxHydration";
+import { useAuth } from "../../providers/AuthProvider";
 import {
   fetchNameSubmissions,
   fetchParentNames,
   saveNameSubmission,
 } from "../../store/nameSubmissions";
 import api from "../../lib/axios";
+import LoadingScreen from "../../components/LoadingScreen";
 
 interface PopupState {
   isVisible: boolean;
@@ -37,12 +38,17 @@ function ListaNomiContent() {
   const dispatch = useAppDispatch();
   const { submissions, parentNames, hasParentSubmission, isLoading } =
     useAppSelector((state) => state.nameSubmissions);
-  
-  // Get user profile from Redux (populated by useReduxHydration)
+
+  // Get user profile from Redux (populated by AuthProvider)
   const userProfile = useAppSelector((state) => state.user.profile);
 
-  // Hook per hydration automatica del Redux store
-  const { isLoading: isHydrating } = useReduxHydration();
+  // Get auth status from AuthProvider
+  const { isLoading: isHydrating } = useAuth();
+
+  // Refs to track if data has been fetched to prevent duplicate calls
+  const hasFetchedGame = useRef(false);
+  const hasFetchedSubmissions = useRef(false);
+  const hasFetchedParentNames = useRef(false);
 
   // Stato locale per i nomi (inizializzato dai dati Redux)
   const [names, setNames] = useState<string[]>(
@@ -58,8 +64,9 @@ function ListaNomiContent() {
   // Carica i dati del game
   useEffect(() => {
     async function loadGame() {
-      if (!gameId) return;
+      if (!gameId || hasFetchedGame.current) return;
 
+      hasFetchedGame.current = true;
       try {
         const response = await api.get(`/api/games/${gameId}`);
         setGame(response.data.data);
@@ -81,10 +88,16 @@ function ListaNomiContent() {
   // Carica i nomi del genitore per i giocatori
   useEffect(() => {
     async function loadParentNamesForPlayers() {
-      if (!gameId || !userProfile || isParent) {
+      if (
+        !gameId ||
+        !userProfile ||
+        isParent ||
+        hasFetchedParentNames.current
+      ) {
         return;
       }
 
+      hasFetchedParentNames.current = true;
       try {
         await dispatch(fetchParentNames({ gameId })).unwrap();
       } catch (error) {
@@ -98,10 +111,11 @@ function ListaNomiContent() {
   // Carica i nomi esistenti quando il componente si monta
   useEffect(() => {
     async function loadExistingNames() {
-      if (!gameId) {
+      if (!gameId || hasFetchedSubmissions.current) {
         return;
       }
 
+      hasFetchedSubmissions.current = true;
       try {
         await dispatch(
           fetchNameSubmissions({
@@ -290,15 +304,7 @@ function ListaNomiContent() {
 
   // Show loading state while hydrating Redux store
   if (isHydrating) {
-    return (
-      <div className={styles.container}>
-        <div className={styles.wrapper}>
-          <div className={styles.errorState}>
-            <p>Caricamento...</p>
-          </div>
-        </div>
-      </div>
-    );
+    return <LoadingScreen />;
   }
 
   return (
@@ -450,23 +456,10 @@ function ListaNomiContent() {
   );
 }
 
-// Loading component per Suspense
-function LoadingListaNomi() {
-  return (
-    <div className={styles.container}>
-      <div className={styles.wrapper}>
-        <div className={styles.errorState}>
-          <p>Caricamento...</p>
-        </div>
-      </div>
-    </div>
-  );
-}
-
 // Componente principale con Suspense boundary
 export default function ListaNomiPage() {
   return (
-    <Suspense fallback={<LoadingListaNomi />}>
+    <Suspense fallback={<LoadingScreen />}>
       <ListaNomiContent />
     </Suspense>
   );

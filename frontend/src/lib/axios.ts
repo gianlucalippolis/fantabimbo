@@ -1,6 +1,5 @@
 import axios from "axios";
 import { getStrapiConfig } from "./env";
-import { getSession } from "next-auth/react";
 import { store } from "../store";
 
 const { apiUrl: STRAPI_API_URL } = getStrapiConfig();
@@ -18,16 +17,10 @@ api.interceptors.request.use(async (config: any) => {
     return config;
   }
 
+  // Get JWT from Redux store (populated by AuthProvider)
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const state: any = store.getState();
-  const storedJwt = state?.user?.profile?.jwt ?? null;
-  let token = storedJwt;
-
-  if (!token) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const session: any = await getSession();
-    token = session?.jwt ?? null;
-  }
+  const token = state?.user?.profile?.jwt ?? null;
 
   if (token) {
     config.headers = {

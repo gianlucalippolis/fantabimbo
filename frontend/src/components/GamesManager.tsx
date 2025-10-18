@@ -1,10 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useSession } from "next-auth/react";
-import { FormEvent, useEffect, useMemo, useState } from "react";
+import { FormEvent, useEffect, useMemo, useState, useRef } from "react";
 import type { AxiosError } from "axios";
-import type ISession from "types/session";
 import styles from "../app/page.module.css";
 import type { GameSummary } from "types/game";
 import api from "../lib/axios";
@@ -37,15 +35,15 @@ export function GamesManager({
   userId,
   canCreateGames,
 }: GamesManagerProps) {
-  const { data: session } = useSession();
-  const typedSession = session as ISession | null;
   const profileFromStore = useAppSelector((state) => state.user.profile);
-  const strapiJwt = typedSession?.jwt ?? profileFromStore?.jwt ?? null;
+  const strapiJwt = profileFromStore?.jwt ?? null;
 
   const dispatch = useAppDispatch();
   const gamesFromStore = useAppSelector((state) => state.user.games);
   const gamesStatus = useAppSelector((state) => state.user.gamesStatus);
   const gamesErrorMessage = useAppSelector((state) => state.user.gamesError);
+
+  const hasFetchedGames = useRef(false);
 
   const [createForm, setCreateForm] =
     useState<CreateFormState>(INITIAL_CREATE_STATE);
@@ -69,13 +67,13 @@ export function GamesManager({
     }
   }, [dispatch, games]);
 
+  // Fetch games only once when component mounts
   useEffect(() => {
-    if (strapiJwt) {
-      // Always refetch games when userId changes to ensure isOwner is recalculated
-      // This fixes the issue where isOwner was incorrectly calculated
-      dispatch(fetchGames(userId));
+    if (strapiJwt && !hasFetchedGames.current) {
+      hasFetchedGames.current = true;
+      dispatch(fetchGames(strapiJwt));
     }
-  }, [dispatch, strapiJwt, userId]);
+  }, [dispatch, strapiJwt]);
 
   const orderedGames = useMemo(() => {
     return [...gamesFromStore].sort((a, b) => {

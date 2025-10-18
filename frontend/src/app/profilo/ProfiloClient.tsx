@@ -2,23 +2,22 @@
 
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useSession } from "next-auth/react";
 import { useAppSelector, useAppDispatch } from "../../store/hooks";
 import { setUserProfile } from "../../store/user";
-import { useReduxHydration } from "../../hooks/useReduxHydration";
+import { useAuth } from "../../providers/AuthProvider";
 import Link from "next/link";
 import styles from "./page.module.css";
 import api from "../../lib/axios";
 import { getStrapiMediaURL } from "../../lib/utils";
 import type { AxiosError } from "axios";
+import LoadingScreen from "../../components/LoadingScreen";
 
 export default function ProfiloClient() {
   const router = useRouter();
   const dispatch = useAppDispatch();
-  const { data: session, status } = useSession();
 
-  // Hook per hydration automatica del Redux store
-  const { isLoading: isHydrating } = useReduxHydration();
+  // Get auth status from AuthProvider
+  const { isLoading: isHydrating } = useAuth();
 
   // Safe selector - avoid accessing Redux during SSR
   const user = useAppSelector((state) => state?.user?.profile ?? null);
@@ -31,29 +30,19 @@ export default function ProfiloClient() {
 
   // Redirect to login if not authenticated
   useEffect(() => {
-    if (status === "loading" || isHydrating) {
+    if (isHydrating) {
       return;
     }
 
-    if (status === "unauthenticated" || !session) {
+    // If hydration is complete but no user in Redux, redirect to login
+    if (!user) {
       router.push("/login");
       return;
     }
+  }, [user, router, isHydrating]);
 
-    if (!user) {
-      router.push("/");
-      return;
-    }
-  }, [status, session, user, router, isHydrating]);
-
-  if (status === "loading" || isHydrating) {
-    return (
-      <div className={styles.container}>
-        <div className={styles.card}>
-          <p className={styles.loading}>Caricamento...</p>
-        </div>
-      </div>
-    );
+  if (isHydrating) {
+    return <LoadingScreen />;
   }
 
   if (!user) {
