@@ -1,11 +1,9 @@
 "use client";
 
-import type { AxiosError } from "axios";
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { GameSummary } from "types/game";
-import api from "../lib/axios";
 import { getStrapiMediaURL } from "../lib/utils";
 import styles from "../app/partite/[id]/page.module.css";
 import Countdown from "./Countdown";
@@ -13,63 +11,21 @@ import Leaderboard from "./Leaderboard";
 import Avatar from "./Avatar";
 import BackIcon from "./icons/BackIcon";
 import { Button } from "./Button";
+import RevealDatePopup from "./RevealDatePopup";
 
 interface GameDetailClientProps {
   game: GameSummary;
 }
 
-function toDateInputValue(value: string | null): string {
-  if (!value) {
-    return "";
-  }
-  const date = new Date(value);
-  if (Number.isNaN(date.valueOf())) {
-    return "";
-  }
-  return date.toISOString().split("T")[0] ?? "";
-}
-
-function toTimeInputValue(value: string | null): string {
-  if (!value) {
-    return "";
-  }
-  const date = new Date(value);
-  if (Number.isNaN(date.valueOf())) {
-    return "";
-  }
-  const iso = date.toISOString();
-  const [, timePart] = iso.split("T");
-  return timePart ? timePart.slice(0, 5) : "";
-}
-
-function combineDateTime(date: string, time: string): string | null {
-  if (!date || !time) {
-    return null;
-  }
-  const candidate = new Date(`${date}T${time}`);
-  if (Number.isNaN(candidate.valueOf())) {
-    return null;
-  }
-  return candidate.toISOString();
-}
-
 export function GameDetailClient({ game }: GameDetailClientProps) {
   const router = useRouter();
-  const [revealDate, setRevealDate] = useState<string>(() =>
-    toDateInputValue(game.revealAt)
-  );
-  const [revealTime, setRevealTime] = useState<string>(() =>
-    toTimeInputValue(game.revealAt)
-  );
   const [currentReveal, setCurrentReveal] = useState<string | null>(
     game.revealAt ?? null
   );
-  const [isSaving, setIsSaving] = useState(false);
-  const [saveMessage, setSaveMessage] = useState<string | null>(null);
-  const [saveError, setSaveError] = useState<string | null>(null);
   const [mounted, setMounted] = useState(false);
   const [isNavigating, setIsNavigating] = useState(false);
   const [showLeaderboard, setShowLeaderboard] = useState(false);
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -84,23 +40,12 @@ export function GameDetailClient({ game }: GameDetailClientProps) {
   }, [game.revealAt]);
 
   useEffect(() => {
-    setSaveMessage(null);
-    setSaveError(null);
-  }, [revealDate, revealTime]);
+    setMounted(true);
+  }, []);
 
-  useEffect(() => {
-    if (!saveMessage) {
-      return;
-    }
-    const timeout = setTimeout(() => setSaveMessage(null), 3000);
-    return () => clearTimeout(timeout);
-  }, [saveMessage]);
-
-  useEffect(() => {
-    setCurrentReveal(game.revealAt ?? null);
-    setRevealDate(toDateInputValue(game.revealAt));
-    setRevealTime(toTimeInputValue(game.revealAt));
-  }, [game.revealAt]);
+  const handleSaveSuccess = (revealAt: string | null) => {
+    setCurrentReveal(revealAt);
+  };
 
   const participants = useMemo(
     () => (Array.isArray(game.participants) ? game.participants : []),
@@ -122,48 +67,16 @@ export function GameDetailClient({ game }: GameDetailClientProps) {
     return formatted.toLocaleString("it-IT");
   }, [currentReveal, mounted]);
 
-  async function handleSave() {
-    if (!game.isOwner) {
-      return;
-    }
-
-    const revealAt = combineDateTime(revealDate, revealTime);
-
-    try {
-      setIsSaving(true);
-      setSaveMessage(null);
-      setSaveError(null);
-
-      await api.put(`/api/games/${encodeURIComponent(game.id)}`, {
-        data: {
-          revealAt,
-        },
-      });
-
-      setSaveMessage("Impostazioni aggiornate!");
-      setCurrentReveal(revealAt);
-    } catch (error) {
-      console.error("Failed to update reveal date", error);
-      const err = error as AxiosError<{ error?: { message?: string } }>;
-      setSaveError(
-        err.response?.data?.error?.message ??
-          "Impossibile aggiornare la data di rivelazione. Riprova più tardi."
-      );
-    } finally {
-      setIsSaving(false);
-    }
-  }
-
   return (
     <div className={styles.container}>
       <div className={styles.card}>
         <header className={styles.header}>
           <Button
-            variant="tertiary"
             onClick={() => {
               setIsNavigating(true);
               router.push("/");
             }}
+            variant="secondary"
             isLoading={isNavigating}
             className={styles.backLink}
           >
@@ -219,59 +132,28 @@ export function GameDetailClient({ game }: GameDetailClientProps) {
         <section className={styles.section}>
           <h2 className={styles.sectionTitle}>Data di rivelazione</h2>
           <p className={styles.currentReveal}>Attuale: {currentRevealLabel}</p>
-          <div className={styles.revealForm}>
-            <label htmlFor="reveal-date">Data</label>
-            <input
-              id="reveal-date"
-              type="date"
-              value={revealDate}
-              onChange={(event) => setRevealDate(event.target.value)}
-              disabled={!game.isOwner}
-            />
-            <label htmlFor="reveal-time">Ora</label>
-            <input
-              id="reveal-time"
-              type="time"
-              value={revealTime}
-              onChange={(event) => setRevealTime(event.target.value)}
-              disabled={!game.isOwner}
-            />
-            {game.isOwner ? (
-              <div className={styles.revealActions}>
-                <button
-                  type="button"
-                  className={styles.primaryAction}
-                  onClick={handleSave}
-                  disabled={isSaving}
-                >
-                  {isSaving ? "Salvataggio…" : "Salva impostazioni"}
-                </button>
-                <button
-                  type="button"
-                  className={styles.secondaryAction}
-                  onClick={() => {
-                    setRevealDate("");
-                    setRevealTime("");
-                  }}
-                  disabled={isSaving}
-                >
-                  Azzera data
-                </button>
-              </div>
-            ) : null}
-            {saveMessage ? (
-              <p className={styles.successMessage}>{saveMessage}</p>
-            ) : null}
-            {saveError ? (
-              <p className={styles.errorMessage}>{saveError}</p>
-            ) : null}
-            {!game.isOwner ? (
-              <p className={styles.noticeInfo}>
-                Solo l&apos;organizzatore può modificare la data di rivelazione.
-              </p>
-            ) : null}
-          </div>
+          {game.isOwner ? (
+            <Button
+              onClick={() => setIsPopupOpen(true)}
+              variant="primary"
+              className={styles.editRevealButton}
+            >
+              Modifica data
+            </Button>
+          ) : (
+            <p className={styles.noticeInfo}>
+              Solo l&apos;organizzatore può modificare la data di rivelazione.
+            </p>
+          )}
         </section>
+
+        <RevealDatePopup
+          isOpen={isPopupOpen}
+          onClose={() => setIsPopupOpen(false)}
+          onSuccess={handleSaveSuccess}
+          currentRevealAt={currentReveal}
+          gameId={game.id}
+        />
 
         <section className={styles.section}>
           <h2 className={styles.sectionTitle}>Giocatori iscritti</h2>
