@@ -1,21 +1,61 @@
 "use client";
 import { signIn } from "next-auth/react";
-import { useRouter } from "next/navigation";
-import { FormEvent, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { FormEvent, useState, useEffect } from "react";
 import styles from "../../styles/Login.module.css";
 import Link from "next/link";
 import { Logo } from "components/Logo";
 import { Button } from "components/Button";
 import { InstallPwaPrompt } from "components/InstallPwaPrompt";
+import GoogleIcon from "components/icons/GoogleIcon";
 
 export default function Login() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [credentials, setCredentials] = useState({
     identifier: "",
     password: "",
   });
   const [loginError, setLoginError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
+
+  // Gestisce errori OAuth dai query params
+  useEffect(() => {
+    if (!searchParams) return;
+
+    const error = searchParams.get("error");
+    if (error) {
+      let errorMessage = "Si è verificato un errore durante l'accesso.";
+
+      switch (error) {
+        case "OAuthCallback":
+          errorMessage =
+            "Errore durante l'autenticazione con Google. Verifica le credenziali OAuth.";
+          break;
+        case "OAuthAccountNotLinked":
+          errorMessage =
+            "Email già registrata con un altro metodo. Usa il metodo di login originale.";
+          break;
+        case "AccessDenied":
+          errorMessage = "Accesso negato. Hai annullato l'autenticazione.";
+          break;
+        case "Configuration":
+          errorMessage = "Errore di configurazione. Contatta l'assistenza.";
+          break;
+        default:
+          errorMessage = `Errore durante l'accesso: ${error}`;
+      }
+
+      setLoginError(errorMessage);
+      setIsGoogleLoading(false);
+
+      // Rimuove il parametro error dall'URL senza ricaricare la pagina
+      const url = new URL(window.location.href);
+      url.searchParams.delete("error");
+      window.history.replaceState({}, "", url.toString());
+    }
+  }, [searchParams]);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -68,6 +108,18 @@ export default function Login() {
     }));
     if (loginError) {
       setLoginError(null);
+    }
+  }
+
+  async function handleGoogleLogin() {
+    try {
+      setIsGoogleLoading(true);
+      setLoginError(null);
+      await signIn("google", { callbackUrl: "/" });
+    } catch (error) {
+      console.error("Google login failed", error);
+      setLoginError("Impossibile completare il login con Google. Riprova.");
+      setIsGoogleLoading(false);
     }
   }
 
@@ -155,6 +207,25 @@ export default function Login() {
               </Button>
             </div>
           </form>
+
+          <div className={styles.divider}>
+            <span>oppure</span>
+          </div>
+
+          <Button
+            type="button"
+            variant="tertiary"
+            onClick={handleGoogleLogin}
+            disabled={isGoogleLoading || isSubmitting}
+            fullWidth
+            className={styles.googleButton}
+          >
+            <GoogleIcon size={20} />
+            {isGoogleLoading
+              ? "Accesso con Google in corso…"
+              : "Accedi con Google"}
+          </Button>
+
           <p className={styles.footer}>
             Non hai ancora un account?
             <Link href="/registrazione">Registrati subito</Link>

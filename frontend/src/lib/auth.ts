@@ -1,6 +1,7 @@
 import type { NextAuthOptions } from "next-auth";
 import type { Session } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
+import GoogleProvider from "next-auth/providers/google";
 import type { JWT } from "next-auth/jwt";
 import { getStrapiConfig } from "./env";
 
@@ -109,7 +110,15 @@ export const authOptions: NextAuthOptions = {
   session: {
     strategy: "jwt",
   },
+  pages: {
+    signIn: "/login",
+    error: "/login", // Reindirizza alla pagina di login in caso di errore
+  },
   providers: [
+    GoogleProvider({
+      clientId: process.env.GOOGLE_CLIENT_ID || "",
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
+    }),
     CredentialsProvider({
       name: "Strapi",
       credentials: {
@@ -146,25 +155,148 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   callbacks: {
-    async jwt({ token, user }) {
-      console.log("token", token);
+    async jwt({ token, user, account }) {
+      console.log("JWT callback - token:", token);
+      console.log("JWT callback - user:", user);
+      console.log("JWT callback - account:", account);
       const mutableToken = token as ExtendedJWT;
 
       if (user) {
-        const strapiUser = user as StrapiAuthorizedUser;
-        mutableToken.jwt = strapiUser.jwt;
-        const numericId = Number(strapiUser.id);
-        mutableToken.id = Number.isNaN(numericId) ? strapiUser.id : numericId;
-        const displayName =
-          strapiUser.name ||
-          [strapiUser.firstName, strapiUser.lastName]
-            .filter(Boolean)
-            .join(" ")
-            .trim();
-        token.name = displayName || token.name;
-        token.email = strapiUser.email;
-        mutableToken.profileFetchedAt = 0;
-        mutableToken.userType = strapiUser.userType ?? null;
+        // Se è un login con Google
+        if (account?.provider === "google") {
+          console.log("Login con Google - access_token:", account.access_token);
+          console.log("Login con Google - user profile:", user);
+
+          // Registra o recupera l'utente su Strapi
+          try {
+            const strapiCallbackUrl = `${STRAPI_API_URL}/api/auth/${account.provider}/callback?access_token=${account.access_token}`;
+            console.log("Chiamata a Strapi:", strapiCallbackUrl);
+
+            const strapiResponse = await fetch(strapiCallbackUrl, {
+              method: "GET",
+              headers: {
+                "Content-Type": "application/json",
+              },
+            });
+
+            console.log("Strapi response status:", strapiResponse.status);
+            const strapiData = await strapiResponse.json();
+            console.log("Strapi response data:", strapiData);
+
+            if (!strapiResponse.ok) {
+              console.error("Errore risposta Strapi:", strapiData);
+              throw new Error(
+                strapiData?.error?.message ||
+                  "Errore durante la connessione con Strapi"
+              );
+            }
+
+            if (strapiData.jwt && strapiData.user) {
+              console.log("JWT di Strapi ottenuto con successo");
+
+              // Verifica se firstName e lastName sono presenti
+              const hasFirstName =
+                strapiData.user.firstName && strapiData.user.firstName.trim();
+              const hasLastName =
+                strapiData.user.lastName && strapiData.user.lastName.trim();
+
+              console.log("Utente ha firstName:", hasFirstName);
+              console.log("Utente ha lastName:", hasLastName);
+
+              // Se mancano nome o cognome, aggiornali con i dati di Google
+              if (!hasFirstName || !hasLastName) {
+                console.log(
+                  "Nome o cognome mancanti, aggiornamento con dati Google..."
+                );
+
+                // Estrai nome e cognome dal nome completo di Google
+                const fullName = user.name || "";
+                const nameParts = fullName.split(" ");
+                const firstName =
+                  !hasFirstName && nameParts.length > 0
+                    ? nameParts[0]
+                    : strapiData.user.firstName;
+                const lastName =
+                  !hasLastName && nameParts.length > 1
+                    ? nameParts.slice(1).join(" ")
+                    : strapiData.user.lastName;
+
+                try {
+                  // Aggiorna l'utente in Strapi con nome e cognome
+                  const updateResponse = await fetch(
+                    `${STRAPI_API_URL}/api/users/${strapiData.user.id}`,
+                    {
+                      method: "PUT",
+                      headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${strapiData.jwt}`,
+                      },
+                      body: JSON.stringify({
+                        firstName: firstName || strapiData.user.firstName,
+                        lastName: lastName || strapiData.user.lastName,
+                      }),
+                    }
+                  );
+
+                  if (updateResponse.ok) {
+                    const updatedUser = await updateResponse.json();
+                    console.log("Utente aggiornato con successo:", updatedUser);
+                    strapiData.user.firstName = updatedUser.firstName;
+                    strapiData.user.lastName = updatedUser.lastName;
+                  } else {
+                    console.warn(
+                      "Impossibile aggiornare nome e cognome in Strapi"
+                    );
+                  }
+                } catch (updateError) {
+                  console.error(
+                    "Errore durante l'aggiornamento dell'utente:",
+                    updateError
+                  );
+                  // Continua comunque con i dati disponibili
+                }
+              }
+
+              mutableToken.jwt = strapiData.jwt;
+              const numericId = Number(strapiData.user.id);
+              mutableToken.id = Number.isNaN(numericId)
+                ? strapiData.user.id
+                : numericId;
+              token.name =
+                [strapiData.user.firstName, strapiData.user.lastName]
+                  .filter(Boolean)
+                  .join(" ")
+                  .trim() ||
+                strapiData.user.username ||
+                token.name;
+              token.email = strapiData.user.email;
+              mutableToken.userType = strapiData.user.userType ?? null;
+              mutableToken.profileFetchedAt = Date.now();
+            } else {
+              console.error("JWT o user mancanti nella risposta di Strapi");
+              throw new Error("Risposta Strapi incompleta");
+            }
+          } catch (error) {
+            console.error("Error connecting Google account to Strapi:", error);
+            throw new Error("Impossibile collegare l'account Google. Riprova.");
+          }
+        } else {
+          // Login con credenziali
+          const strapiUser = user as StrapiAuthorizedUser;
+          mutableToken.jwt = strapiUser.jwt;
+          const numericId = Number(strapiUser.id);
+          mutableToken.id = Number.isNaN(numericId) ? strapiUser.id : numericId;
+          const displayName =
+            strapiUser.name ||
+            [strapiUser.firstName, strapiUser.lastName]
+              .filter(Boolean)
+              .join(" ")
+              .trim();
+          token.name = displayName || token.name;
+          token.email = strapiUser.email;
+          mutableToken.profileFetchedAt = 0;
+          mutableToken.userType = strapiUser.userType ?? null;
+        }
       }
 
       if (!mutableToken.jwt) {
