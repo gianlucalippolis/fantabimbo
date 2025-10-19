@@ -69,36 +69,6 @@
   text-align: center;
 }
 
-.infoBox {
-  background: linear-gradient(135deg, #89b5af 0%, #6b9080 100%);
-  color: white;
-  padding: 1.5rem;
-  border-radius: 16px;
-  text-align: left;
-  font-weight: 500;
-  font-size: 0.95rem;
-  margin: 1rem 0;
-  box-shadow: 0 8px 24px rgba(107, 144, 128, 0.25);
-  line-height: 1.6;
-}
-
-.infoBox strong {
-  font-weight: 700;
-  color: white;
-}
-
-.warningBox {
-  background: linear-gradient(135deg, #ff6b6b, #ee5a6f);
-  color: white;
-  padding: 1rem 1.5rem;
-  border-radius: 12px;
-  text-align: center;
-  font-weight: 600;
-  font-size: 1rem;
-  margin: 1rem 0;
-  box-shadow: 0 4px 15px rgba(238, 90, 111, 0.3);
-}
-
 .form {
   display: grid;
   gap: 2rem;

@@ -1,0 +1,78 @@
+.infoBox {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 16px 20px;
+  border-radius: 12px;
+  font-size: 14px;
+  line-height: 1.6;
+  margin-bottom: 20px;
+  border: 1px solid transparent;
+  transition: all 0.2s ease;
+}
+
+.icon {
+  font-size: 20px;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.content {
+  flex: 1;
+}
+
+/* Variant: info (green gradient) */
+.info {
+  background: linear-gradient(135deg, #89b5af, #6b9080);
+  color: white;
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.info strong {
+  font-weight: 600;
+}
+
+/* Variant: warning (orange/yellow) */
+.warning {
+  background: linear-gradient(135deg, #ffc107, #ff9800);
+  color: white;
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.warning strong {
+  font-weight: 600;
+}
+
+/* Variant: success (green) */
+.success {
+  background: linear-gradient(135deg, #4caf50, #2e7d32);
+  color: white;
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.success strong {
+  font-weight: 600;
+}
+
+/* Variant: error (red) */
+.error {
+  background: linear-gradient(135deg, #f44336, #c62828);
+  color: white;
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.error strong {
+  font-weight: 600;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .infoBox {
+    padding: 14px 16px;
+    font-size: 13px;
+  }
+
+  .icon {
+    font-size: 18px;
+  }
+}

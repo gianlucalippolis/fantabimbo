@@ -3,6 +3,7 @@
 import type { AxiosError } from "axios";
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import type { GameSummary } from "types/game";
 import api from "../lib/axios";
 import { getStrapiMediaURL } from "../lib/utils";
@@ -11,6 +12,7 @@ import Countdown from "./Countdown";
 import Leaderboard from "./Leaderboard";
 import Avatar from "./Avatar";
 import BackIcon from "./icons/BackIcon";
+import { Button } from "./Button";
 
 interface GameDetailClientProps {
   game: GameSummary;
@@ -52,6 +54,7 @@ function combineDateTime(date: string, time: string): string | null {
 }
 
 export function GameDetailClient({ game }: GameDetailClientProps) {
+  const router = useRouter();
   const [revealDate, setRevealDate] = useState<string>(() =>
     toDateInputValue(game.revealAt)
   );
@@ -65,6 +68,7 @@ export function GameDetailClient({ game }: GameDetailClientProps) {
   const [saveMessage, setSaveMessage] = useState<string | null>(null);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [mounted, setMounted] = useState(false);
+  const [isNavigating, setIsNavigating] = useState(false);
   const [showLeaderboard, setShowLeaderboard] = useState(false);
 
   useEffect(() => {
@@ -154,9 +158,17 @@ export function GameDetailClient({ game }: GameDetailClientProps) {
     <div className={styles.container}>
       <div className={styles.card}>
         <header className={styles.header}>
-          <Link className={styles.backLink} href="/">
+          <Button
+            variant="tertiary"
+            onClick={() => {
+              setIsNavigating(true);
+              router.push("/");
+            }}
+            isLoading={isNavigating}
+            className={styles.backLink}
+          >
             <BackIcon size={20} /> Torna alla dashboard
-          </Link>
+          </Button>
           <h1 className={styles.title}>{game.name}</h1>
           <p className={styles.subtitle}>
             Organizzata da{" "}

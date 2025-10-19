@@ -15,6 +15,8 @@ import {
 import api from "../../lib/axios";
 import LoadingScreen from "../../components/LoadingScreen";
 import BackIcon from "../../components/icons/BackIcon";
+import { Button } from "../../components/Button";
+import InfoBox from "../../components/InfoBox";
 
 interface PopupState {
   isVisible: boolean;
@@ -60,6 +62,7 @@ function ListaNomiContent() {
   const [game, setGame] = useState<Game | null>(null);
   const [isRevealExpired, setIsRevealExpired] = useState(false);
   const [isLoadingData, setIsLoadingData] = useState(true);
+  const [isNavigating, setIsNavigating] = useState(false);
 
   const isParent = userProfile?.userType === "parent";
 
@@ -338,29 +341,37 @@ function ListaNomiContent() {
   return (
     <div className={styles.container}>
       <div className={styles.wrapper}>
-        <button className={styles.backButton} onClick={() => router.push("/")}>
+        <Button
+          variant="tertiary"
+          onClick={() => {
+            setIsNavigating(true);
+            router.push("/");
+          }}
+          isLoading={isNavigating}
+          className={styles.backButton}
+        >
           <BackIcon size={20} /> Torna alla dashboard
-        </button>
+        </Button>
 
         <h1 className={styles.title}>
           {isParent ? "Le tue preferenze" : "Riordina i nomi"}
         </h1>
 
         {!isParent && (
-          <div className={styles.infoBox}>
-            💡 <strong>Istruzioni:</strong> Riordina i nomi dal 1° al 10° posto
+          <InfoBox variant="info">
+            <strong>Istruzioni:</strong> Riordina i nomi dal 1° al 10° posto
             secondo la tua previsione. Il genitore ha inserito questi nomi, ma
             tu li vedi in ordine casuale. Cerca di indovinare quale sarà il nome
             scelto (1° posto)!
-          </div>
+          </InfoBox>
         )}
 
         {isParent && (
-          <div className={styles.infoBox}>
-            💡 <strong>Info:</strong> Inserisci i tuoi 10 nomi preferiti in
-            ordine. Il <strong>primo nome</strong> della lista sarà quello
-            scelto per il bambino!
-          </div>
+          <InfoBox variant="info">
+            <strong>Info:</strong> Inserisci i tuoi 10 nomi preferiti in ordine.
+            Il <strong>primo nome</strong> della lista sarà quello scelto per il
+            bambino!
+          </InfoBox>
         )}
 
         {game?.attributes?.revealAt && (
@@ -372,16 +383,16 @@ function ListaNomiContent() {
         )}
 
         {isRevealExpired && (
-          <div className={styles.warningBox}>
-            ⚠️ La data di rivelazione è scaduta. Non è più possibile modificare
-            i nomi.
-          </div>
+          <InfoBox variant="warning">
+            La data di rivelazione è scaduta. Non è più possibile modificare i
+            nomi.
+          </InfoBox>
         )}
 
         {!isParent && !hasParentSubmission && !isLoading && (
-          <div className={styles.warningBox}>
-            ⚠️ Il genitore non ha ancora inserito i nomi. Torna più tardi!
-          </div>
+          <InfoBox variant="warning">
+            Il genitore non ha ancora inserito i nomi. Torna più tardi!
+          </InfoBox>
         )}
 
         <form className={styles.form} onSubmit={handleSubmit}>

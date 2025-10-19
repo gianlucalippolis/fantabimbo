@@ -5,13 +5,13 @@ import { useRouter } from "next/navigation";
 import { useAppSelector, useAppDispatch } from "../../store/hooks";
 import { setUserProfile } from "../../store/user";
 import { useAuth } from "../../providers/AuthProvider";
-import Link from "next/link";
 import styles from "./page.module.css";
 import api from "../../lib/axios";
 import { getStrapiMediaURL } from "../../lib/utils";
 import type { AxiosError } from "axios";
 import LoadingScreen from "../../components/LoadingScreen";
 import BackIcon from "../../components/icons/BackIcon";
+import { Button } from "../../components/Button";
 
 export default function ProfiloClient() {
   const router = useRouter();
@@ -28,6 +28,7 @@ export default function ProfiloClient() {
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [uploadSuccess, setUploadSuccess] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [isNavigating, setIsNavigating] = useState(false);
 
   // Redirect to login if not authenticated
   useEffect(() => {
@@ -156,9 +157,17 @@ export default function ProfiloClient() {
     <div className={styles.container}>
       <div className={styles.card}>
         <header className={styles.header}>
-          <Link className={styles.backLink} href="/">
+          <Button
+            variant="tertiary"
+            onClick={() => {
+              setIsNavigating(true);
+              router.push("/");
+            }}
+            isLoading={isNavigating}
+            className={styles.backLink}
+          >
             <BackIcon size={20} /> Torna alla dashboard
-          </Link>
+          </Button>
           <h1 className={styles.title}>Il mio profilo</h1>
         </header>
 

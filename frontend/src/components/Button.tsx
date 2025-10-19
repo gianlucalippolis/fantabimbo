@@ -6,13 +6,14 @@ import type {
 } from "react";
 import styles from "./Button.module.css";
 
-type ButtonVariant = "primary" | "secondary";
+type ButtonVariant = "primary" | "secondary" | "tertiary" | "danger";
 
 interface BaseProps {
   variant?: ButtonVariant;
   fullWidth?: boolean;
   className?: string;
   children: ReactNode;
+  isLoading?: boolean;
 }
 
 type ButtonElementProps = BaseProps &
@@ -29,6 +30,7 @@ export function Button(props: ButtonProps) {
     fullWidth = false,
     className,
     children,
+    isLoading = false,
     ...rest
   } = props;
 
@@ -36,6 +38,7 @@ export function Button(props: ButtonProps) {
     styles.base,
     styles[variant],
     fullWidth ? styles.fullWidth : "",
+    isLoading ? styles.loading : "",
     className ?? "",
   ]
     .filter(Boolean)
@@ -50,17 +53,37 @@ export function Button(props: ButtonProps) {
         href={href}
         {...anchorProps}
         className={classes}
-        aria-disabled={isDisabled ? true : undefined}
+        aria-disabled={isDisabled || isLoading ? true : undefined}
       >
-        {children}
+        {isLoading ? (
+          <>
+            <span className={styles.spinner} />
+            <span className={styles.loadingText}>{children}</span>
+          </>
+        ) : (
+          children
+        )}
       </Link>
     );
   }
 
   const buttonProps = rest as ButtonHTMLAttributes<HTMLButtonElement>;
   return (
-    <button {...buttonProps} className={classes}>
-      {children}
+    <button
+      {...buttonProps}
+      className={classes}
+      disabled={buttonProps.disabled || isLoading}
+    >
+      {isLoading ? (
+        <>
+          <span className={styles.spinner} />
+          <span className={styles.loadingText}>{children}</span>
+        </>
+      ) : (
+        children
+      )}
     </button>
   );
 }
+
+export default Button;

@@ -12,6 +12,7 @@
   transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease,
     color 0.2s ease, border-color 0.2s ease;
   border: none;
+  position: relative;
 }
 
 .fullWidth {
@@ -66,4 +67,90 @@
   cursor: not-allowed;
   transform: none;
   box-shadow: none;
+}
+
+.tertiary {
+  background: transparent;
+  color: #7b604c;
+  border: 2px solid rgba(194, 160, 131, 0.3);
+  box-shadow: 0 2px 8px rgba(123, 96, 76, 0.1);
+}
+
+.tertiary:hover {
+  background: linear-gradient(
+    135deg,
+    rgba(194, 160, 131, 0.1),
+    rgba(194, 160, 131, 0.05)
+  );
+  border-color: rgba(194, 160, 131, 0.5);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(123, 96, 76, 0.15);
+}
+
+.tertiary:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 6px rgba(123, 96, 76, 0.1);
+}
+
+.tertiary:focus-visible {
+  outline: 3px solid rgba(194, 160, 131, 0.4);
+  outline-offset: 3px;
+}
+
+.tertiary:disabled,
+.tertiary[aria-disabled="true"] {
+  opacity: 0.65;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.danger {
+  background: linear-gradient(135deg, #c25b50, #8a1f1f);
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(138, 31, 31, 0.15);
+}
+
+.danger:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(138, 31, 31, 0.2);
+  background: linear-gradient(135deg, #b14e45, #7a1b1b);
+}
+
+.danger:focus-visible {
+  outline: 3px solid rgba(194, 91, 80, 0.4);
+  outline-offset: 3px;
+}
+
+.danger:disabled,
+.danger[aria-disabled="true"] {
+  opacity: 0.65;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* Loading state */
+.loading {
+  cursor: wait;
+  pointer-events: none;
+}
+
+.loadingText {
+  opacity: 0.7;
+}
+
+/* Spinner animation */
+.spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid currentColor;
+  border-radius: 50%;
+  border-top-color: transparent;
+  animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
 }

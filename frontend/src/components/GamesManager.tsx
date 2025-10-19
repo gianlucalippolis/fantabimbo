@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { FormEvent, useEffect, useMemo, useState, useRef } from "react";
 import type { AxiosError } from "axios";
 import styles from "../app/page.module.css";
@@ -9,6 +10,7 @@ import api from "../lib/axios";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
 import { fetchGames, setUserGames } from "../store/user";
 import Countdown from "./Countdown";
+import { Button } from "./Button";
 
 interface GamesManagerProps {
   games: GameSummary[];
@@ -35,6 +37,7 @@ export function GamesManager({
   userId,
   canCreateGames,
 }: GamesManagerProps) {
+  const router = useRouter();
   const profileFromStore = useAppSelector((state) => state.user.profile);
   const strapiJwt = profileFromStore?.jwt ?? null;
 
@@ -60,6 +63,7 @@ export function GamesManager({
     useState<GameSummary | null>(null);
   const [deleteError, setDeleteError] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [navigatingToGame, setNavigatingToGame] = useState<number | null>(null);
 
   useEffect(() => {
     if (games.length > 0) {
@@ -542,8 +546,15 @@ export function GamesManager({
 
                 {/* Azioni principali */}
                 <div className={styles.gamePrimaryActions}>
-                  <Link
-                    href={`/lista-nomi?game=${encodeURIComponent(game.id)}`}
+                  <Button
+                    variant="primary"
+                    onClick={() => {
+                      setNavigatingToGame(game.id);
+                      router.push(
+                        `/lista-nomi?game=${encodeURIComponent(game.id)}`
+                      );
+                    }}
+                    isLoading={navigatingToGame === game.id}
                     className={styles.gamePrimaryButton}
                   >
                     {(() => {
@@ -560,13 +571,18 @@ export function GamesManager({
                       // Fallback generico
                       return "Partecipa";
                     })()}
-                  </Link>
-                  <Link
-                    href={`/partite/${encodeURIComponent(game.id)}`}
+                  </Button>
+                  <Button
+                    variant="secondary"
+                    onClick={() => {
+                      setNavigatingToGame(game.id);
+                      router.push(`/partite/${encodeURIComponent(game.id)}`);
+                    }}
+                    isLoading={navigatingToGame === game.id}
                     className={styles.gameSecondaryButton}
                   >
                     Dettagli partita
-                  </Link>
+                  </Button>
                 </div>
 
                 {/* Sezione invito */}
