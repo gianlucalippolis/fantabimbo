@@ -100,6 +100,10 @@ export function mapStrapiGame(
     participants,
     isOwner,
     createdAt: asString(gameData.createdAt) ?? undefined,
+    allNames: Array.isArray(gameData.allNames) ? gameData.allNames : null,
+    selectedNames: Array.isArray(gameData.selectedNames)
+      ? gameData.selectedNames
+      : null,
   };
 }
 

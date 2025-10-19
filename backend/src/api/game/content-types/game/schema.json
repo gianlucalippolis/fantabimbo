@@ -50,6 +50,14 @@
       "relation": "manyToMany",
       "target": "plugin::users-permissions.user",
       "inversedBy": "joinedGames"
+    },
+    "allNames": {
+      "type": "json",
+      "required": false
+    },
+    "selectedNames": {
+      "type": "json",
+      "required": false
     }
   }
 }

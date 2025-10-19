@@ -168,6 +168,27 @@
   border-radius: 8px;
 }
 
+.scoreItem.perfectGuess {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 215, 0, 0.3),
+    rgba(255, 223, 0, 0.15)
+  );
+  border: 2px solid #ffd700;
+  font-weight: 700;
+  animation: glow 2s ease-in-out infinite;
+}
+
+@keyframes glow {
+  0%,
+  100% {
+    box-shadow: 0 0 5px rgba(255, 215, 0, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.8);
+  }
+}
+
 .scoreLabel {
   font-size: 0.9rem;
   color: rgba(47, 36, 27, 0.8);

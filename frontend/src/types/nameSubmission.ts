@@ -31,14 +31,17 @@ export interface VictoryResult {
     };
     score: number;
     guessedNames: string[];
-    exactMatches: string[];
-    orderMatches: Array<{
-      name: string;
-      guessedPosition: number;
-      actualPosition: number;
-    }>;
+    details: {
+      namesInTop5: number; // Numero di nomi indovinati nei nomi selezionati
+      correctPositions: number; // Numero di posizioni corrette
+      perfectGuess: boolean; // true se tutti i nomi sono corretti nelle posizioni giuste
+      pointsForNames: number; // Punti per nomi indovinati (20 punti per nome)
+      pointsForPositions: number; // Punti per posizioni corrette (30 punti per posizione)
+      perfectBonus: number; // Bonus per guess perfetto (100 punti)
+    };
   }>;
-  parentPreferences: string[];
+  parentPreferences: string[]; // Nomi selezionati dal genitore
+  babyName: string | null;
   gameRevealed: boolean;
   message?: string;
 }

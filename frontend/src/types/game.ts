@@ -26,4 +26,6 @@ export interface GameSummary {
   owner: GameParticipant;
   participants: GameParticipant[];
   createdAt?: string;
+  allNames?: string[] | null;
+  selectedNames?: string[] | null;
 }

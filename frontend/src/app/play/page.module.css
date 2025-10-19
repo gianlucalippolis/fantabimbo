@@ -1,0 +1,271 @@
+.container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #ede3da 0%, #c2a083 100%);
+  padding: 2rem 1rem;
+}
+
+.wrapper {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.backButton {
+  margin-bottom: 2rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #2c3e50;
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.errorState {
+  background: white;
+  padding: 3rem 2rem;
+  border-radius: 12px;
+  text-align: center;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.errorTitle {
+  font-size: 1.5rem;
+  color: #e74c3c;
+  margin-bottom: 1.5rem;
+}
+
+/* Step Indicator */
+.stepIndicator {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  margin-bottom: 3rem;
+  padding: 0 1rem;
+}
+
+.step {
+  padding: 1rem 2rem;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  text-align: center;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.7);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  transition: all 0.3s ease;
+}
+
+.step.active {
+  background: white;
+  color: #89b5af;
+  border-color: white;
+  transform: scale(1.05);
+}
+
+/* Step Content */
+.stepContent {
+  background: white;
+  padding: 2.5rem;
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+/* Selezione nomi */
+.selectionInfo {
+  text-align: center;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #89b5af;
+  margin: 2rem 0;
+  padding: 1rem;
+  background: linear-gradient(
+    135deg,
+    rgba(137, 181, 175, 0.15) 0%,
+    rgba(107, 144, 128, 0.15) 100%
+  );
+  border-radius: 12px;
+}
+
+.selectionGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 1.25rem;
+  margin: 2rem 0;
+}
+
+.selectionCard {
+  position: relative;
+  padding: 1.75rem 1rem;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border: 3px solid transparent;
+  border-radius: 16px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #2c3e50;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.selectionCard:hover:not(:disabled) {
+  transform: translateY(-6px) scale(1.02);
+  box-shadow: 0 8px 24px rgba(137, 181, 175, 0.4);
+  border-color: #89b5af;
+}
+
+.selectionCard:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  background: #e9ecef;
+}
+
+.selectionCard.selected {
+  background: linear-gradient(135deg, #89b5af 0%, #6b9080 100%);
+  color: white;
+  border-color: #6b9080;
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(137, 181, 175, 0.6);
+}
+
+.selectedBadge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: #10b981;
+  color: white;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  font-weight: 700;
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.4);
+  animation: bounceIn 0.3s ease;
+}
+
+@keyframes bounceIn {
+  0% {
+    transform: scale(0);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Ordinamento nomi */
+.orderList {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  margin: 2rem 0;
+}
+
+.orderItem {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 1.5rem;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border-radius: 16px;
+  border: 3px solid #e0e0e0;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.orderItem:hover {
+  transform: translateX(8px);
+  box-shadow: 0 4px 16px rgba(137, 181, 175, 0.35);
+  border-color: #89b5af;
+}
+
+.orderControls {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.orderButton {
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+  padding: 0;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.orderPosition {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #89b5af;
+  width: 40px;
+  text-align: center;
+  background: white;
+  border-radius: 50%;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(137, 181, 175, 0.25);
+}
+
+.orderName {
+  flex: 1;
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: #2c3e50;
+}
+
+/* Buttons */
+.stepButtons {
+  display: flex;
+  gap: 1.5rem;
+  justify-content: space-between;
+  margin-top: 2.5rem;
+}
+
+.submitButton {
+  width: 100%;
+  margin-top: 2.5rem;
+  font-size: 1.1rem;
+  padding: 1rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .stepIndicator {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .step {
+    padding: 0.75rem 1.5rem;
+  }
+
+  .selectionGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .stepButtons {
+    flex-direction: column;
+  }
+
+  .orderItem {
+    gap: 1rem;
+  }
+
+  .orderName {
+    font-size: 1.1rem;
+  }
+}

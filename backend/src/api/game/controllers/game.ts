@@ -30,10 +30,24 @@ interface PopulatedGame {
   revealAt?: string | null;
   owner?: PopulatedUser | null;
   participants?: PopulatedUser[] | null;
+  allNames?: string[] | null;
+  selectedNames?: string[] | null;
   [key: string]: unknown;
 }
 
 const USER_FIELDS = ["id", "email", "firstName", "lastName", "userType"];
+
+const GAME_FIELDS = [
+  "id",
+  "name",
+  "slug",
+  "description",
+  "prize",
+  "revealAt",
+  "inviteCode",
+  "allNames",
+  "selectedNames",
+];
 
 const DEFAULT_POPULATE = {
   owner: {
@@ -205,6 +219,7 @@ export default factories.createCoreController(
 
         const entity = (await strapi.entityService.create("api::game.game", {
           data: createData as any,
+          fields: GAME_FIELDS as any,
           populate: {
             owner: {
               fields: USER_FIELDS,
@@ -335,6 +350,24 @@ export default factories.createCoreController(
               : undefined;
       }
 
+      if (Object.prototype.hasOwnProperty.call(rawPayload, "allNames")) {
+        const rawAllNames = rawPayload.allNames;
+        if (Array.isArray(rawAllNames)) {
+          updateData.allNames = rawAllNames;
+        } else if (rawAllNames === null) {
+          updateData.allNames = null;
+        }
+      }
+
+      if (Object.prototype.hasOwnProperty.call(rawPayload, "selectedNames")) {
+        const rawSelected = rawPayload.selectedNames;
+        if (Array.isArray(rawSelected)) {
+          updateData.selectedNames = rawSelected;
+        } else if (rawSelected === null) {
+          updateData.selectedNames = null;
+        }
+      }
+
       if (Object.keys(updateData).length === 0) {
         const sanitized = await this.sanitizeOutput(existing, ctx);
         return this.transformResponse(sanitized);
@@ -346,6 +379,7 @@ export default factories.createCoreController(
           gameId,
           {
             data: updateData as any,
+            fields: GAME_FIELDS as any,
             populate: {
               owner: {
                 fields: USER_FIELDS,
@@ -417,6 +451,7 @@ export default factories.createCoreController(
       const refreshed = alreadyParticipant
         ? game
         : ((await strapi.entityService.findOne("api::game.game", game.id, {
+            fields: GAME_FIELDS as any,
             populate: DEFAULT_POPULATE as any,
           })) as PopulatedGame);
 
@@ -470,6 +505,7 @@ export default factories.createCoreController(
             data: {
               inviteCode,
             },
+            fields: GAME_FIELDS as any,
             populate: DEFAULT_POPULATE as any,
           }
         );
@@ -520,6 +556,7 @@ export default factories.createCoreController(
         "api::game.game",
         gameId,
         {
+          fields: GAME_FIELDS as any,
           populate: DEFAULT_POPULATE as any,
         }
       )) as PopulatedGame;

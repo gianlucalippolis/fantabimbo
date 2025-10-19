@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FormEvent, useEffect, useMemo, useState, useRef } from "react";
 import type { AxiosError } from "axios";
@@ -550,8 +549,15 @@ export function GamesManager({
                     variant="primary"
                     onClick={() => {
                       setNavigatingToGame(game.id);
+                      const currentParticipant = game.participants.find(
+                        (p) => p.id === Number(userId)
+                      );
+                      const targetPage =
+                        currentParticipant?.userType === "parent"
+                          ? "/game-setup"
+                          : "/play";
                       router.push(
-                        `/lista-nomi?game=${encodeURIComponent(game.id)}`
+                        `${targetPage}?game=${encodeURIComponent(game.id)}`
                       );
                     }}
                     isLoading={navigatingToGame === game.id}

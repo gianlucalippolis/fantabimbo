@@ -14,10 +14,12 @@ interface PlayerScore {
   };
   score: number;
   details: {
-    exactNameFirstPosition: number;
-    exactNameAnyPosition: number;
-    correctPosition: number;
-    nearPosition: number;
+    namesInTop5: number; // Numero di nomi indovinati nei nomi selezionati
+    correctPositions: number; // Numero di posizioni corrette
+    perfectGuess: boolean; // true se tutti i nomi sono corretti nelle posizioni giuste
+    pointsForNames: number; // Punti per nomi indovinati (20 punti per nome)
+    pointsForPositions: number; // Punti per posizioni corrette (30 punti per posizione)
+    perfectBonus: number; // Bonus per guess perfetto (100 punti)
   };
   guessedNames: string[];
 }
@@ -145,41 +147,41 @@ export default function Leaderboard({ gameId }: LeaderboardProps) {
                   </div>
 
                   <div className={styles.scoreDetails}>
-                    {score.details.exactNameFirstPosition > 0 && (
-                      <div className={styles.scoreItem}>
+                    {score.details.perfectGuess && (
+                      <div
+                        className={`${styles.scoreItem} ${styles.perfectGuess}`}
+                      >
                         <span className={styles.scoreLabel}>
-                          Nome esatto 1° posto
+                          🌟 Guess perfetto!
                         </span>
                         <span className={styles.scoreValue}>
-                          +{score.details.exactNameFirstPosition}
+                          +{score.details.perfectBonus}
                         </span>
                       </div>
                     )}
-                    {score.details.exactNameAnyPosition > 0 && (
+                    {score.details.namesInTop5 > 0 && (
                       <div className={styles.scoreItem}>
-                        <span className={styles.scoreLabel}>Nome esatto</span>
+                        <span className={styles.scoreLabel}>
+                          {score.details.namesInTop5}{" "}
+                          {score.details.namesInTop5 === 1
+                            ? "nome indovinato"
+                            : "nomi indovinati"}
+                        </span>
                         <span className={styles.scoreValue}>
-                          +{score.details.exactNameAnyPosition}
+                          +{score.details.pointsForNames}
                         </span>
                       </div>
                     )}
-                    {score.details.correctPosition > 0 && (
+                    {score.details.correctPositions > 0 && (
                       <div className={styles.scoreItem}>
                         <span className={styles.scoreLabel}>
-                          Posizioni corrette
+                          {score.details.correctPositions}{" "}
+                          {score.details.correctPositions === 1
+                            ? "posizione corretta"
+                            : "posizioni corrette"}
                         </span>
                         <span className={styles.scoreValue}>
-                          +{score.details.correctPosition}
-                        </span>
-                      </div>
-                    )}
-                    {score.details.nearPosition > 0 && (
-                      <div className={styles.scoreItem}>
-                        <span className={styles.scoreLabel}>
-                          Posizioni vicine
-                        </span>
-                        <span className={styles.scoreValue}>
-                          +{score.details.nearPosition}
+                          +{score.details.pointsForPositions}
                         </span>
                       </div>
                     )}

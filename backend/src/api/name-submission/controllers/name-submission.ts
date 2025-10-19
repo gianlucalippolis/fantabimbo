@@ -20,14 +20,16 @@ interface VictoryCalculationResult {
     };
     score: number;
     details: {
-      exactNameFirstPosition: number;
-      exactNameAnyPosition: number;
-      correctPosition: number;
-      nearPosition: number;
+      namesInTop5: number; // Numero di nomi indovinati nei nomi selezionati
+      correctPositions: number; // Numero di posizioni corrette
+      perfectGuess: boolean; // true se tutti i nomi sono corretti nelle posizioni giuste
+      pointsForNames: number; // Punti per nomi indovinati (20 punti per nome)
+      pointsForPositions: number; // Punti per posizioni corrette (30 punti per posizione)
+      perfectBonus: number; // Bonus per guess perfetto (100 punti)
     };
     guessedNames: string[];
   }>;
-  parentPreferences: string[];
+  parentPreferences: string[]; // Nomi selezionati dal genitore
   babyName: string | null;
   gameRevealed: boolean;
 }
@@ -278,80 +280,51 @@ export default factories.createCoreController(
 
       console.log("=== DEBUG calculateVictory ===");
       console.log("Total submissions found:", submissions.length);
-      console.log(
-        "Submissions:",
-        JSON.stringify(
-          submissions.map((s: any) => ({
-            id: s.id,
-            submitterType: s.submitterType,
-            isParentPreference: s.isParentPreference,
-            submitterId: s.submitter?.id,
-            namesCount: s.names?.length,
-          })),
-          null,
-          2
-        )
-      );
 
-      // Find parent preferences (the "correct" answers)
-      // Prima cerca con isParentPreference = true, poi fallback a qualsiasi submission del parent
-      let parentSubmission = submissions.find(
-        (sub: any) => sub.submitterType === "parent" && sub.isParentPreference
-      );
+      // **NUOVA LOGICA**: Il genitore ha salvato i nomi selezionati nel campo selectedNames del Game
+      // Recuperiamo questi nomi dal game invece che dalla submission
+      const parentSelectedNames =
+        Array.isArray(game.selectedNames) && game.selectedNames.length > 0
+          ? game.selectedNames
+          : [];
 
-      console.log(
-        "Parent submission with isParentPreference=true:",
-        parentSubmission?.id || "NOT FOUND"
-      );
-
-      // Fallback: se non trova con isParentPreference, cerca qualsiasi submission del parent
-      if (!parentSubmission) {
-        parentSubmission = submissions.find(
-          (sub: any) => sub.submitterType === "parent"
-        );
-        console.log(
-          "Fallback parent submission:",
-          parentSubmission?.id || "NOT FOUND"
-        );
-      }
-
-      if (!parentSubmission) {
+      if (parentSelectedNames.length === 0) {
         return this.transformResponse({
           winners: [],
           parentPreferences: [],
           babyName: null,
           gameRevealed,
-          message: "Nessuna preferenza del genitore trovata.",
+          message:
+            "Il genitore non ha ancora completato la selezione dei nomi preferiti.",
         });
       }
 
-      const parentPreferences = Array.isArray(parentSubmission.names)
-        ? (parentSubmission.names as string[])
-        : [];
-
-      // Il primo nome della lista del genitore è il nome del bambino
-      const babyName =
-        parentPreferences.length > 0 ? parentPreferences[0] : null;
+      // Il primo nome dei nomi selezionati è il nome del bambino
+      const babyName = parentSelectedNames[0];
 
       const participantSubmissions = submissions.filter(
         (sub: any) => sub.submitterType === "participant"
       );
 
-      // Calculate scores for each participant
+      // Calculate scores for each participant with NEW scoring algorithm
       const winners = participantSubmissions
         .map((submission: any) => {
-          const guessedNames = Array.isArray(submission.names)
-            ? (submission.names as string[])
-            : [];
+          const guessedNames =
+            Array.isArray(submission.names) && submission.names.length > 0
+              ? (submission.names as string[])
+              : [];
 
+          // Inizializza i dettagli del punteggio
           const details = {
-            exactNameFirstPosition: 0,
-            exactNameAnyPosition: 0,
-            correctPosition: 0,
-            nearPosition: 0,
+            namesInTop5: 0,
+            correctPositions: 0,
+            perfectGuess: false,
+            pointsForNames: 0,
+            pointsForPositions: 0,
+            perfectBonus: 0,
           };
 
-          if (!babyName) {
+          if (guessedNames.length === 0) {
             return {
               userId: submission.submitter.id,
               user: submission.submitter,
@@ -362,43 +335,50 @@ export default factories.createCoreController(
           }
 
           // Normalizza i nomi per confronto case-insensitive
-          const normalizedBabyName = babyName.trim().toLowerCase();
-          const normalizedParentNames = parentPreferences.map((n) =>
+          const normalizedParentSelected = parentSelectedNames.map((n) =>
             n.trim().toLowerCase()
           );
           const normalizedGuessed = guessedNames.map((n) =>
             n.trim().toLowerCase()
           );
 
-          // 100 punti se indovina il nome esatto del bambino al 1° posto
-          if (normalizedGuessed[0] === normalizedBabyName) {
-            details.exactNameFirstPosition = 100;
-          }
-          // 50 punti se indovina il nome esatto in qualsiasi altra posizione
-          else if (normalizedGuessed.includes(normalizedBabyName)) {
-            details.exactNameAnyPosition = 50;
-          }
+          // Calcola quanti nomi indovinati sono nei nomi selezionati dal genitore
+          let correctPositionCount = 0;
+          normalizedGuessed.forEach((guessedName, index) => {
+            if (normalizedParentSelected.includes(guessedName)) {
+              details.namesInTop5++;
 
-          // Calcola punti per posizioni corrette e vicine
-          normalizedGuessed.forEach((guessedName, guessedIndex) => {
-            const parentIndex = normalizedParentNames.indexOf(guessedName);
-
-            if (parentIndex !== -1 && guessedName !== normalizedBabyName) {
-              // 20 punti per posizione corretta (escludendo il nome del bambino già contato)
-              if (parentIndex === guessedIndex) {
-                details.correctPosition += 20;
-              }
-              // 10 punti se è a una posizione di distanza
-              else if (Math.abs(parentIndex - guessedIndex) === 1) {
-                details.nearPosition += 10;
+              // Controlla se è nella posizione corretta
+              if (
+                index < normalizedParentSelected.length &&
+                normalizedParentSelected[index] === guessedName
+              ) {
+                details.correctPositions++;
+                correctPositionCount++;
               }
             }
           });
 
-          const score = Object.values(details).reduce(
-            (sum, val) => sum + val,
-            0
-          );
+          // Calcola i punti
+          // 20 punti per ogni nome indovinato nei nomi selezionati
+          details.pointsForNames = details.namesInTop5 * 20;
+
+          // 30 punti per ogni posizione corretta
+          details.pointsForPositions = details.correctPositions * 30;
+
+          // 100 punti bonus se tutti i nomi sono corretti nelle posizioni giuste
+          if (
+            correctPositionCount === normalizedParentSelected.length &&
+            normalizedGuessed.length === normalizedParentSelected.length
+          ) {
+            details.perfectGuess = true;
+            details.perfectBonus = 100;
+          }
+
+          const score =
+            details.pointsForNames +
+            details.pointsForPositions +
+            details.perfectBonus;
 
           return {
             userId: submission.submitter.id,
@@ -412,13 +392,14 @@ export default factories.createCoreController(
 
       const result: VictoryCalculationResult = {
         winners,
-        parentPreferences,
+        parentPreferences: parentSelectedNames,
         babyName,
         gameRevealed,
       };
 
       console.log("=== Result to return ===");
       console.log("Baby name:", babyName);
+      console.log("Parent selected names:", parentSelectedNames);
       console.log("Winners count:", winners.length);
       console.log("Game revealed:", gameRevealed);
 

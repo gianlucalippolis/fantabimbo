@@ -1,0 +1,275 @@
+.container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #ede3da 0%, #c2a083 100%);
+  padding: 2rem 1rem;
+}
+
+.wrapper {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.backButton {
+  margin-bottom: 2rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #2c3e50;
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.errorState {
+  background: white;
+  padding: 3rem 2rem;
+  border-radius: 12px;
+  text-align: center;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.errorTitle {
+  font-size: 1.5rem;
+  color: #e74c3c;
+  margin-bottom: 1.5rem;
+}
+
+/* Step Indicator */
+.stepIndicator {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 3rem;
+  padding: 0 1rem;
+  gap: 1rem;
+}
+
+.step {
+  flex: 1;
+  padding: 1rem;
+  background: white;
+  border-radius: 8px;
+  text-align: center;
+  font-weight: 600;
+  color: #95a5a6;
+  border: 2px solid #e0e0e0;
+  transition: all 0.3s ease;
+}
+
+.step.active {
+  background: linear-gradient(135deg, #89b5af 0%, #6b9080 100%);
+  color: white;
+  border-color: #89b5af;
+}
+
+/* Step Content */
+.stepContent {
+  background: white;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Step 1: Input nomi */
+.namesList {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin: 2rem 0;
+}
+
+.nameItem {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.positionLabel {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #89b5af;
+  min-width: 40px;
+  text-align: center;
+}
+
+.nameInput {
+  flex: 1;
+  padding: 0.75rem 1rem;
+  background: white;
+  color: #2c3e50;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: border-color 0.3s ease;
+}
+
+.nameInput:focus {
+  outline: none;
+  border-color: #89b5af;
+}
+
+/* Step 2: Selezione */
+.selectionInfo {
+  text-align: center;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #2c3e50;
+  margin: 2rem 0;
+}
+
+.difficultyHint {
+  display: inline-block;
+  margin-left: 1rem;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #89b5af;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.selectionGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1rem;
+  margin: 2rem 0;
+}
+
+.selectionCard {
+  position: relative;
+  padding: 1.5rem 1rem;
+  background: #f8f9fa;
+  border: 2px solid #e0e0e0;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #2c3e50;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: center;
+}
+
+.selectionCard:hover:not(:disabled) {
+  transform: translateY(-4px);
+  box-shadow: 0 4px 12px rgba(137, 181, 175, 0.4);
+  border-color: #89b5af;
+}
+
+.selectionCard:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.selectionCard.selected {
+  background: linear-gradient(135deg, #89b5af 0%, #6b9080 100%);
+  color: white;
+  border-color: #89b5af;
+}
+
+.selectedBadge {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: #10b981;
+  color: white;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+/* Step 3: Ordinamento */
+.orderList {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin: 2rem 0;
+}
+
+.orderItem {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  background: #f8f9fa;
+  border-radius: 12px;
+  border: 2px solid #e0e0e0;
+}
+
+.orderControls {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.orderButton {
+  width: 32px;
+  height: 32px;
+  min-width: 32px;
+  padding: 0;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.orderPosition {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #89b5af;
+  width: 32px;
+  text-align: center;
+}
+
+.orderName {
+  flex: 1;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+/* Buttons */
+.stepButtons {
+  display: flex;
+  gap: 1rem;
+  justify-content: space-between;
+  margin-top: 2rem;
+}
+
+.submitButton {
+  width: 100%;
+  margin-top: 2rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .stepIndicator {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .selectionGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .stepButtons {
+    flex-direction: column;
+  }
+}

@@ -122,7 +122,9 @@ export function GameDetailClient({ game }: GameDetailClientProps) {
           {!showLeaderboard && (
             <Link
               className={styles.highlightAction}
-              href={`/lista-nomi?game=${encodeURIComponent(game.id)}`}
+              href={`${
+                game.isOwner ? "/game-setup" : "/play"
+              }?game=${encodeURIComponent(game.id)}`}
             >
               Compila la tua lista dei nomi
             </Link>
