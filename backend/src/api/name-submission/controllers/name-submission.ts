@@ -57,46 +57,51 @@ export default factories.createCoreController(
         return ctx.badRequest("ID partita mancante.");
       }
 
-      // Check if user has access to this game
-      const game = (await strapi.entityService.findOne(
-        "api::game.game",
-        Number(gameId),
-        {
-          populate: DEFAULT_POPULATE,
+      try {
+        // Check if user has access to this game
+        const game = (await strapi.entityService.findOne(
+          "api::game.game",
+          Number(gameId),
+          {
+            populate: DEFAULT_POPULATE,
+          }
+        )) as any;
+
+        if (!game) {
+          return ctx.notFound("Partita non trovata.");
         }
-      )) as any;
 
-      if (!game) {
-        return ctx.notFound("Partita non trovata.");
-      }
+        const isOwner = game.owner?.id === user.id;
+        const isParticipant = Array.isArray(game.participants)
+          ? game.participants.some((p: any) => p.id === user.id)
+          : false;
 
-      const isOwner = game.owner?.id === user.id;
-      const isParticipant = Array.isArray(game.participants)
-        ? game.participants.some((p: any) => p.id === user.id)
-        : false;
-
-      if (!isOwner && !isParticipant) {
-        return ctx.forbidden("Non hai accesso a questa partita.");
-      }
-
-      // Get only the current user's submission for this game
-      const submissions = await strapi.entityService.findMany(
-        "api::name-submission.name-submission",
-        {
-          filters: {
-            game: { id: Number(gameId) },
-            submitter: { id: user.id },
-          },
-          populate: {
-            submitter: true,
-            game: true,
-          },
-          sort: "createdAt:asc",
+        if (!isOwner && !isParticipant) {
+          return ctx.forbidden("Non hai accesso a questa partita.");
         }
-      );
 
-      const sanitized = await this.sanitizeOutput(submissions, ctx);
-      return this.transformResponse(sanitized);
+        // Get only the current user's submission for this game
+        const submissions = await strapi.entityService.findMany(
+          "api::name-submission.name-submission",
+          {
+            filters: {
+              game: { id: Number(gameId) },
+              submitter: { id: user.id },
+            },
+            populate: {
+              submitter: true,
+              game: true,
+            },
+            sort: "createdAt:asc",
+          }
+        );
+
+        const sanitized = await this.sanitizeOutput(submissions, ctx);
+        return this.transformResponse(sanitized);
+      } catch (error) {
+        console.error("Error in name-submission find:", error);
+        return ctx.badRequest("Errore nella richiesta delle submission.");
+      }
     },
 
     async create(this: any, ctx) {

@@ -260,6 +260,14 @@
 
 /* Responsive */
 @media (max-width: 768px) {
+  .container {
+    padding: 1rem 0.75rem;
+  }
+
+  .setupContainer {
+    padding: 1.5rem 1rem;
+  }
+
   .stepIndicator {
     flex-direction: column;
     gap: 0.5rem;

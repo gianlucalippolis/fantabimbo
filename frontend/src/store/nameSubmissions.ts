@@ -3,20 +3,14 @@ import api from "../lib/axios";
 
 interface NameSubmission {
   id: number;
-  attributes: {
-    names: string[];
-    submitterType: "parent" | "participant";
-    isParentPreference: boolean;
-    submitter: {
-      data: {
-        id: number;
-      };
-    };
-    game: {
-      data: {
-        id: number;
-      };
-    };
+  names: string[];
+  submitterType: "parent" | "participant";
+  isParentPreference: boolean;
+  submitter: {
+    id: number;
+  };
+  game: {
+    id: number;
   };
 }
 
@@ -47,7 +41,7 @@ export const fetchNameSubmissions = createAsyncThunk(
     // Il backend ora ritorna solo la submission dell'utente corrente
     const submissions = response.data.data;
     const userSubmission = submissions.length > 0 ? submissions[0] : null;
-    const userNames = userSubmission?.attributes?.names || null;
+    const userNames = userSubmission?.names || null;
 
     // Debug info removed for production build
 
@@ -171,9 +165,7 @@ const nameSubmissionsSlice = createSlice({
         // Se il payload esiste, aggiorna o aggiungi la submission
         if (action.payload) {
           const existingIndex = state.submissions.findIndex(
-            (sub) =>
-              sub.attributes?.submitter?.data?.id ===
-              action.payload.attributes?.submitter?.data?.id
+            (sub) => sub.submitter?.id === action.payload.submitter?.id
           );
 
           if (existingIndex >= 0) {

@@ -136,7 +136,29 @@ export default factories.createCoreController(
         return ctx.forbidden("Non hai accesso a questa partita.");
       }
 
-      const sanitized = await this.sanitizeOutput(game, ctx);
+      // Filtra i dati in base al ruolo dell'utente
+      let responseData;
+
+      if (isOwner) {
+        // Per il genitore: tutti i dati
+        responseData = game;
+      } else {
+        // Per i giocatori: solo dati non sensibili
+        responseData = {
+          id: game.id,
+          name: game.name,
+          description: game.description,
+          prize: game.prize,
+          revealAt: game.revealAt,
+          allNames: game.allNames, // Solo i 12 nomi disordinati
+          selectedCount: game.selectedNames ? game.selectedNames.length : 0, // Numero di nomi da selezionare
+          owner: game.owner,
+          participants: game.participants,
+          // NON includere selectedNames e altri dati sensibili
+        };
+      }
+
+      const sanitized = await this.sanitizeOutput(responseData, ctx);
       return this.transformResponse(sanitized);
     },
 
