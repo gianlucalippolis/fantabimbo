@@ -36,8 +36,6 @@ const initialState: NameSubmissionsState = {
   error: null,
 };
 
-console.log("NameSubmissions store initialized with:", initialState);
-
 // Async thunk per caricare le submissions di un game e filtrare per utente
 export const fetchNameSubmissions = createAsyncThunk(
   "nameSubmissions/fetchByGame",
@@ -51,11 +49,7 @@ export const fetchNameSubmissions = createAsyncThunk(
     const userSubmission = submissions.length > 0 ? submissions[0] : null;
     const userNames = userSubmission?.attributes?.names || null;
 
-    console.log("fetchNameSubmissions response:", {
-      submissions,
-      userSubmission,
-      userNames,
-    });
+    // Debug info removed for production build
 
     return {
       allSubmissions: submissions,
@@ -95,11 +89,7 @@ export const saveNameSubmission = createAsyncThunk(
     try {
       const filteredNames = names.filter((name) => name.trim().length > 0);
 
-      console.log("Saving submission with data:", {
-        gameId: Number(gameId),
-        names: filteredNames,
-        submitterType,
-      });
+      // Save operation in progress
 
       const response = await api.post("/api/name-submissions", {
         data: {
@@ -111,7 +101,7 @@ export const saveNameSubmission = createAsyncThunk(
         },
       });
 
-      console.log("Save response:", response.data);
+      // Save completed successfully
       return response.data.data;
     } catch (error: unknown) {
       // Extract error message from backend response
@@ -123,7 +113,7 @@ export const saveNameSubmission = createAsyncThunk(
         err.response?.data?.error?.message ||
         err.message ||
         "Impossibile salvare la lista.";
-      console.error("Save error:", errorMessage);
+      // Error handled in rejected case
       return rejectWithValue(errorMessage);
     }
   }
@@ -147,10 +137,7 @@ const nameSubmissionsSlice = createSlice({
       .addCase(fetchNameSubmissions.fulfilled, (state, action) => {
         state.isLoading = false;
         state.submissions = action.payload.allSubmissions;
-        console.log(
-          "Loaded submissions in Redux:",
-          action.payload.allSubmissions
-        );
+        // Submissions loaded successfully
       })
       .addCase(fetchNameSubmissions.rejected, (state, action) => {
         state.isLoading = false;
@@ -165,7 +152,7 @@ const nameSubmissionsSlice = createSlice({
         state.isLoading = false;
         state.parentNames = action.payload.shuffled || [];
         state.hasParentSubmission = action.payload.hasParentSubmission || false;
-        console.log("Loaded parent names:", action.payload);
+        // Parent names loaded successfully
       })
       .addCase(fetchParentNames.rejected, (state, action) => {
         state.isLoading = false;
@@ -173,12 +160,12 @@ const nameSubmissionsSlice = createSlice({
       })
       // Save submission
       .addCase(saveNameSubmission.pending, (state) => {
-        console.log("saveNameSubmission.pending");
+        // Save operation starting
         state.isLoading = true;
         state.error = null;
       })
       .addCase(saveNameSubmission.fulfilled, (state, action) => {
-        console.log("saveNameSubmission.fulfilled", action.payload);
+        // Save operation completed
         state.isLoading = false;
 
         // Se il payload esiste, aggiorna o aggiungi la submission
@@ -191,15 +178,15 @@ const nameSubmissionsSlice = createSlice({
 
           if (existingIndex >= 0) {
             state.submissions[existingIndex] = action.payload;
-            console.log("Updated existing submission at index:", existingIndex);
+            // Updated existing submission
           } else {
             state.submissions.push(action.payload);
-            console.log("Added new submission");
+            // Added new submission
           }
         }
       })
       .addCase(saveNameSubmission.rejected, (state, action) => {
-        console.log("saveNameSubmission.rejected", action.error);
+        // Save operation failed
         state.isLoading = false;
         state.error = action.error.message || "Errore nel salvataggio";
       });
