@@ -1,0 +1,54 @@
+/* CollapsibleBox base styles - can be overridden by parent components */
+.collapsibleBox {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  margin-bottom: 16px;
+}
+
+.collapsibleSummary {
+  padding: 16px;
+  cursor: pointer;
+  font-weight: 600;
+  list-style: none;
+  user-select: none;
+  background: #f9f9f9;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+}
+
+.collapsibleSummary::-webkit-details-marker {
+  display: none;
+}
+
+.collapsibleSummary::after {
+  content: "▼";
+  font-size: 12px;
+  color: #666;
+  transition: transform 0.2s ease;
+  margin-left: 8px;
+}
+
+.collapsibleSummary:hover {
+  background: #f0f0f0;
+  border-color: #c2a083;
+}
+
+/* Quando è aperto */
+details[open] .collapsibleSummary::after {
+  transform: rotate(180deg);
+}
+
+details[open] .collapsibleSummary {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+  background: #f0f0f0;
+}
+
+.collapsibleContent {
+  padding: 16px;
+  border-top: 1px solid #eee;
+}

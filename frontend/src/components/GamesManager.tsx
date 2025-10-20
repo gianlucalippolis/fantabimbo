@@ -10,6 +10,7 @@ import { useAppDispatch, useAppSelector } from "../store/hooks";
 import { fetchGames, setUserGames } from "../store/user";
 import Countdown from "./Countdown";
 import { Button } from "./Button";
+import { CollapsibleBox } from "./CollapsibleBox";
 
 interface GamesManagerProps {
   games: GameSummary[];
@@ -332,10 +333,11 @@ export function GamesManager({
 
       <div className={styles.gamesForms}>
         {canCreateGames ? (
-          <details className={styles.createGameAccordion}>
-            <summary className={styles.createGameSummary}>
-              ➕ Crea una nuova partita
-            </summary>
+          <CollapsibleBox
+            title="Crea una nuova partita"
+            className={styles.createGameAccordion}
+            summaryClassName={styles.createGameSummary}
+          >
             <form className={styles.gamesForm} onSubmit={handleCreate}>
               <div className={styles.gamesFormRow}>
                 <label htmlFor="game-name">Nome della partita</label>
@@ -440,46 +442,51 @@ export function GamesManager({
                 {isCreating ? "Creazione in corso…" : "Crea partita"}
               </button>
             </form>
-          </details>
+          </CollapsibleBox>
         ) : (
-          <form className={styles.gamesForm} onSubmit={handleJoin}>
-            <h3>Hai un codice invito?</h3>
-            <p className={styles.gamesNotice}>
-              Solo i genitori possono creare nuove partite. Inserisci il codice
-              che ti hanno fornito per partecipare.
-            </p>
-            <div className={styles.gamesFormRow}>
-              <label htmlFor="invite-code">Codice invito</label>
-              <input
-                id="invite-code"
-                name="invite-code"
-                type="text"
-                value={joinCode}
-                onChange={(event) => {
-                  setJoinCode(event.target.value);
-                  if (joinError) {
-                    setJoinError(null);
-                  }
-                }}
-                placeholder="ES. FANTA23"
-                className={styles.gamesInput}
-                autoComplete="off"
-                pattern="[A-Za-z0-9]+"
-              />
-            </div>
-            {joinError ? (
-              <div className={styles.gamesError} role="alert">
-                {joinError}
+          <CollapsibleBox
+            title="Hai un codice invito?"
+            className={styles.createGameAccordion}
+            summaryClassName={styles.createGameSummary}
+          >
+            <form className={styles.gamesForm} onSubmit={handleJoin}>
+              <p className={styles.gamesNotice}>
+                Solo i genitori possono creare nuove partite. Inserisci il
+                codice che ti hanno fornito per partecipare.
+              </p>
+              <div className={styles.gamesFormRow}>
+                <label htmlFor="invite-code">Codice invito</label>
+                <input
+                  id="invite-code"
+                  name="invite-code"
+                  type="text"
+                  value={joinCode}
+                  onChange={(event) => {
+                    setJoinCode(event.target.value);
+                    if (joinError) {
+                      setJoinError(null);
+                    }
+                  }}
+                  placeholder="ES. FANTA23"
+                  className={styles.gamesInput}
+                  autoComplete="off"
+                  pattern="[A-Za-z0-9]+"
+                />
               </div>
-            ) : null}
-            <button
-              type="submit"
-              className={styles.gamesSecondaryButton}
-              disabled={isJoining}
-            >
-              {isJoining ? "Accesso in corso…" : "Unisciti alla partita"}
-            </button>
-          </form>
+              {joinError ? (
+                <div className={styles.gamesError} role="alert">
+                  {joinError}
+                </div>
+              ) : null}
+              <button
+                type="submit"
+                className={styles.gamesSecondaryButton}
+                disabled={isJoining}
+              >
+                {isJoining ? "Accesso in corso…" : "Unisciti alla partita"}
+              </button>
+            </form>
+          </CollapsibleBox>
         )}
       </div>
 
@@ -592,47 +599,47 @@ export function GamesManager({
                 </div>
 
                 {/* Sezione invito */}
-                <details className={styles.gameInviteSection}>
-                  <summary className={styles.gameInviteSummary}>
-                    Condividi invito
-                  </summary>
-                  <div className={styles.gameInviteContent}>
-                    <div className={styles.gameInviteInput}>
-                      <label htmlFor={`invite-link-${game.id}`}>
-                        Link invito
-                      </label>
-                      <input
-                        id={`invite-link-${game.id}`}
-                        readOnly
-                        value={inviteLink}
-                        className={styles.gamesInput}
-                        onFocus={(event) => event.target.select()}
-                        aria-label={`Link invito per ${game.name}`}
-                      />
-                    </div>
-                    <div className={styles.gameInviteActions}>
+                <CollapsibleBox
+                  title="Condividi invito"
+                  className={styles.gameInviteSection}
+                  summaryClassName={styles.gameInviteSummary}
+                  contentClassName={styles.gameInviteContent}
+                >
+                  <div className={styles.gameInviteInput}>
+                    <label htmlFor={`invite-link-${game.id}`}>
+                      Link invito
+                    </label>
+                    <input
+                      id={`invite-link-${game.id}`}
+                      readOnly
+                      value={inviteLink}
+                      className={styles.gamesInput}
+                      onFocus={(event) => event.target.select()}
+                      aria-label={`Link invito per ${game.name}`}
+                    />
+                  </div>
+                  <div className={styles.gameInviteActions}>
+                    <button
+                      type="button"
+                      className={styles.gamesSecondaryButton}
+                      onClick={() => handleCopy(inviteLink, game.id)}
+                    >
+                      {copiedGameId === game.id ? "✓ Copiato!" : "Copia link"}
+                    </button>
+                    {game.isOwner ? (
                       <button
                         type="button"
-                        className={styles.gamesSecondaryButton}
-                        onClick={() => handleCopy(inviteLink, game.id)}
+                        className={styles.gamesTertiaryButton}
+                        onClick={() => handleRegenerate(game.id)}
+                        disabled={regeneratingId === game.id}
                       >
-                        {copiedGameId === game.id ? "✓ Copiato!" : "Copia link"}
+                        {regeneratingId === game.id
+                          ? "Rigenerazione…"
+                          : "Nuovo codice"}
                       </button>
-                      {game.isOwner ? (
-                        <button
-                          type="button"
-                          className={styles.gamesTertiaryButton}
-                          onClick={() => handleRegenerate(game.id)}
-                          disabled={regeneratingId === game.id}
-                        >
-                          {regeneratingId === game.id
-                            ? "Rigenerazione…"
-                            : "Nuovo codice"}
-                        </button>
-                      ) : null}
-                    </div>
+                    ) : null}
                   </div>
-                </details>
+                </CollapsibleBox>
 
                 {/* Pulsante elimina partita (solo proprietario) */}
                 {game.isOwner ? (
