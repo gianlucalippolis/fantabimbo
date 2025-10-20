@@ -156,21 +156,14 @@ export const authOptions: NextAuthOptions = {
   ],
   callbacks: {
     async jwt({ token, user, account }) {
-      console.log("JWT callback - token:", token);
-      console.log("JWT callback - user:", user);
-      console.log("JWT callback - account:", account);
       const mutableToken = token as ExtendedJWT;
 
       if (user) {
         // Se è un login con Google
         if (account?.provider === "google") {
-          console.log("Login con Google - access_token:", account.access_token);
-          console.log("Login con Google - user profile:", user);
-
           // Registra o recupera l'utente su Strapi
           try {
             const strapiCallbackUrl = `${STRAPI_API_URL}/api/auth/${account.provider}/callback?access_token=${account.access_token}`;
-            console.log("Chiamata a Strapi:", strapiCallbackUrl);
 
             const strapiResponse = await fetch(strapiCallbackUrl, {
               method: "GET",
@@ -179,9 +172,7 @@ export const authOptions: NextAuthOptions = {
               },
             });
 
-            console.log("Strapi response status:", strapiResponse.status);
             const strapiData = await strapiResponse.json();
-            console.log("Strapi response data:", strapiData);
 
             if (!strapiResponse.ok) {
               console.error("Errore risposta Strapi:", strapiData);
@@ -192,23 +183,14 @@ export const authOptions: NextAuthOptions = {
             }
 
             if (strapiData.jwt && strapiData.user) {
-              console.log("JWT di Strapi ottenuto con successo");
-
               // Verifica se firstName e lastName sono presenti
               const hasFirstName =
                 strapiData.user.firstName && strapiData.user.firstName.trim();
               const hasLastName =
                 strapiData.user.lastName && strapiData.user.lastName.trim();
 
-              console.log("Utente ha firstName:", hasFirstName);
-              console.log("Utente ha lastName:", hasLastName);
-
               // Se mancano nome o cognome, aggiornali con i dati di Google
               if (!hasFirstName || !hasLastName) {
-                console.log(
-                  "Nome o cognome mancanti, aggiornamento con dati Google..."
-                );
-
                 // Estrai nome e cognome dal nome completo di Google
                 const fullName = user.name || "";
                 const nameParts = fullName.split(" ");
@@ -240,7 +222,6 @@ export const authOptions: NextAuthOptions = {
 
                   if (updateResponse.ok) {
                     const updatedUser = await updateResponse.json();
-                    console.log("Utente aggiornato con successo:", updatedUser);
                     strapiData.user.firstName = updatedUser.firstName;
                     strapiData.user.lastName = updatedUser.lastName;
                   } else {

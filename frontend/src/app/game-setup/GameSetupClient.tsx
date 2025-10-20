@@ -62,18 +62,12 @@ function SetupGiocoContent() {
         const gameData = response.data.data;
         setGame(gameData);
 
-        console.log("🔍 Dati caricati dal backend:", {
-          allNames: gameData?.allNames,
-          selectedNames: gameData?.selectedNames,
-        });
-
         // Se ci sono già dati salvati, caricali
         if (gameData?.allNames) {
           const loadedNames = Array.from(
             { length: 12 },
             (_, i) => gameData.allNames[i] || ""
           );
-          console.log("📝 Nomi caricati nello stato:", loadedNames);
           setAllNames(loadedNames);
         }
 
@@ -170,8 +164,6 @@ function SetupGiocoContent() {
       return;
     }
 
-    console.log("💾 Salvataggio Step 1 - allNames:", allNames);
-
     setIsSaving(true);
     try {
       // Salva la lista completa di nomi
@@ -180,9 +172,6 @@ function SetupGiocoContent() {
           allNames: allNames,
         },
       });
-
-      console.log("✅ Risposta backend Step 1:", response.data);
-
       setCurrentStep(2);
       setPopup({
         isVisible: true,

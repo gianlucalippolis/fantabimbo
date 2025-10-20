@@ -47,12 +47,9 @@ export default function Leaderboard({ gameId }: LeaderboardProps) {
         const response = await api.get(
           `/api/name-submissions/calculate-victory/${gameId}`
         );
-        console.log("=== Leaderboard API Response ===");
-        console.log("Full response:", JSON.stringify(response.data, null, 2));
 
         // Il backend Strapi wrappa la risposta in { data: {...}, meta: {} }
         const leaderboardData = response.data.data || response.data;
-        console.log("Extracted leaderboard data:", leaderboardData);
 
         setData(leaderboardData);
       } catch (err: unknown) {
@@ -83,11 +80,6 @@ export default function Leaderboard({ gameId }: LeaderboardProps) {
   }
 
   if (!data || !data.babyName) {
-    console.log("=== NO DATA OR NO BABY NAME ===");
-    console.log("data exists:", !!data);
-    console.log("data.babyName:", data?.babyName);
-    console.log("Full data object:", data);
-
     return (
       <div className={styles.container}>
         <div className={styles.noData}>

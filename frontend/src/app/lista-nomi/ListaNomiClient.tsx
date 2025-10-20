@@ -137,14 +137,6 @@ function ListaNomiContent() {
 
   // Quando arrivano i dati da Redux, aggiorna lo stato locale
   useEffect(() => {
-    console.log("🔍 Lista nomi - stato Redux:", {
-      isParent,
-      hasParentSubmission,
-      parentNamesLength: parentNames.length,
-      parentNames,
-      submissions: submissions.length,
-    });
-
     // Se è un giocatore e ci sono i nomi del genitore, usa quelli come base
     if (!isParent && hasParentSubmission && parentNames.length > 0) {
       // Se il giocatore ha già una submission, caricala
@@ -161,7 +153,6 @@ function ListaNomiContent() {
             (_, index) => loadedNames[index] || ""
           );
           setNames(fullNames);
-          console.log("Giocatore - nomi submission caricati:", fullNames);
           return;
         }
       }
@@ -172,10 +163,6 @@ function ListaNomiContent() {
         (_, index) => parentNames[index] || ""
       );
       setNames(fullNames);
-      console.log(
-        "Giocatore - nomi del genitore (shuffled) caricati:",
-        fullNames
-      );
     }
     // Se è il genitore, carica la sua submission
     else if (isParent && submissions.length > 0) {
@@ -185,15 +172,12 @@ function ListaNomiContent() {
         loadedNames = (submissions[0] as any).names;
       }
 
-      console.log("Genitore - loaded names:", loadedNames);
-
       if (loadedNames && Array.isArray(loadedNames)) {
         const fullNames = Array.from(
           { length: 10 },
           (_, index) => loadedNames[index] || ""
         );
         setNames(fullNames);
-        console.log("Genitore - nomi caricati e impostati:", fullNames);
       }
     }
   }, [submissions, parentNames, hasParentSubmission, isParent]);
@@ -284,8 +268,6 @@ function ListaNomiContent() {
         })
       ).unwrap();
 
-      console.log("Save successful, result:", result);
-
       setPopup({
         isVisible: true,
         type: "success",
@@ -293,10 +275,6 @@ function ListaNomiContent() {
         message: "Lista salvata con successo!",
       });
     } catch (error) {
-      console.error("Errore catturato nel catch:", error);
-      console.error("Error type:", typeof error);
-      console.error("Error details:", JSON.stringify(error, null, 2));
-
       // Extract error message - it's the payload from rejectWithValue
       const errorMessage =
         typeof error === "string" ? error : "Impossibile salvare la lista.";

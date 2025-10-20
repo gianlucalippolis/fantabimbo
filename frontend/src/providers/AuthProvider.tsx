@@ -125,7 +125,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
         // No need to fetch here to avoid unnecessary API calls on every page
 
         setIsHydrated(true);
-        console.log("✅ Redux store hydrated successfully from AuthProvider");
       } catch (err) {
         console.error("❌ Error hydrating Redux store:", err);
         setError(err instanceof Error ? err.message : "Errore sconosciuto");

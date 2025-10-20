@@ -90,8 +90,6 @@ export function useReduxHydration() {
         if (jwt) {
           dispatch(fetchGames(jwt));
         }
-
-        console.log("✅ Redux store hydrated successfully from session");
       } catch (err) {
         console.error("❌ Error hydrating Redux store:", err);
         setError(err instanceof Error ? err.message : "Errore sconosciuto");

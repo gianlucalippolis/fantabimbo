@@ -100,16 +100,11 @@ export default function ProfiloClient() {
       const formData = new FormData();
       formData.append("avatar", file);
 
-      console.log("Uploading avatar for user:", user.id);
-      console.log("File:", file.name, file.type, file.size);
-
       const response = await api.post("/api/user-profile/avatar", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
       });
-
-      console.log("Upload response:", response.data);
 
       // Update Redux store with new avatar
       if (response.data?.avatar && user) {

@@ -278,9 +278,6 @@ export default factories.createCoreController(
         }
       )) as any[];
 
-      console.log("=== DEBUG calculateVictory ===");
-      console.log("Total submissions found:", submissions.length);
-
       // **NUOVA LOGICA**: Il genitore ha salvato i nomi selezionati nel campo selectedNames del Game
       // Recuperiamo questi nomi dal game invece che dalla submission
       const parentSelectedNames =
@@ -396,12 +393,6 @@ export default factories.createCoreController(
         babyName,
         gameRevealed,
       };
-
-      console.log("=== Result to return ===");
-      console.log("Baby name:", babyName);
-      console.log("Parent selected names:", parentSelectedNames);
-      console.log("Winners count:", winners.length);
-      console.log("Game revealed:", gameRevealed);
 
       return this.transformResponse(result);
     },
