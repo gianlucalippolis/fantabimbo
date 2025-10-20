@@ -154,7 +154,9 @@ export function GameDetailClient({ game }: GameDetailClientProps) {
         {game.isOwner && (
           <section className={styles.section}>
             <h2 className={styles.sectionTitle}>Data di rivelazione</h2>
-            <p className={styles.currentReveal}>Attuale: {currentRevealLabel}</p>
+            <p className={styles.currentReveal}>
+              Attuale: {currentRevealLabel}
+            </p>
             <Button
               onClick={() => setIsPopupOpen(true)}
               variant="primary"

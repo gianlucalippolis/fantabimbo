@@ -89,7 +89,7 @@ export default function ProfiloClient() {
         maxHeight: 800,
         quality: 0.85,
         correctOrientation: true,
-        resize: true
+        resize: true,
       });
 
       // Create preview
@@ -102,8 +102,8 @@ export default function ProfiloClient() {
       // Upload processed file
       await uploadAvatar(processedFile);
     } catch (error) {
-      console.error('Error processing image:', error);
-      setUploadError('Errore nel processamento dell\'immagine. Riprova.');
+      console.error("Error processing image:", error);
+      setUploadError("Errore nel processamento dell'immagine. Riprova.");
       setIsUploading(false);
     }
   }
