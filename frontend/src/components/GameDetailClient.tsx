@@ -83,16 +83,35 @@ export function GameDetailClient({ game }: GameDetailClientProps) {
             <BackIcon size={20} /> Torna alla dashboard
           </Button>
           <h1 className={styles.title}>{game.name}</h1>
-          <p className={styles.subtitle}>
-            Organizzata da{" "}
-            <strong>
-              {game.owner?.firstName || game.owner?.lastName
-                ? [game.owner?.firstName, game.owner?.lastName]
-                    .filter(Boolean)
-                    .join(" ")
-                : game.owner?.email || "Genitore"}
-            </strong>
-          </p>
+          <div className={styles.ownerInfo}>
+            <Avatar
+              imageUrl={getStrapiMediaURL(
+                game.owner?.avatar?.formats?.thumbnail?.url ||
+                  game.owner?.avatar?.url ||
+                  null
+              )}
+              name={
+                game.owner?.firstName || game.owner?.lastName
+                  ? [game.owner?.firstName, game.owner?.lastName]
+                      .filter(Boolean)
+                      .join(" ")
+                  : game.owner?.email || "Genitore"
+              }
+              size="medium"
+            />
+            <div className={styles.ownerDetails}>
+              <p className={styles.subtitle}>
+                Organizzata da{" "}
+                <strong>
+                  {game.owner?.firstName || game.owner?.lastName
+                    ? [game.owner?.firstName, game.owner?.lastName]
+                        .filter(Boolean)
+                        .join(" ")
+                    : game.owner?.email || "Genitore"}
+                </strong>
+              </p>
+            </div>
+          </div>
           {game.prize ? (
             <div className={styles.prize}>
               <span className={styles.prizeLabel}>Premio:</span>
@@ -131,10 +150,11 @@ export function GameDetailClient({ game }: GameDetailClientProps) {
           )}
         </div>
 
-        <section className={styles.section}>
-          <h2 className={styles.sectionTitle}>Data di rivelazione</h2>
-          <p className={styles.currentReveal}>Attuale: {currentRevealLabel}</p>
-          {game.isOwner ? (
+        {/* Sezione Data di rivelazione - Solo per l'organizzatore */}
+        {game.isOwner && (
+          <section className={styles.section}>
+            <h2 className={styles.sectionTitle}>Data di rivelazione</h2>
+            <p className={styles.currentReveal}>Attuale: {currentRevealLabel}</p>
             <Button
               onClick={() => setIsPopupOpen(true)}
               variant="primary"
@@ -142,12 +162,8 @@ export function GameDetailClient({ game }: GameDetailClientProps) {
             >
               Modifica data
             </Button>
-          ) : (
-            <p className={styles.noticeInfo}>
-              Solo l&apos;organizzatore può modificare la data di rivelazione.
-            </p>
-          )}
-        </section>
+          </section>
+        )}
 
         <RevealDatePopup
           isOpen={isPopupOpen}

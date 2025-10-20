@@ -12,6 +12,7 @@ import type { AxiosError } from "axios";
 import LoadingScreen from "../../components/LoadingScreen";
 import BackIcon from "../../components/icons/BackIcon";
 import { Button } from "../../components/Button";
+import { processImage } from "../../lib/imageUtils";
 
 export default function ProfiloClient() {
   const router = useRouter();
@@ -78,15 +79,33 @@ export default function ProfiloClient() {
       return;
     }
 
-    // Create preview
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setPreviewUrl(reader.result as string);
-    };
-    reader.readAsDataURL(file);
+    try {
+      setIsUploading(true);
+      setUploadError(null);
 
-    // Upload file
-    await uploadAvatar(file);
+      // Processa l'immagine: corregge orientamento EXIF e ridimensiona
+      const processedFile = await processImage(file, {
+        maxWidth: 800,
+        maxHeight: 800,
+        quality: 0.85,
+        correctOrientation: true,
+        resize: true
+      });
+
+      // Create preview
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPreviewUrl(reader.result as string);
+      };
+      reader.readAsDataURL(processedFile);
+
+      // Upload processed file
+      await uploadAvatar(processedFile);
+    } catch (error) {
+      console.error('Error processing image:', error);
+      setUploadError('Errore nel processamento dell\'immagine. Riprova.');
+      setIsUploading(false);
+    }
   }
 
   async function uploadAvatar(file: File) {
