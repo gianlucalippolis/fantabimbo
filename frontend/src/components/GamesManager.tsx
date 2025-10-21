@@ -151,6 +151,16 @@ export function GamesManager({
 
     const revealAt = normalizeRevealDate(trimmedRevealDate, trimmedRevealTime);
 
+    // Validate reveal date is in the future
+    if (revealAt) {
+      const revealDate = new Date(revealAt);
+      const now = new Date();
+      if (revealDate <= now) {
+        setCreateError("La data di rivelazione deve essere nel futuro.");
+        return;
+      }
+    }
+
     try {
       setIsCreating(true);
       setCreateError(null); // Clear previous errors
