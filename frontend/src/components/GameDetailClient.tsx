@@ -27,6 +27,13 @@ export function GameDetailClient({ game }: GameDetailClientProps) {
   const [showLeaderboard, setShowLeaderboard] = useState(false);
   const [isPopupOpen, setIsPopupOpen] = useState(false);
 
+  const handleCountdownExpire = () => {
+    // Aspetta 2 secondi prima di mostrare la leaderboard
+    setTimeout(() => {
+      setShowLeaderboard(true);
+    }, 2000);
+  };
+
   useEffect(() => {
     setMounted(true);
     // Check if reveal date is already expired
@@ -135,7 +142,7 @@ export function GameDetailClient({ game }: GameDetailClientProps) {
             <Countdown
               targetDate={currentReveal}
               gameId={game.id}
-              onExpire={() => setShowLeaderboard(true)}
+              onExpire={handleCountdownExpire}
             />
           )}
           {!showLeaderboard && (
