@@ -167,7 +167,7 @@ function SetupGiocoContent() {
     setIsSaving(true);
     try {
       // Salva la lista completa di nomi
-      const response = await api.put(`/api/games/${gameId}`, {
+      await api.put(`/api/games/${gameId}`, {
         data: {
           allNames: allNames,
         },

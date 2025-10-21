@@ -153,6 +153,8 @@ export function GamesManager({
 
     try {
       setIsCreating(true);
+      setCreateError(null); // Clear previous errors
+
       await api.post("/api/games", {
         data: {
           name: trimmedName,
@@ -162,6 +164,7 @@ export function GamesManager({
         },
       });
 
+      // Se arriviamo qui, la creazione è andata a buon fine
       await dispatch(fetchGames(userId)).unwrap();
       setCreateForm(INITIAL_CREATE_STATE);
       setRevealDate("");
@@ -169,17 +172,36 @@ export function GamesManager({
       setCreateError(null);
     } catch (error) {
       console.error("Game creation failed", error);
-      const err = error as AxiosError<{ error?: { message?: string } }>;
+      const err = error as AxiosError<{
+        error?: { message?: string };
+        message?: string;
+      }>;
+
+      console.log("Error details:", {
+        status: err.response?.status,
+        data: err.response?.data,
+        message: err.message,
+      });
+
+      // Previeni eventuali alert automatici del browser
+      if (typeof event?.preventDefault === "function") {
+        event.preventDefault();
+      }
+
       if (err.response?.status === 409) {
-        setCreateError(
+        // Conflitto - nome già esistente
+        const conflictMessage =
           err.response.data?.error?.message ??
-            "Hai già una partita con questo nome."
-        );
+          err.response.data?.message ??
+          "Hai già creato una partita con questo nome. Usa un nome diverso.";
+        setCreateError(conflictMessage);
       } else {
-        setCreateError(
+        // Altri errori
+        const genericMessage =
           err.response?.data?.error?.message ??
-            "Impossibile creare la partita. Riprova più tardi."
-        );
+          err.response?.data?.message ??
+          "Impossibile creare la partita. Riprova più tardi.";
+        setCreateError(genericMessage);
       }
     } finally {
       setIsCreating(false);
