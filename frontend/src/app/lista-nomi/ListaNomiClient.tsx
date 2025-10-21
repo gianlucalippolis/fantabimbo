@@ -141,11 +141,7 @@ function ListaNomiContent() {
     if (!isParent && hasParentSubmission && parentNames.length > 0) {
       // Se il giocatore ha già una submission, caricala
       if (submissions.length > 0) {
-        let loadedNames = submissions[0].attributes?.names;
-        if (!loadedNames) {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          loadedNames = (submissions[0] as any).names;
-        }
+        const loadedNames = submissions[0].names;
 
         if (loadedNames && Array.isArray(loadedNames)) {
           const fullNames = Array.from(
@@ -166,11 +162,7 @@ function ListaNomiContent() {
     }
     // Se è il genitore, carica la sua submission
     else if (isParent && submissions.length > 0) {
-      let loadedNames = submissions[0].attributes?.names;
-      if (!loadedNames) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        loadedNames = (submissions[0] as any).names;
-      }
+      const loadedNames = submissions[0].names;
 
       if (loadedNames && Array.isArray(loadedNames)) {
         const fullNames = Array.from(
@@ -260,7 +252,7 @@ function ListaNomiContent() {
     if (isLoading) return;
 
     try {
-      const result = await dispatch(
+      await dispatch(
         saveNameSubmission({
           gameId,
           names: names,
