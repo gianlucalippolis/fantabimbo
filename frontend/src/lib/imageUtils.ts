@@ -2,11 +2,38 @@
  * Utility per gestire e correggere le immagini caricate, inclusa la rotazione EXIF
  */
 
+import imageCompression from "browser-image-compression";
+
 /**
  * Corregge la rotazione dell'immagine basandosi sui dati EXIF
  * Risolve il problema delle foto caricate dall'iPhone che appaiono ruotate
+ * Usa browser-image-compression per una gestione robusta dell'orientamento
  */
-export function correctImageOrientation(file: File): Promise<File> {
+export async function correctImageOrientation(file: File): Promise<File> {
+  try {
+    // browser-image-compression gestisce automaticamente l'orientamento EXIF
+    const options = {
+      maxSizeMB: 5,
+      maxWidthOrHeight: 1920,
+      useWebWorker: true,
+      exifOrientation: 1, // Normalizza sempre a orientamento 1 (standard)
+    };
+
+    const compressedFile = await imageCompression(file, options);
+    console.log(
+      "✅ Image orientation corrected with browser-image-compression"
+    );
+    return compressedFile;
+  } catch (error) {
+    console.error("Error correcting image orientation:", error);
+    return file;
+  }
+}
+
+/**
+ * Versione legacy - mantenuta per compatibilità ma non più usata
+ */
+export function correctImageOrientationLegacy(file: File): Promise<File> {
   return new Promise((resolve) => {
     // Se il file non è un'immagine, restituisci il file originale
     if (!file.type.startsWith("image/")) {
@@ -27,11 +54,19 @@ export function correctImageOrientation(file: File): Promise<File> {
       // Leggi l'orientamento EXIF dal file
       const orientation = getImageOrientation(arrayBuffer);
 
+      console.log("📐 EXIF Orientation detected:", orientation);
+
       // Se non c'è orientamento EXIF o è già corretto (1), restituisci il file originale
       if (!orientation || orientation === 1) {
+        console.log(
+          "✓ No correction needed, orientation is",
+          orientation || "not found"
+        );
         resolve(file);
         return;
       }
+
+      console.log("🔄 Applying correction for orientation:", orientation);
 
       // Crea un'immagine per processare il file
       const img = new Image();
@@ -212,8 +247,35 @@ function readOrientationFromExif(
 
 /**
  * Ridimensiona un'immagine mantenendo l'aspect ratio
+ * Usa browser-image-compression per una gestione robusta
  */
-export function resizeImage(
+export async function resizeImage(
+  file: File,
+  maxWidth: number = 1200,
+  maxHeight: number = 1200,
+  quality: number = 0.8
+): Promise<File> {
+  try {
+    const options = {
+      maxSizeMB: 5,
+      maxWidthOrHeight: Math.max(maxWidth, maxHeight),
+      useWebWorker: true,
+      initialQuality: quality,
+    };
+
+    const resizedFile = await imageCompression(file, options);
+    console.log("✅ Image resized with browser-image-compression");
+    return resizedFile;
+  } catch (error) {
+    console.error("Error resizing image:", error);
+    return file;
+  }
+}
+
+/**
+ * Versione legacy - mantenuta per compatibilità ma non più usata
+ */
+export function resizeImageLegacy(
   file: File,
   maxWidth: number = 1200,
   maxHeight: number = 1200,
@@ -282,7 +344,8 @@ export function resizeImage(
 }
 
 /**
- * Processa un'immagine: corregge l'orientamento EXIF e opzionalmente ridimensiona
+ * Processa un'immagine: corregge l'orientamento EXIF e ridimensiona
+ * Usa browser-image-compression per una gestione completa e robusta
  */
 export async function processImage(
   file: File,
@@ -297,27 +360,39 @@ export async function processImage(
   const {
     maxWidth = 1200,
     maxHeight = 1200,
-    quality = 0.8,
+    quality = 0.85,
     correctOrientation = true,
-    resize = true,
   } = options;
 
-  let processedFile = file;
+  try {
+    console.log("🔄 Processing image:", file.name, file.type, file.size);
 
-  // Step 1: Correggi l'orientamento EXIF se richiesto
-  if (correctOrientation) {
-    processedFile = await correctImageOrientation(processedFile);
-  }
+    // Usa browser-image-compression che gestisce tutto automaticamente
+    const compressionOptions = {
+      maxSizeMB: 5,
+      maxWidthOrHeight: Math.max(maxWidth, maxHeight),
+      useWebWorker: true,
+      initialQuality: quality,
+      // Questa opzione forza la correzione dell'orientamento EXIF
+      exifOrientation: correctOrientation ? undefined : 1,
+    };
 
-  // Step 2: Ridimensiona se richiesto
-  if (resize) {
-    processedFile = await resizeImage(
-      processedFile,
-      maxWidth,
-      maxHeight,
-      quality
+    const processedFile = await imageCompression(file, compressionOptions);
+
+    console.log(
+      "✅ Image processed:",
+      processedFile.name,
+      processedFile.type,
+      processedFile.size,
+      "Original:",
+      file.size,
+      "Reduction:",
+      Math.round(((file.size - processedFile.size) / file.size) * 100) + "%"
     );
-  }
 
-  return processedFile;
+    return processedFile;
+  } catch (error) {
+    console.error("❌ Error processing image:", error);
+    return file;
+  }
 }
