@@ -23,8 +23,8 @@ export function UserHydrator({ profile }: UserHydratorProps) {
       dispatch(setUserProfile(profile));
 
       // Fetch games from the store
-      if (profile.jwt) {
-        dispatch(fetchGames(profile.jwt));
+      if (profile.id) {
+        dispatch(fetchGames(profile.id));
       }
     }
   }, [dispatch, profile]);
