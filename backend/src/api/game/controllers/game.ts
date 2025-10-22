@@ -441,6 +441,11 @@ export default factories.createCoreController(
         filters: {
           inviteCode,
         },
+        populate: {
+          participants: {
+            fields: ["id"],
+          },
+        },
         limit: 1,
       })) as PopulatedGame[];
 
