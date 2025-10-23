@@ -7,7 +7,7 @@ import styles from "../app/page.module.css";
 import type { GameSummary } from "types/game";
 import api from "../lib/axios";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
-import { fetchGames, setUserGames } from "../store/user";
+import { fetchGames, joinGameByCode, setUserGames } from "../store/user";
 import Countdown from "./Countdown";
 import { Button } from "./Button";
 import { CollapsibleBox } from "./CollapsibleBox";
@@ -224,31 +224,20 @@ export function GamesManager({
       return;
     }
 
-    const trimmedCode = joinCode.trim().toUpperCase();
-    if (!trimmedCode) {
-      setJoinError("Inserisci un codice invito valido.");
-      return;
-    }
-
     try {
       setIsJoining(true);
-      const response = await api.post("/api/games/join", {
-        inviteCode: trimmedCode,
-      });
-
-      if (!response?.data) {
-        setJoinError("Codice invito non valido.");
-        return;
-      }
-
-      setJoinCode("");
       setJoinError(null);
-      await dispatch(fetchGames(userId));
+      await dispatch(
+        joinGameByCode({
+          inviteCode: joinCode,
+          userId,
+        })
+      ).unwrap();
+      setJoinCode("");
     } catch (error) {
-      console.error("Game join failed", error);
       setJoinError(
-        error instanceof Error
-          ? error.message
+        typeof error === "string"
+          ? error
           : "Impossibile partecipare alla partita. Riprova più tardi."
       );
     } finally {

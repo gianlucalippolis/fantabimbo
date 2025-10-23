@@ -52,9 +52,19 @@ const GAME_FIELDS = [
 const DEFAULT_POPULATE = {
   owner: {
     fields: USER_FIELDS,
+    populate: {
+      avatar: {
+        fields: ["url", "formats"],
+      },
+    },
   },
   participants: {
     fields: USER_FIELDS,
+    populate: {
+      avatar: {
+        fields: ["url", "formats"],
+      },
+    },
   },
 } as any;
 
@@ -242,14 +252,7 @@ export default factories.createCoreController(
         const entity = (await strapi.entityService.create("api::game.game", {
           data: createData as any,
           fields: GAME_FIELDS as any,
-          populate: {
-            owner: {
-              fields: USER_FIELDS,
-            },
-            participants: {
-              fields: USER_FIELDS,
-            },
-          } as any,
+          populate: DEFAULT_POPULATE,
         })) as PopulatedGame;
 
         const sanitized = await this.sanitizeOutput(entity, ctx);
@@ -402,14 +405,7 @@ export default factories.createCoreController(
           {
             data: updateData as any,
             fields: GAME_FIELDS as any,
-            populate: {
-              owner: {
-                fields: USER_FIELDS,
-              },
-              participants: {
-                fields: USER_FIELDS,
-              },
-            } as any,
+            populate: DEFAULT_POPULATE,
           }
         );
 

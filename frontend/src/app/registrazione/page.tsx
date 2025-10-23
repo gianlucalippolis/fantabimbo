@@ -2,11 +2,9 @@
 import Link from "next/link";
 import { signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { FormEvent, Suspense, useEffect, useMemo, useState } from "react";
+import { FormEvent, Suspense, useMemo, useState } from "react";
 import styles from "../../styles/Login.module.css";
 import { Button } from "components/Button";
-import { publicApi } from "../../lib/axios";
-import { joinGame } from "../../lib/games";
 
 const MIN_PASSWORD_LENGTH = 8;
 
@@ -23,17 +21,12 @@ function RegisterContent() {
   const searchParams = useSearchParams();
 
   const initialInviteCode = useMemo(() => {
-    const codeFromQueryParams = searchParams?.get("code") || "";
-    const inviteFromQueryParams = searchParams?.get("invite") || "";
-    const initialCode =
-      codeFromQueryParams.trim().toUpperCase() ??
-      inviteFromQueryParams.trim().toUpperCase() ??
-      "";
-
-    if (typeof initialCode === "string") {
-      return initialCode.trim().toUpperCase();
+    const codeParam = searchParams?.get("code") ?? searchParams?.get("invite");
+    if (typeof codeParam !== "string") {
+      return "";
     }
-    return "";
+    const trimmed = codeParam.trim();
+    return trimmed ? trimmed.toUpperCase() : "";
   }, [searchParams]);
 
   // Se c'è un codice invito nell'URL, l'utente è automaticamente un giocatore
@@ -48,80 +41,7 @@ function RegisterContent() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isCheckingInvite, setIsCheckingInvite] = useState(false);
-  const [inviteError, setInviteError] = useState<string | null>(null);
-  const [inviteGameName, setInviteGameName] = useState<string | null>(null);
-  const [inviteCode, setInviteCode] = useState("");
   const [acceptedPrivacy, setAcceptedPrivacy] = useState(false);
-  const isInviteValid =
-    form.accountType === "parent"
-      ? true
-      : Boolean(
-          inviteCode && inviteGameName && !inviteError && !isCheckingInvite
-        );
-
-  useEffect(() => {
-    setInviteCode(initialInviteCode);
-  }, [initialInviteCode]);
-
-  useEffect(() => {
-    if (form.accountType !== "player") {
-      setInviteError(null);
-      setInviteGameName(null);
-      setIsCheckingInvite(false);
-      return;
-    }
-
-    const normalizedCode = inviteCode.trim().toUpperCase();
-    if (!normalizedCode) {
-      setInviteError(null);
-      setInviteGameName(null);
-      setIsCheckingInvite(false);
-      return;
-    }
-
-    let isMounted = true;
-
-    async function validateInvite(code: string) {
-      setIsCheckingInvite(true);
-      setInviteError(null);
-      setInviteGameName(null);
-      try {
-        const response = await publicApi.get(
-          `/api/invite/validate?code=${encodeURIComponent(code)}`
-        );
-        if (!isMounted) {
-          return;
-        }
-
-        if (response.status !== 200 || response.data.data.valid === false) {
-          setInviteError("Codice invito non valido o scaduto.");
-          return;
-        }
-
-        const gameName = response.data.data.name ?? "Partita Fantanome";
-        setInviteGameName(gameName);
-        setInviteError(null);
-      } catch (validateError) {
-        console.error("Invite validation failed", validateError);
-        if (isMounted) {
-          setInviteError(
-            "Impossibile verificare il codice invito. Riprova più tardi."
-          );
-        }
-      } finally {
-        if (isMounted) {
-          setIsCheckingInvite(false);
-        }
-      }
-    }
-
-    validateInvite(normalizedCode);
-
-    return () => {
-      isMounted = false;
-    };
-  }, [inviteCode, form.accountType]);
 
   function updateField<K extends keyof RegisterFormState>(
     field: K,
@@ -136,19 +56,6 @@ function RegisterContent() {
     }
     if (success) {
       setSuccess(null);
-    }
-    if (field === "accountType") {
-      const typedValue = value as RegisterFormState["accountType"];
-      setInviteError(null);
-      setInviteGameName(null);
-      setIsCheckingInvite(false);
-      if (typedValue === "parent") {
-        setInviteCode("");
-      } else if (typedValue === "player") {
-        setInviteCode((current) => (current ? current : initialInviteCode));
-      } else {
-        setInviteCode(initialInviteCode);
-      }
     }
   }
 
@@ -185,30 +92,6 @@ function RegisterContent() {
     if (form.password !== form.confirmPassword) {
       setError("Le password non coincidono.");
       return;
-    }
-
-    const normalizedInviteCode = inviteCode.trim().toUpperCase();
-
-    if (form.accountType === "player") {
-      if (!normalizedInviteCode) {
-        setError("Inserisci un codice invito valido.");
-        return;
-      }
-
-      if (isCheckingInvite) {
-        setError("Attendi la verifica del codice invito prima di procedere.");
-        return;
-      }
-
-      if (inviteError) {
-        setError(inviteError);
-        return;
-      }
-
-      if (!inviteGameName) {
-        setError("Codice invito non valido o non verificato.");
-        return;
-      }
     }
 
     if (form.accountType !== "parent" && form.accountType !== "player") {
@@ -259,18 +142,12 @@ function RegisterContent() {
       }
 
       if (signInResult?.ok) {
-        if (form.accountType === "player" && normalizedInviteCode) {
-          try {
-            await joinGame(normalizedInviteCode);
-          } catch (joinError) {
-            console.error("Failed to join via invite code", joinError);
-            setError(
-              "Registrazione completata, ma non è stato possibile usare il codice invito. Contatta chi ti ha invitato."
-            );
-            return;
-          }
-        }
-        await router.replace("/completa-profilo");
+        const normalizedInviteCode = initialInviteCode;
+        const destination =
+          form.accountType === "player" && normalizedInviteCode
+            ? `/completa-profilo?invite=${encodeURIComponent(normalizedInviteCode)}`
+            : "/completa-profilo";
+        await router.replace(destination);
       }
     } catch (registrationError) {
       console.error("Registration failed", registrationError);
@@ -369,55 +246,13 @@ function RegisterContent() {
                 </p>
               ) : (
                 <p className={styles.noticeInfo}>
-                  Inserisci il codice invito ricevuto da un genitore per
-                  completare la registrazione.
+                  Ti chiederemo il codice invito nel passaggio successivo: se
+                  arrivi da un link con codice lo useremo automaticamente, altrimenti
+                  potrai inserirlo oppure completare l&apos;accesso e farlo più tardi.
                 </p>
               )}
             </div>
           </div>
-          {form.accountType === "player" ? (
-            <div className={styles.var}>
-              <div className={styles.labelRow}>
-                <label htmlFor="invite-code">Codice invito</label>
-              </div>
-              <div className={styles.inputGroup}>
-                <span className={styles.inputIcon} aria-hidden="true">
-                  <svg
-                    viewBox="0 0 24 24"
-                    role="img"
-                    focusable="false"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path d="M17 3a4 4 0 0 1 2.906 6.781l-1.47 1.471-1.414-1.414 1.47-1.47A2 2 0 0 0 17 5a2 2 0 0 0-1.414.586l-4.95 4.95A2 2 0 0 0 10 12a2 2 0 0 0 .586 1.414l1 1-1.414 1.414-1-1A4 4 0 0 1 9 12a4 4 0 0 1 1.172-2.828l4.95-4.95A4 4 0 0 1 17 3zm-5 7a4 4 0 0 1 1.172 2.828A4 4 0 0 1 12 15.828l-1.47 1.47 1.414 1.414 1.47-1.47A2 2 0 0 0 15 14a2 2 0 0 0-.586-1.414l-1-1L14.828 10l1 1A4 4 0 0 1 16 14a4 4 0 0 1-1.172 2.828l-4.95 4.95A4 4 0 0 1 6 20a4 4 0 0 1-2.906-6.781l1.47-1.47 1.414 1.414-1.47 1.47A2 2 0 0 0 6 18a2 2 0 0 0 1.414-.586l4.95-4.95A2 2 0 0 0 12 12a2 2 0 0 0-.586-1.414l-1-1L11.828 8l1 1z" />
-                  </svg>
-                </span>
-                <input
-                  id="invite-code"
-                  name="invite-code"
-                  type="text"
-                  value={inviteCode}
-                  className={styles.input}
-                  onChange={(event) =>
-                    setInviteCode(event.target.value.toUpperCase())
-                  }
-                  placeholder="ES. FANTA23"
-                  autoComplete="off"
-                  maxLength={12}
-                />
-              </div>
-              {isCheckingInvite ? (
-                <p className={styles.noticeInfo}>
-                  Verifica del codice in corso…
-                </p>
-              ) : inviteError ? (
-                <p className={styles.noticeError}>{inviteError}</p>
-              ) : inviteGameName ? (
-                <p className={styles.noticeSuccess}>
-                  Codice valido! Ti unirai a <strong>{inviteGameName}</strong>.
-                </p>
-              ) : null}
-            </div>
-          ) : null}
           <div className={styles.var}>
             <div className={styles.labelRow}>
               <label htmlFor="email">Email</label>
@@ -534,7 +369,7 @@ function RegisterContent() {
           <div className={styles.actions}>
             <Button
               type="submit"
-              disabled={isSubmitting || !isInviteValid || !acceptedPrivacy}
+              disabled={isSubmitting || !acceptedPrivacy}
               fullWidth
             >
               {isSubmitting ? "Registrazione in corso…" : "Registrati"}

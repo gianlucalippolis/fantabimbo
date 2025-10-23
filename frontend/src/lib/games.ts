@@ -2,31 +2,64 @@ import type { GameParticipant, GameSummary } from "types/game";
 import api from "./axios";
 import type { AxiosError } from "axios";
 
-export const joinGame = async (code: string) => {
+export interface JoinGameResult<T = unknown> {
+  data: T | null;
+  error: string | null;
+  status?: number | null;
+}
+
+export const joinGame = async <T = unknown>(
+  code: string
+): Promise<JoinGameResult<T>> => {
+  const trimmedCode = code.trim().toUpperCase();
+
+  if (!trimmedCode) {
+    return {
+      data: null,
+      error: "Inserisci un codice invito valido.",
+      status: null,
+    };
+  }
+
   try {
-    const trimmedCode = code.trim().toUpperCase();
-
-    if (!trimmedCode) {
-      throw new Error("Inserisci un codice invito valido.");
-    }
-
     const response = await api.post("/api/games/join", {
       inviteCode: trimmedCode,
     });
 
     if (!response?.data) {
-      throw new Error("Codice invito non valido.");
+      return {
+        data: null,
+        error: "Codice invito non valido.",
+        status: 404,
+      };
     }
 
-    return response.data;
+    return {
+      data: response.data as T,
+      error: null,
+      status: response.status ?? 200,
+    };
   } catch (error) {
     console.error("Game join failed", error);
     const err = error as AxiosError<{ error?: { message?: string } }>;
-    throw new Error(
-      err.response?.data?.error?.message ??
-        err.message ??
-        "Impossibile partecipare alla partita. Riprova più tardi."
-    );
+    const status = err.response?.status ?? null;
+
+    let fallbackMessage = "Impossibile partecipare alla partita. Riprova più tardi.";
+    if (status === 404) {
+      fallbackMessage = "Codice invito non valido o scaduto.";
+    } else if (status === 403 || status === 401) {
+      fallbackMessage =
+        "Non hai i permessi per usare questo codice. Contatta chi ti ha invitato.";
+    }
+
+    const apiMessage = err.response?.data?.error?.message;
+    const errorMessage = apiMessage ?? fallbackMessage ?? err.message ?? fallbackMessage;
+
+    return {
+      data: null,
+      error: errorMessage,
+      status,
+    };
   }
 };
 

@@ -66,6 +66,38 @@ export const fetchGames = createAsyncThunk<
   }
 });
 
+export const joinGameByCode = createAsyncThunk<
+  void,
+  { inviteCode: string; userId?: number | string | null },
+  { rejectValue: string }
+>("user/joinGameByCode", async ({ inviteCode, userId }, { dispatch, rejectWithValue }) => {
+  const trimmedCode = inviteCode.trim().toUpperCase();
+
+  if (!trimmedCode) {
+    return rejectWithValue("Inserisci un codice invito valido.");
+  }
+
+  try {
+    const response = await api.post("/api/games/join", {
+      inviteCode: trimmedCode,
+    });
+
+    if (!response?.data) {
+      return rejectWithValue("Codice invito non valido.");
+    }
+
+    await dispatch(fetchGames(userId ?? null));
+  } catch (error) {
+    console.error("Game join failed", error);
+    const err = error as AxiosError<{ error?: { message?: string } }>;
+    return rejectWithValue(
+      err.response?.data?.error?.message ??
+        err.message ??
+        "Impossibile partecipare alla partita. Riprova più tardi."
+    );
+  }
+});
+
 const userSlice = createSlice({
   name: "user",
   initialState,

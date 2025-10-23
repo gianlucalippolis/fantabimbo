@@ -14,14 +14,24 @@ interface PlayerScore {
   };
   score: number;
   details: {
-    namesInTop5: number; // Numero di nomi indovinati nei nomi selezionati
-    correctPositions: number; // Numero di posizioni corrette
-    perfectGuess: boolean; // true se tutti i nomi sono corretti nelle posizioni giuste
-    pointsForNames: number; // Punti per nomi indovinati (20 punti per nome)
-    pointsForPositions: number; // Punti per posizioni corrette (30 punti per posizione)
-    perfectBonus: number; // Bonus per guess perfetto (100 punti)
+    babyNameGuessed: boolean;
+    babyNameInFirstPosition: boolean;
+    correctPositions: number;
+    nearPositions: number;
+    pointsForBabyName: number;
+    pointsForCorrectPositions: number;
+    pointsForNearPositions: number;
   };
   guessedNames: string[];
+  nameBreakdown?: Array<{
+    name: string;
+    position: number;
+    correctPosition: number | null;
+    distance: number | null;
+    points: number;
+    reason: string;
+    type: 'babyNameFirst' | 'babyNameGuessed' | 'correctPosition' | 'nearPosition' | 'farPosition' | 'wrongName';
+  }>;
 }
 
 interface LeaderboardData {
@@ -50,6 +60,15 @@ export default function Leaderboard({ gameId }: LeaderboardProps) {
 
         // Il backend Strapi wrappa la risposta in { data: {...}, meta: {} }
         const leaderboardData = response.data.data || response.data;
+
+        // Debug: controlla userId duplicati
+        if (leaderboardData?.winners) {
+          const userIds = leaderboardData.winners.map((w: any) => w.userId);
+          const duplicates = userIds.filter((id: any, idx: number) => userIds.indexOf(id) !== idx);
+          if (duplicates.length > 0) {
+            console.error('[Leaderboard] Duplicate userIds found:', duplicates);
+          }
+        }
 
         setData(leaderboardData);
       } catch (err: unknown) {
@@ -139,31 +158,29 @@ export default function Leaderboard({ gameId }: LeaderboardProps) {
                   </div>
 
                   <div className={styles.scoreDetails}>
-                    {score.details.perfectGuess && (
+                    {score.details.babyNameInFirstPosition && (
                       <div
                         className={`${styles.scoreItem} ${styles.perfectGuess}`}
                       >
                         <span className={styles.scoreLabel}>
-                          🌟 Guess perfetto!
+                          ⭐ Nome del bambino al 1° posto!
                         </span>
                         <span className={styles.scoreValue}>
-                          +{score.details.perfectBonus}
+                          +{score.details.pointsForBabyName}
                         </span>
                       </div>
                     )}
-                    {score.details.namesInTop5 > 0 && (
-                      <div className={styles.scoreItem}>
-                        <span className={styles.scoreLabel}>
-                          {score.details.namesInTop5}{" "}
-                          {score.details.namesInTop5 === 1
-                            ? "nome indovinato"
-                            : "nomi indovinati"}
-                        </span>
-                        <span className={styles.scoreValue}>
-                          +{score.details.pointsForNames}
-                        </span>
-                      </div>
-                    )}
+                    {score.details.babyNameGuessed &&
+                      !score.details.babyNameInFirstPosition && (
+                        <div className={styles.scoreItem}>
+                          <span className={styles.scoreLabel}>
+                            Nome del bambino indovinato
+                          </span>
+                          <span className={styles.scoreValue}>
+                            +{score.details.pointsForBabyName}
+                          </span>
+                        </div>
+                      )}
                     {score.details.correctPositions > 0 && (
                       <div className={styles.scoreItem}>
                         <span className={styles.scoreLabel}>
@@ -173,24 +190,87 @@ export default function Leaderboard({ gameId }: LeaderboardProps) {
                             : "posizioni corrette"}
                         </span>
                         <span className={styles.scoreValue}>
-                          +{score.details.pointsForPositions}
+                          +{score.details.pointsForCorrectPositions}
+                        </span>
+                      </div>
+                    )}
+                    {score.details.nearPositions > 0 && (
+                      <div className={styles.scoreItem}>
+                        <span className={styles.scoreLabel}>
+                          {score.details.nearPositions}{" "}
+                          {score.details.nearPositions === 1
+                            ? "nome vicino (distanza 1)"
+                            : "nomi vicini (distanza 1)"}
+                        </span>
+                        <span className={styles.scoreValue}>
+                          +{score.details.pointsForNearPositions}
                         </span>
                       </div>
                     )}
                   </div>
 
-                  {/* Lista dei nomi indovinati */}
-                  {score.guessedNames && score.guessedNames.length > 0 && (
+                  {/* Lista dei nomi con dettaglio punti */}
+                  {score.nameBreakdown && score.nameBreakdown.length > 0 ? (
                     <div className={styles.guessedNames}>
-                      <p className={styles.guessedNamesTitle}>Nomi proposti:</p>
+                      <p className={styles.guessedNamesTitle}>
+                        Dettaglio punteggio per nome:
+                      </p>
                       <ol className={styles.namesList}>
-                        {score.guessedNames.map((name, idx) => (
-                          <li key={idx} className={styles.nameItem}>
-                            {name}
-                          </li>
-                        ))}
+                        {score.nameBreakdown.map((nameDetail, idx) => {
+                          const iconMap = {
+                            babyNameFirst: "⭐",
+                            babyNameGuessed: "🎯",
+                            correctPosition: "✅",
+                            nearPosition: "📍",
+                            farPosition: "○",
+                            wrongName: "✗",
+                          };
+
+                          return (
+                            <li
+                              key={`${score.userId}-${nameDetail.position}`}
+                              className={`${styles.nameItem} ${styles[nameDetail.type]}`}
+                            >
+                              <span className={styles.nameText}>
+                                {iconMap[nameDetail.type]} {nameDetail.name}
+                                {nameDetail.correctPosition !== null && (
+                                  <span className={styles.positionInfo}>
+                                    (pos. corretta: {nameDetail.correctPosition}°)
+                                  </span>
+                                )}
+                              </span>
+                              <span className={styles.namePoints}>
+                                {nameDetail.points > 0 ? (
+                                  <>
+                                    +{nameDetail.points} pt
+                                  </>
+                                ) : (
+                                  <span className={styles.noPoints}>
+                                    0 pt
+                                  </span>
+                                )}
+                              </span>
+                            </li>
+                          );
+                        })}
                       </ol>
                     </div>
+                  ) : (
+                    score.guessedNames &&
+                    score.guessedNames.length > 0 && (
+                      <div className={styles.guessedNames}>
+                        <p className={styles.guessedNamesTitle}>
+                          Nomi proposti:
+                        </p>
+                        <ol className={styles.namesList}>
+                          {score.guessedNames.map((name, idx) => (
+                            <li key={`${score.userId}-name-${idx}`} className={styles.nameItem}>
+                              {name}
+                            </li>
+                          ))}
+                        </ol>
+                      </div>
+                    )
                   )}
                 </div>
               );
