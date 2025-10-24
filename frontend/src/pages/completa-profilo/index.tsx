@@ -109,8 +109,15 @@ export default function CompleteProfile({
             avatarData && "url" in avatarData
               ? {
                   url: (avatarData as { url: string }).url,
-                  formats:
-                    (avatarData as { formats?: unknown }).formats || null,
+                  formats: (
+                    avatarData as {
+                      formats?: {
+                        thumbnail?: { url: string };
+                        small?: { url: string };
+                        medium?: { url: string };
+                      };
+                    }
+                  ).formats,
                 }
               : null,
         })
@@ -224,15 +231,15 @@ export default function CompleteProfile({
         return;
       }
 
-      setProfileSuccess("Profilo aggiornato! Ti reindirizziamo alla dashboard…");
+      setProfileSuccess(
+        "Profilo aggiornato! Ti reindirizziamo alla dashboard…"
+      );
       setTimeout(() => {
         router.replace("/");
       }, 800);
     } catch (error) {
       console.error("Complete profile failed", error);
-      setProfileError(
-        "Impossibile aggiornare il profilo. Riprova più tardi."
-      );
+      setProfileError("Impossibile aggiornare il profilo. Riprova più tardi.");
     } finally {
       setIsSubmitting(false);
     }
@@ -253,7 +260,9 @@ export default function CompleteProfile({
     const normalizedCode = inviteCodeInput.trim().toUpperCase();
 
     if (!normalizedCode) {
-      setInviteError("Inserisci un codice invito valido oppure salta l'operazione.");
+      setInviteError(
+        "Inserisci un codice invito valido oppure salta l'operazione."
+      );
       return;
     }
 
@@ -279,8 +288,8 @@ export default function CompleteProfile({
         typeof error === "string"
           ? error
           : error instanceof Error
-            ? error.message || "Impossibile usare il codice invito."
-            : "Impossibile usare il codice invito. Riprova più tardi.";
+          ? error.message || "Impossibile usare il codice invito."
+          : "Impossibile usare il codice invito. Riprova più tardi.";
       setInviteError(message);
     } finally {
       setIsJoining(false);
