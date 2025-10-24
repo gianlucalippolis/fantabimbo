@@ -20,6 +20,9 @@ I punti vengono assegnati in base a quanto i giocatori si avvicinano all'ordine 
 - **20 punti**: Per **ogni nome** che si trova nella **posizione corretta** rispetto alla lista del genitore (escluso il nome del bambino già conteggiato)
 - **10 punti**: Se un nome è a **una sola posizione di distanza** da quella corretta nella lista del genitore
 
+### Malus:
+- **-10 punti**: Se un giocatore **non indovina neanche uno** dei tre nomi del podio (1°, 2° o 3° posto della lista del genitore)
+
 ### Esempio di Calcolo Punteggio:
 
 **Lista del genitore (ordine corretto):**
@@ -43,6 +46,22 @@ I punti vengono assegnati in base a quanto i giocatori si avvicinano all'ordine 
 ...
 
 **Punteggio totale esempio: 160 punti**
+
+---
+
+**Esempio con Malus:**
+
+**Lista di un altro giocatore (che non indovina nessuno dei primi 3):**
+1. Alice → 0 punti (era al 10°)
+2. Marco → 0 punti (era al 9°)
+3. Chiara → 0 punti (era al 8°)
+4. Emma → **20 punti** (posizione corretta!)
+5. Alessandro → **20 punti** (posizione corretta!)
+...
+
+**Malus:** -10 punti (non ha indovinato nessuno dei nomi del podio: Leonardo 1°, Matteo 2°, Sofia 3°)
+
+**Punteggio totale esempio: 30 punti** (40 punti - 10 malus)
 
 ### Note Importanti:
 - Il nome del bambino (1° nella lista del genitore) vale molti più punti per incentivare la competizione

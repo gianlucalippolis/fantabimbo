@@ -38,6 +38,7 @@ export interface VictoryResult {
       pointsForNames: number; // Punti per nomi indovinati (20 punti per nome)
       pointsForPositions: number; // Punti per posizioni corrette (30 punti per posizione)
       perfectBonus: number; // Bonus per guess perfetto (100 punti)
+      podiumPenalty: number; // -10 punti se non indovina nessuno dei primi 3 nomi
     };
   }>;
   parentPreferences: string[]; // Nomi selezionati dal genitore

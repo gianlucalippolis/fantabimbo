@@ -27,6 +27,7 @@ interface VictoryCalculationResult {
       pointsForBabyName: number; // 100 se al 1° posto, 50 altrimenti
       pointsForCorrectPositions: number; // 20 punti per posizione corretta
       pointsForNearPositions: number; // 10 punti per posizione vicina
+      podiumPenalty: number; // -10 punti se non indovina nessuno dei primi 3 nomi
     };
     guessedNames: string[];
     nameBreakdown: Array<{
@@ -367,6 +368,7 @@ export default factories.createCoreController(
               pointsForBabyName: 0,
               pointsForCorrectPositions: 0,
               pointsForNearPositions: 0,
+              podiumPenalty: 0,
             };
 
             // Array con i dettagli per ogni nome
@@ -484,10 +486,24 @@ export default factories.createCoreController(
               });
             });
 
+            // Regola Malus: -10 punti se non indovina nessuno dei primi 3 nomi del podio
+            // Controlla se ha indovinato almeno uno dei primi 3 nomi in posizione corretta
+            const hasGuessedPodium = nameBreakdown.some(
+              (nb) => 
+                nb.correctPosition !== null &&
+                nb.correctPosition <= 3 &&
+                nb.distance === 0
+            );
+
+            if (!hasGuessedPodium && guessedNames.length > 0) {
+              details.podiumPenalty = -10;
+            }
+
             const score =
               details.pointsForBabyName +
               details.pointsForCorrectPositions +
-              details.pointsForNearPositions;
+              details.pointsForNearPositions +
+              details.podiumPenalty;
 
             return {
               userId: submission.submitter.id,

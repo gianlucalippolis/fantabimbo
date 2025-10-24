@@ -21,6 +21,7 @@ interface PlayerScore {
     pointsForBabyName: number;
     pointsForCorrectPositions: number;
     pointsForNearPositions: number;
+    podiumPenalty: number;
   };
   guessedNames: string[];
   nameBreakdown?: Array<{
@@ -204,6 +205,16 @@ export default function Leaderboard({ gameId }: LeaderboardProps) {
                         </span>
                         <span className={styles.scoreValue}>
                           +{score.details.pointsForNearPositions}
+                        </span>
+                      </div>
+                    )}
+                    {score.details.podiumPenalty < 0 && (
+                      <div className={`${styles.scoreItem} ${styles.penalty}`}>
+                        <span className={styles.scoreLabel}>
+                          ❌ Nessun nome del podio indovinato
+                        </span>
+                        <span className={styles.scoreValue}>
+                          {score.details.podiumPenalty}
                         </span>
                       </div>
                     )}
