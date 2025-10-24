@@ -11,14 +11,12 @@ const api = axios.create({
   },
 });
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 api.interceptors.request.use(async (config: any) => {
   if (typeof window === "undefined") {
     return config;
   }
 
   // Get JWT from Redux store (populated by AuthProvider)
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const state: any = store.getState();
   const token = state?.user?.profile?.jwt ?? null;
 

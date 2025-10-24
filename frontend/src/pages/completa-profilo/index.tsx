@@ -478,7 +478,6 @@ export const getServerSideProps: GetServerSideProps<
   const inviteCode =
     typeof inviteParam === "string" ? inviteParam.trim().toUpperCase() : "";
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const session: any = await getServerSession(
     context.req,
     context.res,

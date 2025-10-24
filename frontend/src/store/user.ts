@@ -3,6 +3,7 @@ import type { AxiosError } from "axios";
 import api from "../lib/axios";
 import { mapStrapiGame } from "../lib/games";
 import type { GameSummary } from "types/game";
+import type { AppDispatch, RootState } from "./index";
 
 export interface UserProfile {
   id: number | string;
@@ -39,7 +40,7 @@ const initialState: UserState = {
 export const fetchGames = createAsyncThunk<
   GameSummary[],
   number | string | null | undefined,
-  { rejectValue: string; state: { user: UserState } }
+  { rejectValue: string; state: RootState; dispatch: AppDispatch }
 >("user/fetchGames", async (explicitUserId, { rejectWithValue, getState }) => {
   try {
     const response = await api.get("/api/games");
@@ -69,7 +70,7 @@ export const fetchGames = createAsyncThunk<
 export const joinGameByCode = createAsyncThunk<
   void,
   { inviteCode: string; userId?: number | string | null },
-  { rejectValue: string }
+  { rejectValue: string; dispatch: AppDispatch; state: RootState }
 >("user/joinGameByCode", async ({ inviteCode, userId }, { dispatch, rejectWithValue }) => {
   const trimmedCode = inviteCode.trim().toUpperCase();
 
