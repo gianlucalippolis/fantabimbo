@@ -358,8 +358,8 @@ export function GamesManager({
         ) : orderedGames.length === 0 ? (
           <p className={styles.gamesEmpty}>
             {canCreateGames
-              ? "Non hai ancora partite attive. Inizia creando la tua lega personale."
-              : "Non hai ancora partite attive. Usa un codice invito per unirti a una lega esistente."}
+              ? "Non hai ancora partite attive. Inizia creando la tua partita personale."
+              : "Non hai ancora partite attive. Usa un codice invito per unirti a una partita esistente."}
           </p>
         ) : (
           orderedGames.map((game) => {
