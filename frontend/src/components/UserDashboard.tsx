@@ -56,7 +56,7 @@ export function UserDashboard({
       {
         title: "Sistema di punteggio - Punti",
         description:
-          "🌟 200 punti: Indovini il nome del bambino al 1° posto • 🎯 50 punti: Indovini il nome del bambino in altra posizione • ✅ 20 punti: Ogni nome nella posizione corretta • 📍 10 punti: Nome a 1 sola posizione di distanza.",
+          "🌟 200 punti: Indovini il nome del bambino al 1° posto\n\n🎯 50 punti: Indovini il nome del bambino in altra posizione\n\n✅ 20 punti: Ogni nome nella posizione corretta\n\n📍 10 punti: Nome a 1 sola posizione di distanza",
       },
       {
         title: "Sistema di punteggio - Malus",
