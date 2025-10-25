@@ -1034,9 +1034,19 @@
 .tutorialBackdrop {
   position: fixed;
   inset: 0;
-  background: rgba(47, 36, 27, 0.45);
-  backdrop-filter: blur(4px);
-  z-index: 30;
+  background: rgba(47, 36, 27, 0.5);
+  backdrop-filter: blur(6px);
+  z-index: 1000;
+  animation: backdropAppear 0.3s ease-out;
+}
+
+@keyframes backdropAppear {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
 }
 
 .tutorialDialog {
@@ -1044,16 +1054,18 @@
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: min(520px, calc(100% - 2.5rem));
+  width: min(540px, calc(100% - 2.5rem));
+  max-height: calc(100vh - 4rem);
+  overflow-y: auto;
   background: #ffffff;
   border-radius: 28px;
-  box-shadow: 0 30px 80px rgba(47, 36, 27, 0.35),
-    0 0 0 1px rgba(194, 160, 131, 0.15);
+  box-shadow: 0 30px 80px rgba(47, 36, 27, 0.45),
+    0 0 0 1px rgba(194, 160, 131, 0.2);
   display: flex;
   flex-direction: column;
   padding: 2.5rem;
   gap: 1.75rem;
-  z-index: 40;
+  z-index: 1010;
   animation: dialogAppear 0.3s ease-out;
 }
 
@@ -1120,19 +1132,21 @@
 .tutorialDialogBody {
   font-size: 1.05rem;
   color: rgba(47, 36, 27, 0.85);
-  line-height: 1.7;
-  padding: 1.5rem;
+  line-height: 1.75;
+  padding: 1.75rem;
   background: linear-gradient(
     135deg,
-    rgba(237, 227, 218, 0.3),
+    rgba(237, 227, 218, 0.35),
     rgba(194, 160, 131, 0.15)
   );
   border-radius: 16px;
-  border: 1px solid rgba(194, 160, 131, 0.2);
+  border: 1px solid rgba(194, 160, 131, 0.25);
+  min-height: 140px;
 }
 
 .tutorialDialogBody p {
   margin: 0;
+  white-space: pre-line;
 }
 
 .tutorialDialogFooter {

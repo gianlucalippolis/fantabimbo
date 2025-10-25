@@ -46,19 +46,27 @@ export function UserDashboard({
           : "Inserisci il codice invito ricevuto dai genitori per unirti alla partita e iniziare a indovinare!",
       },
       {
-        title: "Compila la tua lista di nomi",
-        description:
-          "Scegli fino a 10 nomi e disponili nell'ordine che preferisci. La posizione è importante per il punteggio finale!",
+        title: canCreateGames
+          ? "Inserisci i 10 nomi candidati"
+          : "Ricevi la lista di 10 nomi",
+        description: canCreateGames
+          ? "Come genitore, inserisci 10 nomi candidati e ordinali dal 1° al 10° in base alla tua preferenza. Il primo nome è quello che sceglierai per il bambino! I giocatori vedranno i nomi in ordine casuale."
+          : "Riceverai una lista di 10 nomi scelti dai genitori, ma presentati in ordine casuale. Il tuo obiettivo è riordinarli cercando di indovinare le preferenze del genitore!",
       },
       {
-        title: "Sistema di punteggio",
+        title: "Sistema di punteggio - Punti",
         description:
-          "Guadagni: 200 punti se indovini il nome esatto del bambino al 1° posto, 50 punti se lo indovini in qualsiasi altra posizione, 20 punti per ogni nome nella posizione corretta, 10 punti se un nome è a una sola posizione di distanza.",
+          "🌟 200 punti: Indovini il nome del bambino al 1° posto • 🎯 50 punti: Indovini il nome del bambino in altra posizione • ✅ 20 punti: Ogni nome nella posizione corretta • 📍 10 punti: Nome a 1 sola posizione di distanza.",
+      },
+      {
+        title: "Sistema di punteggio - Malus",
+        description:
+          "⚠️ Attenzione al podio! Se non indovini nessuno dei primi 3 nomi nella posizione corretta, perdi 10 punti. Più ti avvicini alle preferenze del genitore, più punti guadagni!",
       },
       {
         title: "Rivelazione e classifica",
         description:
-          "Allo scadere del countdown, il nome del bambino viene rivelato e puoi vedere la classifica con i punteggi di tutti i partecipanti!",
+          "Allo scadere del countdown, il nome del bambino viene rivelato! Scopri la classifica finale con i punteggi dettagliati di tutti i partecipanti e chi ha vinto la sfida! 🏆",
       },
     ],
     [canCreateGames]
