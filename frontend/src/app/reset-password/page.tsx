@@ -10,7 +10,7 @@ import api from "../../lib/axios";
 function ResetPasswordContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const code = searchParams.get("code");
+  const code = searchParams ? searchParams.get("code") : null;
 
   const [password, setPassword] = useState("");
   const [passwordConfirmation, setPasswordConfirmation] = useState("");
@@ -64,7 +64,11 @@ function ResetPasswordContent() {
       }, 2000);
     } catch (err) {
       console.error("Reset password failed", err);
-      const error = err as { response?: { data?: { error?: { message?: string }; message?: string } } };
+      const error = err as {
+        response?: {
+          data?: { error?: { message?: string }; message?: string };
+        };
+      };
       const errorMessage =
         error.response?.data?.error?.message ||
         error.response?.data?.message ||
@@ -80,7 +84,7 @@ function ResetPasswordContent() {
       <main className={styles.main}>
         <div className={styles.container}>
           <div className={styles.logoContainer}>
-            <Logo size={80} />
+            <Logo />
           </div>
 
           <div className={styles.card}>
@@ -102,12 +106,14 @@ function ResetPasswordContent() {
       <main className={styles.main}>
         <div className={styles.container}>
           <div className={styles.logoContainer}>
-            <Logo size={80} />
+            <Logo />
           </div>
 
           <div className={styles.card}>
             <h1 className={styles.title}>❌ Link non valido</h1>
-            <p className={styles.error} role="alert">{error}</p>
+            <p className={styles.error} role="alert">
+              {error}
+            </p>
             <Link href="/forgot-password" className={styles.primaryButton}>
               Richiedi nuovo link
             </Link>
@@ -121,14 +127,12 @@ function ResetPasswordContent() {
     <main className={styles.main}>
       <div className={styles.container}>
         <div className={styles.logoContainer}>
-          <Logo size={80} />
+          <Logo />
         </div>
 
         <div className={styles.card}>
           <h1 className={styles.title}>Reimposta la password</h1>
-          <p className={styles.description}>
-            Inserisci la tua nuova password.
-          </p>
+          <p className={styles.description}>Inserisci la tua nuova password.</p>
 
           <form className={styles.form} onSubmit={handleSubmit}>
             <div className={styles.formGroup}>
@@ -208,7 +212,7 @@ export default function ResetPassword() {
         <main className={styles.main}>
           <div className={styles.container}>
             <div className={styles.logoContainer}>
-              <Logo size={80} />
+              <Logo />
             </div>
             <div className={styles.card}>
               <p className={styles.description}>Caricamento...</p>
@@ -221,4 +225,3 @@ export default function ResetPassword() {
     </Suspense>
   );
 }
-
