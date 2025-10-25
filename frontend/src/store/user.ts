@@ -118,13 +118,13 @@ export const updateProfile = createAsyncThunk<
   }
 
   try {
-    const response = await api.put(`/api/users/${currentProfile.id}`, {
+    await api.put(`/api/users/${currentProfile.id}`, {
       firstName: trimmedFirstName,
       lastName: trimmedLastName,
     });
 
-    const updatedUser = response.data;
-    const displayName = [updatedUser.firstName, updatedUser.lastName]
+    // Usa i parametri per costruire il displayName invece della risposta del backend
+    const displayName = [trimmedFirstName, trimmedLastName]
       .filter(Boolean)
       .join(" ")
       .trim();

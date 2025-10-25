@@ -9,6 +9,7 @@
 
 .card {
   width: min(720px, 100%);
+  max-width: 100%;
   background: #ffffff;
   border-radius: 28px;
   padding: 2.5rem;
@@ -16,6 +17,7 @@
   border: 1px solid rgba(194, 160, 131, 0.25);
   display: grid;
   gap: 2.5rem;
+  box-sizing: border-box;
 }
 
 .header {
@@ -72,6 +74,8 @@
   font-weight: 700;
   color: #5f4634;
   margin: 0;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 .avatarSection {
@@ -247,16 +251,30 @@
 
 @media (max-width: 640px) {
   .container {
-    padding: 1.5rem 1rem;
+    padding: 1rem;
+    align-items: flex-start;
   }
 
   .card {
-    padding: 1.5rem;
-    gap: 1.5rem;
+    padding: 1.25rem;
+    gap: 1.25rem;
+    border-radius: 20px;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+
+  .backLink {
+    width: 100%;
+    justify-content: center;
+    padding: 0.65rem 1rem;
+    font-size: 0.9rem;
   }
 
   .title {
-    font-size: 1.6rem;
+    font-size: 1.5rem;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
   }
 
   .avatarButton {
@@ -266,6 +284,10 @@
 
   .avatarPlaceholder {
     font-size: 2.5rem;
+  }
+
+  .avatarHint {
+    font-size: 0.85rem;
   }
 
   .infoItem {
@@ -286,8 +308,18 @@
     align-items: flex-start;
   }
 
+  .sectionTitle {
+    font-size: 1.1rem;
+  }
+
   .editLink,
   .editButton {
     width: 100%;
+  }
+
+  .success,
+  .error {
+    padding: 0.875rem 1rem;
+    font-size: 0.9rem;
   }
 }

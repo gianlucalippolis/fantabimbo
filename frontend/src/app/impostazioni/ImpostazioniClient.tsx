@@ -92,7 +92,7 @@ export default function ImpostazioniClient() {
       // Hide success message and redirect after 2 seconds
       setTimeout(() => {
         setUpdateSuccess(false);
-        router.push("/profilo");
+        router.push("/");
       }, 2000);
     } catch (error) {
       setUpdateError(
@@ -113,12 +113,12 @@ export default function ImpostazioniClient() {
             variant="tertiary"
             onClick={() => {
               setIsNavigating(true);
-              router.push("/profilo");
+              router.push("/");
             }}
             isLoading={isNavigating}
             className={styles.backLink}
           >
-            <BackIcon size={20} /> Torna al profilo
+            <BackIcon size={20} /> Torna alla dashboard
           </Button>
           <h1 className={styles.title}>Impostazioni profilo</h1>
           <p className={styles.subtitle}>Modifica le tue informazioni personali</p>
@@ -143,7 +143,7 @@ export default function ImpostazioniClient() {
 
           {updateSuccess && (
             <div className={styles.success} role="alert">
-              ✓ Profilo aggiornato con successo! Reindirizzamento in corso...
+              ✓ Profilo aggiornato con successo! Torno alla dashboard...
             </div>
           )}
 
@@ -198,7 +198,7 @@ export default function ImpostazioniClient() {
                 variant="tertiary"
                 onClick={() => {
                   setIsNavigating(true);
-                  router.push("/profilo");
+                  router.push("/");
                 }}
                 disabled={isUpdating || isNavigating}
               >
