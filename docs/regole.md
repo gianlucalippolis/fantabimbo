@@ -15,7 +15,7 @@ Regole di Base:
 I punti vengono assegnati in base a quanto i giocatori si avvicinano all'ordine corretto stabilito dal genitore:
 
 ### Punti Principali:
-- **100 punti**: Se si indovina il **nome esatto del bambino** (1° posto della lista del genitore) e lo si posiziona al **1° posto** nella propria lista
+- **200 punti**: Se si indovina il **nome esatto del bambino** (1° posto della lista del genitore) e lo si posiziona al **1° posto** nella propria lista
 - **50 punti**: Se si indovina il nome esatto del bambino, anche se **non è al 1° posto** nella propria lista
 - **20 punti**: Per **ogni nome** che si trova nella **posizione corretta** rispetto alla lista del genitore (escluso il nome del bambino già conteggiato)
 - **10 punti**: Se un nome è a **una sola posizione di distanza** da quella corretta nella lista del genitore
@@ -38,14 +38,14 @@ I punti vengono assegnati in base a quanto i giocatori si avvicinano all'ordine 
 10. Alice
 
 **Lista di un giocatore:**
-1. Leonardo → **100 punti** (nome esatto al 1° posto)
+1. Leonardo → **200 punti** (nome esatto al 1° posto)
 2. Sofia → **10 punti** (vicino: era al 3°, ora al 2°)
 3. Matteo → **10 punti** (vicino: era al 2°, ora al 3°)
 4. Emma → **20 punti** (posizione corretta!)
 5. Alessandro → **20 punti** (posizione corretta!)
 ...
 
-**Punteggio totale esempio: 160 punti**
+**Punteggio totale esempio: 260 punti**
 
 ---
 

@@ -24,7 +24,7 @@ interface VictoryCalculationResult {
       babyNameInFirstPosition: boolean; // Se il nome del bambino è al 1° posto
       correctPositions: number; // Numero di posizioni corrette (escluso nome bambino)
       nearPositions: number; // Numero di nomi a distanza 1 dalla posizione corretta
-      pointsForBabyName: number; // 100 se al 1° posto, 50 altrimenti
+      pointsForBabyName: number; // 200 se al 1° posto, 50 altrimenti
       pointsForCorrectPositions: number; // 20 punti per posizione corretta
       pointsForNearPositions: number; // 10 punti per posizione vicina
       podiumPenalty: number; // -10 punti se non indovina nessuno dei primi 3 nomi
@@ -438,11 +438,11 @@ export default factories.createCoreController(
               if (guessedName === normalizedBabyName) {
                 details.babyNameGuessed = true;
                 if (guessedPosition === 1) {
-                  // 100 punti: nome del bambino al 1° posto
-                  points = 100;
+                  // 200 punti: nome del bambino al 1° posto
+                  points = 200;
                   reason = "Nome del bambino al 1° posto! ⭐";
                   details.babyNameInFirstPosition = true;
-                  details.pointsForBabyName = 100;
+                  details.pointsForBabyName = 200;
                   type = 'babyNameFirst';
                 } else {
                   // 50 punti: nome del bambino ma non al 1° posto

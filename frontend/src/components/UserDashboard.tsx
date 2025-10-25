@@ -53,7 +53,7 @@ export function UserDashboard({
       {
         title: "Sistema di punteggio",
         description:
-          "Guadagni: 100 punti se indovini il nome esatto del bambino al 1° posto, 50 punti se lo indovini in qualsiasi altra posizione, 20 punti per ogni nome nella posizione corretta, 10 punti se un nome è a una sola posizione di distanza.",
+          "Guadagni: 200 punti se indovini il nome esatto del bambino al 1° posto, 50 punti se lo indovini in qualsiasi altra posizione, 20 punti per ogni nome nella posizione corretta, 10 punti se un nome è a una sola posizione di distanza.",
       },
       {
         title: "Rivelazione e classifica",
