@@ -240,7 +240,6 @@ export default factories.createCoreController(
 
         const createData = {
           name,
-          slug: name,
           description: description || null,
           prize: prize || null,
           revealAt,
@@ -342,7 +341,6 @@ export default factories.createCoreController(
         }
 
         updateData.name = trimmed;
-        updateData.slug = trimmed;
       }
 
       if (Object.prototype.hasOwnProperty.call(rawPayload, "description")) {

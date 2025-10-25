@@ -352,165 +352,6 @@ export function GamesManager({
         </div>
       ) : null}
 
-      <div className={styles.gamesForms}>
-        {canCreateGames ? (
-          <CollapsibleBox
-            title="Crea una nuova partita"
-            className={styles.createGameAccordion}
-            summaryClassName={styles.createGameSummary}
-          >
-            <form className={styles.gamesForm} onSubmit={handleCreate}>
-              <div className={styles.gamesFormRow}>
-                <label htmlFor="game-name">Nome della partita</label>
-                <p className={styles.inputHint}>
-                  Evita di inserire il nome del bambino: sarà visibile a tutti i
-                  partecipanti.
-                </p>
-                <input
-                  id="game-name"
-                  name="game-name"
-                  type="text"
-                  value={createForm.name}
-                  onChange={(event) =>
-                    handleCreateFieldChange("name", event.target.value)
-                  }
-                  placeholder="Nome della partita"
-                  className={styles.gamesInput}
-                />
-              </div>
-              <div className={styles.gamesFormRow}>
-                <label htmlFor="game-reveal-date">
-                  Data e ora di rivelazione
-                </label>
-                <p className={styles.inputHint}>
-                  Imposta quando il nome verrà svelato a tutti i partecipanti.
-                  Puoi lasciarlo vuoto e aggiornarlo in seguito.
-                </p>
-                <div className={styles.inlineFields}>
-                  <input
-                    id="game-reveal-date"
-                    name="game-reveal-date"
-                    type="date"
-                    value={revealDate}
-                    onChange={(event) => {
-                      setRevealDate(event.target.value);
-                      if (createError) {
-                        setCreateError(null);
-                      }
-                    }}
-                    className={styles.gamesInput}
-                  />
-                  <input
-                    id="game-reveal-time"
-                    name="game-reveal-time"
-                    type="time"
-                    value={revealTime}
-                    onChange={(event) => {
-                      setRevealTime(event.target.value);
-                      if (createError) {
-                        setCreateError(null);
-                      }
-                    }}
-                    className={styles.gamesInput}
-                  />
-                </div>
-              </div>
-              <div className={styles.gamesFormRow}>
-                <label htmlFor="game-description">
-                  Descrizione (opzionale)
-                </label>
-                <textarea
-                  id="game-description"
-                  name="game-description"
-                  rows={2}
-                  value={createForm.description}
-                  onChange={(event) =>
-                    handleCreateFieldChange("description", event.target.value)
-                  }
-                  placeholder="Aggiungi qualche dettaglio per i partecipanti…"
-                  className={styles.gamesTextArea}
-                />
-              </div>
-              <div className={styles.gamesFormRow}>
-                <label htmlFor="game-prize">Premio (opzionale)</label>
-                <p className={styles.inputHint}>
-                  Indica se c&apos;è un premio per il vincitore. Sarà visibile a
-                  tutti i partecipanti.
-                </p>
-                <input
-                  id="game-prize"
-                  name="game-prize"
-                  type="text"
-                  value={createForm.prize}
-                  onChange={(event) =>
-                    handleCreateFieldChange("prize", event.target.value)
-                  }
-                  placeholder="Es. Cena offerta, Trofeo personalizzato…"
-                  className={styles.gamesInput}
-                  maxLength={150}
-                />
-              </div>
-              {createError ? (
-                <div className={styles.gamesError} role="alert">
-                  {createError}
-                </div>
-              ) : null}
-              <button
-                type="submit"
-                className={styles.gamesPrimaryButton}
-                disabled={isCreating}
-              >
-                {isCreating ? "Creazione in corso…" : "Crea partita"}
-              </button>
-            </form>
-          </CollapsibleBox>
-        ) : (
-          <CollapsibleBox
-            title="Hai un codice invito?"
-            className={styles.createGameAccordion}
-            summaryClassName={styles.createGameSummary}
-          >
-            <form className={styles.gamesForm} onSubmit={handleJoin}>
-              <p className={styles.gamesNotice}>
-                Solo i genitori possono creare nuove partite. Inserisci il
-                codice che ti hanno fornito per partecipare.
-              </p>
-              <div className={styles.gamesFormRow}>
-                <label htmlFor="invite-code">Codice invito</label>
-                <input
-                  id="invite-code"
-                  name="invite-code"
-                  type="text"
-                  value={joinCode}
-                  onChange={(event) => {
-                    setJoinCode(event.target.value);
-                    if (joinError) {
-                      setJoinError(null);
-                    }
-                  }}
-                  placeholder="ES. FANTA23"
-                  className={styles.gamesInput}
-                  autoComplete="off"
-                  pattern="[A-Za-z0-9]+"
-                />
-              </div>
-              {joinError ? (
-                <div className={styles.gamesError} role="alert">
-                  {joinError}
-                </div>
-              ) : null}
-              <button
-                type="submit"
-                className={styles.gamesSecondaryButton}
-                disabled={isJoining}
-              >
-                {isJoining ? "Accesso in corso…" : "Unisciti alla partita"}
-              </button>
-            </form>
-          </CollapsibleBox>
-        )}
-      </div>
-
       <div className={styles.gamesList}>
         {isLoadingList ? (
           <p className={styles.gamesEmpty}>Caricamento partite…</p>
@@ -680,6 +521,164 @@ export function GamesManager({
               </article>
             );
           })
+        )}
+      </div>
+      <div className={styles.gamesForms}>
+        {canCreateGames ? (
+          <CollapsibleBox
+            title="Crea una nuova partita"
+            className={styles.createGameAccordion}
+            summaryClassName={styles.createGameSummary}
+          >
+            <form className={styles.gamesForm} onSubmit={handleCreate}>
+              <div className={styles.gamesFormRow}>
+                <label htmlFor="game-name">Nome della partita</label>
+                <p className={styles.inputHint}>
+                  Evita di inserire il nome del bambino: sarà visibile a tutti i
+                  partecipanti.
+                </p>
+                <input
+                  id="game-name"
+                  name="game-name"
+                  type="text"
+                  value={createForm.name}
+                  onChange={(event) =>
+                    handleCreateFieldChange("name", event.target.value)
+                  }
+                  placeholder="Nome della partita"
+                  className={styles.gamesInput}
+                />
+              </div>
+              <div className={styles.gamesFormRow}>
+                <label htmlFor="game-reveal-date">
+                  Data e ora di rivelazione
+                </label>
+                <p className={styles.inputHint}>
+                  Imposta quando il nome verrà svelato a tutti i partecipanti.
+                  Puoi lasciarlo vuoto e aggiornarlo in seguito.
+                </p>
+                <div className={styles.inlineFields}>
+                  <input
+                    id="game-reveal-date"
+                    name="game-reveal-date"
+                    type="date"
+                    value={revealDate}
+                    onChange={(event) => {
+                      setRevealDate(event.target.value);
+                      if (createError) {
+                        setCreateError(null);
+                      }
+                    }}
+                    className={styles.gamesInput}
+                  />
+                  <input
+                    id="game-reveal-time"
+                    name="game-reveal-time"
+                    type="time"
+                    value={revealTime}
+                    onChange={(event) => {
+                      setRevealTime(event.target.value);
+                      if (createError) {
+                        setCreateError(null);
+                      }
+                    }}
+                    className={styles.gamesInput}
+                  />
+                </div>
+              </div>
+              <div className={styles.gamesFormRow}>
+                <label htmlFor="game-description">
+                  Descrizione (opzionale)
+                </label>
+                <textarea
+                  id="game-description"
+                  name="game-description"
+                  rows={2}
+                  value={createForm.description}
+                  onChange={(event) =>
+                    handleCreateFieldChange("description", event.target.value)
+                  }
+                  placeholder="Aggiungi qualche dettaglio per i partecipanti…"
+                  className={styles.gamesTextArea}
+                />
+              </div>
+              <div className={styles.gamesFormRow}>
+                <label htmlFor="game-prize">Premio (opzionale)</label>
+                <p className={styles.inputHint}>
+                  Indica se c&apos;è un premio per il vincitore. Sarà visibile a
+                  tutti i partecipanti.
+                </p>
+                <input
+                  id="game-prize"
+                  name="game-prize"
+                  type="text"
+                  value={createForm.prize}
+                  onChange={(event) =>
+                    handleCreateFieldChange("prize", event.target.value)
+                  }
+                  placeholder="Es. Cena offerta, Trofeo personalizzato…"
+                  className={styles.gamesInput}
+                  maxLength={150}
+                />
+              </div>
+              {createError ? (
+                <div className={styles.gamesError} role="alert">
+                  {createError}
+                </div>
+              ) : null}
+              <button
+                type="submit"
+                className={styles.gamesPrimaryButton}
+                disabled={isCreating}
+              >
+                {isCreating ? "Creazione in corso…" : "Crea partita"}
+              </button>
+            </form>
+          </CollapsibleBox>
+        ) : (
+          <CollapsibleBox
+            title="Hai un codice invito?"
+            className={styles.createGameAccordion}
+            summaryClassName={styles.createGameSummary}
+          >
+            <form className={styles.gamesForm} onSubmit={handleJoin}>
+              <p className={styles.gamesNotice}>
+                Solo i genitori possono creare nuove partite. Inserisci il
+                codice che ti hanno fornito per partecipare.
+              </p>
+              <div className={styles.gamesFormRow}>
+                <label htmlFor="invite-code">Codice invito</label>
+                <input
+                  id="invite-code"
+                  name="invite-code"
+                  type="text"
+                  value={joinCode}
+                  onChange={(event) => {
+                    setJoinCode(event.target.value);
+                    if (joinError) {
+                      setJoinError(null);
+                    }
+                  }}
+                  placeholder="ES. FANTA23"
+                  className={styles.gamesInput}
+                  autoComplete="off"
+                  pattern="[A-Za-z0-9]+"
+                />
+              </div>
+              {joinError ? (
+                <div className={styles.gamesError} role="alert">
+                  {joinError}
+                </div>
+              ) : null}
+              <button
+                type="submit"
+                className={styles.gamesSecondaryButton}
+                disabled={isJoining}
+              >
+                {isJoining ? "Accesso in corso…" : "Unisciti alla partita"}
+              </button>
+            </form>
+          </CollapsibleBox>
         )}
       </div>
 

@@ -17,7 +17,6 @@ export interface GameParticipant {
 export interface GameSummary {
   id: number;
   name: string;
-  slug: string | null;
   description: string | null;
   prize: string | null;
   inviteCode: string;

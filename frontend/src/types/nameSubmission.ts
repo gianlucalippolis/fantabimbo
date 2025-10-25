@@ -32,14 +32,24 @@ export interface VictoryResult {
     score: number;
     guessedNames: string[];
     details: {
-      namesInTop5: number; // Numero di nomi indovinati nei nomi selezionati
-      correctPositions: number; // Numero di posizioni corrette
-      perfectGuess: boolean; // true se tutti i nomi sono corretti nelle posizioni giuste
-      pointsForNames: number; // Punti per nomi indovinati (20 punti per nome)
-      pointsForPositions: number; // Punti per posizioni corrette (30 punti per posizione)
-      perfectBonus: number; // Bonus per guess perfetto (100 punti)
-      podiumPenalty: number; // -10 punti se non indovina nessuno dei primi 3 nomi
+      babyNameGuessed: boolean;
+      babyNameInFirstPosition: boolean;
+      correctPositions: number;
+      nearPositions: number;
+      pointsForBabyName: number;
+      pointsForCorrectPositions: number;
+      pointsForNearPositions: number;
+      podiumPenalty: number;
     };
+    nameBreakdown?: Array<{
+      name: string;
+      position: number;
+      correctPosition: number | null;
+      distance: number | null;
+      points: number;
+      reason: string;
+      type: 'babyNameFirst' | 'babyNameGuessed' | 'correctPosition' | 'nearPosition' | 'farPosition' | 'wrongName';
+    }>;
   }>;
   parentPreferences: string[]; // Nomi selezionati dal genitore
   babyName: string | null;
