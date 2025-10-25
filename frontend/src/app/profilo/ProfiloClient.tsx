@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, useRef, useEffect, FormEvent } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { useAppSelector, useAppDispatch } from "../../store/hooks";
-import { setUserProfile, updateProfile } from "../../store/user";
+import { setUserProfile } from "../../store/user";
 import { useAuth } from "../../providers/AuthProvider";
 import styles from "./page.module.css";
 import api from "../../lib/axios";
@@ -30,23 +31,6 @@ export default function ProfiloClient() {
   const [uploadSuccess, setUploadSuccess] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [isNavigating, setIsNavigating] = useState(false);
-  
-  // Profile update state
-  const [isEditing, setIsEditing] = useState(false);
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [isUpdating, setIsUpdating] = useState(false);
-  const [updateError, setUpdateError] = useState<string | null>(null);
-  const [updateSuccess, setUpdateSuccess] = useState(false);
-
-  // Initialize form with current user data
-  useEffect(() => {
-    if (user?.displayName) {
-      const parts = user.displayName.split(" ");
-      setFirstName(parts[0] || "");
-      setLastName(parts.slice(1).join(" ") || "");
-    }
-  }, [user?.displayName]);
 
   // Redirect to login if not authenticated
   useEffect(() => {
@@ -184,58 +168,6 @@ export default function ProfiloClient() {
     fileInputRef.current?.click();
   }
 
-  async function handleProfileUpdate(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    
-    if (isUpdating) {
-      return;
-    }
-
-    const trimmedFirstName = firstName.trim();
-    const trimmedLastName = lastName.trim();
-
-    if (!trimmedFirstName || !trimmedLastName) {
-      setUpdateError("Nome e cognome sono obbligatori");
-      return;
-    }
-
-    try {
-      setIsUpdating(true);
-      setUpdateError(null);
-      setUpdateSuccess(false);
-
-      await dispatch(updateProfile({
-        firstName: trimmedFirstName,
-        lastName: trimmedLastName,
-      })).unwrap();
-
-      setUpdateSuccess(true);
-      setIsEditing(false);
-
-      // Hide success message after 3 seconds
-      setTimeout(() => {
-        setUpdateSuccess(false);
-      }, 3000);
-    } catch (error) {
-      setUpdateError(
-        typeof error === "string" ? error : "Impossibile aggiornare il profilo. Riprova."
-      );
-    } finally {
-      setIsUpdating(false);
-    }
-  }
-
-  function handleCancelEdit() {
-    // Reset form to current values
-    if (user?.displayName) {
-      const parts = user.displayName.split(" ");
-      setFirstName(parts[0] || "");
-      setLastName(parts.slice(1).join(" ") || "");
-    }
-    setIsEditing(false);
-    setUpdateError(null);
-  }
-
   return (
     <div className={styles.container}>
       <div className={styles.card}>
@@ -305,104 +237,29 @@ export default function ProfiloClient() {
         <div className={styles.infoSection}>
           <div className={styles.sectionHeader}>
             <h2 className={styles.sectionTitle}>Informazioni personali</h2>
-            {!isEditing && (
-              <Button
-                variant="secondary"
-                onClick={() => setIsEditing(true)}
-                className={styles.editButton}
-              >
-                Modifica
+            <Link href="/impostazioni" className={styles.editLink}>
+              <Button variant="secondary" className={styles.editButton}>
+                Modifica profilo
               </Button>
-            )}
+            </Link>
           </div>
 
-          {updateSuccess && (
-            <p className={styles.success} role="alert">
-              ✓ Profilo aggiornato con successo!
-            </p>
-          )}
-
-          {isEditing ? (
-            <form onSubmit={handleProfileUpdate} className={styles.form}>
-              <div className={styles.formGroup}>
-                <label htmlFor="firstName" className={styles.label}>
-                  Nome
-                </label>
-                <input
-                  id="firstName"
-                  type="text"
-                  value={firstName}
-                  onChange={(e) => {
-                    setFirstName(e.target.value);
-                    if (updateError) setUpdateError(null);
-                  }}
-                  className={styles.input}
-                  required
-                  disabled={isUpdating}
-                />
-              </div>
-
-              <div className={styles.formGroup}>
-                <label htmlFor="lastName" className={styles.label}>
-                  Cognome
-                </label>
-                <input
-                  id="lastName"
-                  type="text"
-                  value={lastName}
-                  onChange={(e) => {
-                    setLastName(e.target.value);
-                    if (updateError) setUpdateError(null);
-                  }}
-                  className={styles.input}
-                  required
-                  disabled={isUpdating}
-                />
-              </div>
-
-              {updateError && (
-                <p className={styles.error} role="alert">
-                  {updateError}
-                </p>
-              )}
-
-              <div className={styles.formActions}>
-                <Button
-                  type="button"
-                  variant="tertiary"
-                  onClick={handleCancelEdit}
-                  disabled={isUpdating}
-                >
-                  Annulla
-                </Button>
-                <Button
-                  type="submit"
-                  variant="primary"
-                  isLoading={isUpdating}
-                  disabled={isUpdating}
-                >
-                  {isUpdating ? "Salvataggio..." : "Salva modifiche"}
-                </Button>
-              </div>
-            </form>
-          ) : (
-            <div className={styles.infoGrid}>
-              <div className={styles.infoItem}>
-                <span className={styles.infoLabel}>Nome completo</span>
-                <span className={styles.infoValue}>{displayName}</span>
-              </div>
-              <div className={styles.infoItem}>
-                <span className={styles.infoLabel}>Email</span>
-                <span className={styles.infoValue}>{user.email || "N/A"}</span>
-              </div>
-              <div className={styles.infoItem}>
-                <span className={styles.infoLabel}>Tipo account</span>
-                <span className={styles.infoValue}>
-                  {user.userType === "parent" ? "Genitore" : "Giocatore"}
-                </span>
-              </div>
+          <div className={styles.infoGrid}>
+            <div className={styles.infoItem}>
+              <span className={styles.infoLabel}>Nome completo</span>
+              <span className={styles.infoValue}>{displayName}</span>
             </div>
-          )}
+            <div className={styles.infoItem}>
+              <span className={styles.infoLabel}>Email</span>
+              <span className={styles.infoValue}>{user.email || "N/A"}</span>
+            </div>
+            <div className={styles.infoItem}>
+              <span className={styles.infoLabel}>Tipo account</span>
+              <span className={styles.infoValue}>
+                {user.userType === "parent" ? "Genitore" : "Giocatore"}
+              </span>
+            </div>
+          </div>
         </div>
       </div>
     </div>

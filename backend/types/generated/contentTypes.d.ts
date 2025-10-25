@@ -640,7 +640,6 @@ export interface ApiGameGame extends Struct.CollectionTypeSchema {
     publishedAt: Schema.Attribute.DateTime;
     revealAt: Schema.Attribute.DateTime;
     selectedNames: Schema.Attribute.JSON;
-    slug: Schema.Attribute.UID<'name'> & Schema.Attribute.Required;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;

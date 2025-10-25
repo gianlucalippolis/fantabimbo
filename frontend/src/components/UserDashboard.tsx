@@ -158,6 +158,15 @@ export function UserDashboard({
                 </Link>
               </li>
               <li className={styles.menuItem}>
+                <Link
+                  href="/impostazioni"
+                  className={styles.menuLink}
+                  onClick={closeMenu}
+                >
+                  Impostazioni
+                </Link>
+              </li>
+              <li className={styles.menuItem}>
                 <button
                   type="button"
                   className={styles.menuButton}
