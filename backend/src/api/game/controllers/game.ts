@@ -40,7 +40,6 @@ const USER_FIELDS = ["id", "email", "firstName", "lastName", "userType"];
 const GAME_FIELDS = [
   "id",
   "name",
-  "slug",
   "description",
   "prize",
   "revealAt",
