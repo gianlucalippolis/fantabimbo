@@ -376,7 +376,7 @@ export function GamesManager({
                   <div className={styles.gameCardTitle}>
                     <h3>{game.name}</h3>
                     <span className={styles.gameRole}>
-                      {game.isOwner ? "Creatrice" : "Partecipante"}
+                      {game.isOwner ? "Genitore" : "Partecipante"}
                     </span>
                   </div>
                   {game.description ? (
