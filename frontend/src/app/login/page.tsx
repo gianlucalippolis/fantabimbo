@@ -140,9 +140,9 @@ export default function Login() {
             <div className={styles.var}>
               <div className={styles.labelRow}>
                 <label htmlFor="identifier">Email</label>
-                <a className={styles.helperLink} href="/password-dimenticata">
+                <Link className={styles.helperLink} href="/forgot-password">
                   Password dimenticata?
-                </a>
+                </Link>
               </div>
               <div className={styles.inputGroup}>
                 <span className={styles.inputIcon} aria-hidden="true">
