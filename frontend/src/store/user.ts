@@ -99,6 +99,51 @@ export const joinGameByCode = createAsyncThunk<
   }
 });
 
+export const updateProfile = createAsyncThunk<
+  UserProfile,
+  { firstName: string; lastName: string },
+  { rejectValue: string; state: RootState }
+>("user/updateProfile", async ({ firstName, lastName }, { rejectWithValue, getState }) => {
+  const currentProfile = getState().user.profile;
+  
+  if (!currentProfile?.id) {
+    return rejectWithValue("Profilo utente non trovato.");
+  }
+
+  const trimmedFirstName = firstName.trim();
+  const trimmedLastName = lastName.trim();
+
+  if (!trimmedFirstName || !trimmedLastName) {
+    return rejectWithValue("Nome e cognome sono obbligatori.");
+  }
+
+  try {
+    const response = await api.put(`/api/users/${currentProfile.id}`, {
+      firstName: trimmedFirstName,
+      lastName: trimmedLastName,
+    });
+
+    const updatedUser = response.data;
+    const displayName = [updatedUser.firstName, updatedUser.lastName]
+      .filter(Boolean)
+      .join(" ")
+      .trim();
+
+    return {
+      ...currentProfile,
+      displayName,
+    };
+  } catch (error) {
+    console.error("Profile update failed", error);
+    const err = error as AxiosError<{ error?: { message?: string } }>;
+    return rejectWithValue(
+      err.response?.data?.error?.message ??
+        err.message ??
+        "Impossibile aggiornare il profilo. Riprova più tardi."
+    );
+  }
+});
+
 const userSlice = createSlice({
   name: "user",
   initialState,
@@ -132,6 +177,10 @@ const userSlice = createSlice({
       .addCase(fetchGames.rejected, (state, action) => {
         state.gamesStatus = "failed";
         state.gamesError = action.payload ?? action.error.message ?? null;
+      })
+      .addCase(updateProfile.fulfilled, (state, action) => {
+        state.profile = action.payload;
+        state.lastUpdated = Date.now();
       });
   },
 });
